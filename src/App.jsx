@@ -1,6 +1,7 @@
 import React from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import LoginScreen from './screens/LoginScreen';
+import AppNavigation from './navigation/AppNavigation';
 
 export default function App() {
   /*
@@ -11,5 +12,5 @@ export default function App() {
     </SafeAreaView>
   );
   */
-  return <LoginScreen />;
+  return<AppNavigation></AppNavigation>;
 }
