@@ -21,11 +21,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 80,
-    backgroundColor: '#fff',
+    backgroundColor: '#192936',
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
+    color: '#fff',
     fontWeight: '700',
     marginBottom: 30,
   },
