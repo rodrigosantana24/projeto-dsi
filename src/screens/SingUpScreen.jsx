@@ -5,19 +5,21 @@ import { Logo } from '../components/Logo';
 import { TextInput } from '../components/LoginTextInput';
 import { LoginButton } from '../components/LoginButton';
 
-export default function LoginScreen({ navigation }) {
+export default function SingUpScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#192936" barStyle="light-content" />
       <Logo />
-      <Text style={styles.title}>Login</Text>
+      <Text style={styles.title}>Cadastro</Text>
+      <TextInput style={styles.input} placeholder="Nome" secure={false} iconName="person"/>
       <TextInput style={styles.input} placeholder="E-mail" secure={false} iconName="mail-outline" />
       <TextInput style={styles.input} placeholder="Senha" secure={true} iconName="eye-outline" />
-      <LoginButton title="Entrar" onPress={() => navigation.navigate("Home")}/>
-      <Text style={styles.footerText}>
-        Não tem conta? {' '}
-        <Text style={styles.cadastro} onPress={() => navigation.navigate('SingUp')}>Cadastre-se!</Text>
-        </Text>
+      <TextInput style={styles.input} placeholder="Confirmar Senha" secure={true} iconName="eye-outline" />
+      <LoginButton title="Cadastrar" onPress={() => navigation.navigate("Home")}/>
+        <Text style={styles.footerText}>
+                Já tem conta? {' '}
+                <Text style={styles.cadastro} onPress={() => navigation.navigate('Login')}>Faça o Login!</Text>
+                </Text>
     </View>
   );
 }
@@ -26,7 +28,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 80,
+    paddingTop: 40,
     backgroundColor: '#192936',
     alignItems: 'center',
   },
