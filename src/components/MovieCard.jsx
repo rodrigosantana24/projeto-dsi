@@ -3,8 +3,8 @@ import { View, ImageBackground, Text, StyleSheet } from 'react-native';
 
 export default function MovieCard({ title, image }) {
   return (
-    <View style={styles.card}>
-      <ImageBackground source={image} style={styles.image} imageStyle={styles.imageStyle}>
+    <View style={styles.session}>
+      <ImageBackground source={image} style={styles.image}>
         <View style={styles.textContainer}>
             <Text style={styles.title}>{title}</Text>
         </View>
@@ -14,10 +14,9 @@ export default function MovieCard({ title, image }) {
 }
 
 const styles = StyleSheet.create({
-    card: {
+    session: {
       width: 250,
       height: 150,
-      borderRadius: 12,
       overflow: 'hidden',
       marginRight: 15,
     },
@@ -25,11 +24,8 @@ const styles = StyleSheet.create({
       flex: 1,
       justifyContent: 'flex-end',
     },
-    imageStyle: {
-      borderRadius: 12,
-    },
     textContainer: {
-      padding: 20,
+      padding: 10,
     },
     title: {
       color: 'white',
