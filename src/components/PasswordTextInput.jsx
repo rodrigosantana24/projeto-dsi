@@ -1,16 +1,26 @@
-import React from 'react';
-import { View, TextInput as RNInput, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput as RNInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export function LoginTextInput({ placeHolder, iconName }) {
+export function PasswordTextInput({placeHolder}) {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <View style={styles.container}>
       <RNInput
         placeholder={placeHolder}
-        style={styles.input}
         placeholderTextColor="#999"
+        secureTextEntry={!showPassword}
+        style={styles.input}
       />
-      <Ionicons name={ iconName } size={20} style={styles.icon} />
+      
+      <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+        <Ionicons
+          name={showPassword ? 'eye' : 'eye-off'}
+          size={20}
+          style={styles.icon}
+        />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -25,7 +35,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 8,
     height: 50,
-    
   },
   input: {
     flex: 1,

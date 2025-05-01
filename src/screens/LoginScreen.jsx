@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
 import { StatusBar } from 'react-native'
 import { Logo } from '../components/Logo';
-import { TextInput } from '../components/LoginTextInput';
+import { LoginTextInput } from '../components/LoginTextInput';
+import { PasswordTextInput } from '../components/PasswordTextInput';
 import { LoginButton } from '../components/LoginButton';
 
 export default function LoginScreen({ navigation }) {
@@ -11,8 +12,8 @@ export default function LoginScreen({ navigation }) {
       <StatusBar backgroundColor="#192936" barStyle="light-content" />
       <Logo />
       <Text style={styles.title}>Login</Text>
-      <TextInput style={styles.input} placeholder="E-mail" secure={false} iconName="mail-outline" />
-      <TextInput style={styles.input} placeholder="Senha" secure={true} iconName="eye-outline" />
+      <LoginTextInput placeHolder={"Login"} iconName={"mail-outline"} />
+      <PasswordTextInput placeHolder={"Senha"}/>
       <LoginButton title="Entrar" onPress={() => navigation.navigate("Home")}/>
       <Text style={styles.footerText}>
         Não tem conta? {' '}
