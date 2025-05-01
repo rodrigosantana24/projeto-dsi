@@ -26,13 +26,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 8,
     height: 50,
+    
   },
   input: {
     flex: 1,
     fontSize: 16,
+    color: "#fff",
   },
   icon: {
     marginLeft: 10,
-    color: '#666',
+    color: '#fff',
   },
 });

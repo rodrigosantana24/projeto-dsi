@@ -1,0 +1,28 @@
+import React from 'react';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+
+export function LoginButton({ title, onPress }) {
+  return (
+    <TouchableOpacity style={styles.button} onPress={onPress}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+const styles = StyleSheet.create({
+  button: {
+    backgroundColor: '#f4a03f', // laranja
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 999, // deixa o botão oval
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
