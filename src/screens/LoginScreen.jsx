@@ -16,7 +16,7 @@ export default function LoginScreen({ navigation }) {
       <LoginButton title="Entrar" onPress={() => navigation.navigate("Home")}/>
       <Text style={styles.footerText}>
         Não tem conta? {' '}
-        <Text style={styles.cadastro} onPress={() => navigation.navigate('Cadastro')}>Cadastre-se</Text>
+        <Text style={styles.cadastro} onPress={() => navigation.navigate('Cadastro')}>Cadastre-se!</Text>
         </Text>
     </View>
   );
@@ -47,6 +47,8 @@ const styles = StyleSheet.create({
   },
   cadastro:{
     color:'#f4a03f',
+    fontWeight: 'bold',
+    fontSize: 16,
 
   }
 });
