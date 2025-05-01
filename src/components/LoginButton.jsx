@@ -11,10 +11,10 @@ export function LoginButton({ title, onPress }) {
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#f4a03f', // laranja
+    backgroundColor: '#f4a03f', 
     paddingVertical: 12,
     paddingHorizontal: 32,
-    borderRadius: 999, // deixa o botão oval
+    borderRadius: 999, 
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 20,
