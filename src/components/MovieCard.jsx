@@ -15,8 +15,8 @@ export default function MovieCard({ title, image }) {
 
 const styles = StyleSheet.create({
     session: {
-      width: 250,
-      height: 150,
+      width: 125,
+      height: 200,
       overflow: 'hidden',
       marginRight: 15,
     },
@@ -25,11 +25,17 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-end',
     },
     textContainer: {
-      padding: 10,
+      position: 'absolute',
+      right: 1,
+      bottom: 4,
+      backgroundColor: 'rgba(0,0,0,0.8)',
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 6,
     },
     title: {
       color: 'white',
-      fontSize: 14,
+      fontSize: 10,
       fontWeight: 'bold',
     }
   });
