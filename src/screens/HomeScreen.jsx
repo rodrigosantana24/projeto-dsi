@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList} from 'react-native';
+import { View, ScrollView, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import BottomTab from '../components/BottomTab';
 import { Logo } from '../components/Logo';
 import SearchBar from '../components/SearchBar';
 import SectionCarousel from '../components/SectionCarousel';
 import FeaturedCarousel from '../components/FeaturedCarousel';
+
+const Filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama'];
 
 const movieListTest = [
   { 
@@ -41,20 +43,28 @@ export default function HomeScreen( { navigation} ) {
       
       return (
         <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Encontre seu filme preferido!</Text>
-            <Logo style={{ width: 75, height: 75 }}/>
-          </View>
-          <View style={styles.body}>
-            <SearchBar />
-            <FeaturedCarousel data={movieListTest} />
-            <SectionCarousel
-              title="Ação e Aventura"
+          <ScrollView>
+            <View style={styles.header}>
+              <Text style={styles.headerText}>Encontre seu filme preferido!</Text>
+              <Logo style={{ width: 75, height: 75 }}/>
+            </View>
+            <View style={styles.body}>
+              <SearchBar />
+              <FeaturedCarousel data={movieListTest} />
+              <SectionCarousel
+                title="Ação e Aventura"
+                data={movieListTest}
+                onViewAll={() => handleViewAll('Ação e Aventura')}
+                contentContainerStyle={{ paddingLeft: 0 }}
+                />
+              <SectionCarousel
+              title="Drama e Suspense"
               data={movieListTest}
-              onViewAll={() => handleViewAll('Ação e Aventura')}
-              contentContainerStyle={{ paddingLeft: 20 }} style={styles.section}
+              onViewAll={() => handleViewAll('Drama e Suspense')}
+              contentContainerStyle={{ paddingLeft: 0 }}
               />
-          </View>
+            </View>
+          </ScrollView>
           <View style={styles.footer}>
             <BottomTab />
           </View>

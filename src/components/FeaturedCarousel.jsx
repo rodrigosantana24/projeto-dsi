@@ -59,7 +59,6 @@ const styles = StyleSheet.create({
         width: width,
         height: 220,
         justifyContent: 'flex-end',
-        padding: 10,
         marginTop: 20,
     },
     imageStyle: {
@@ -67,16 +66,24 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     overlay: {
-        padding: 20,
+        position: 'absolute',
+        right: 35,
+        bottom: 10,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 6,
     },
     title: {
         color: 'white',
-        fontSize: 16,
+        fontSize: 12,
         fontWeight: 'bold',
     },
     dotsContainer: {
+        position: 'absolute',
+        bottom: 16,
+        left: 16,
         flexDirection: 'row',
-        justifyContent: 'center',
     },
     dot: {
         width: 8,

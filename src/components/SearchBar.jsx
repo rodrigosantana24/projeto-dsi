@@ -25,17 +25,17 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 25,
     paddingHorizontal: 15,
-    marginVertical: 8,
-    height: 50,
+    height: 40,
   },
   input: {
     flex: 1,
-    fontSize: 16,
+    fontSize: 14,
     color: "#fff",
     justifyContent: 'center',
   },
   icon: {
     marginLeft: 10,
     color: '#fff',
+    fontSize: 14,
   },
 });
