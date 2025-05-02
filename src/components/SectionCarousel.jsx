@@ -37,8 +37,7 @@ export default function SectionCarousel({
 
 const styles = StyleSheet.create({
   section: {
-    marginBottom: 12,
-    marginTop: 12,
+    marginTop: 14,
   },
   header: {
     flexDirection: 'row',
