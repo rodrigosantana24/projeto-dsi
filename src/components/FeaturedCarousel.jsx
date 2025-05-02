@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         width: width,
         height: 220,
         justifyContent: 'flex-end',
-        marginTop: 20,
+        marginTop: 10,
     },
     imageStyle: {
         width: '100%',

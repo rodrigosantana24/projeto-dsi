@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, ScrollView, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, ScrollView, Text, StyleSheet} from 'react-native';
 import BottomTab from '../components/BottomTab';
 import { Logo } from '../components/Logo';
 import SearchBar from '../components/SearchBar';
 import SectionCarousel from '../components/SectionCarousel';
 import FeaturedCarousel from '../components/FeaturedCarousel';
+import FilterChips from '../components/FilterChips';
 
-const Filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama'];
+const filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama'];
 
 const movieListTest = [
   { 
@@ -50,6 +51,10 @@ export default function HomeScreen( { navigation} ) {
             </View>
             <View style={styles.body}>
               <SearchBar />
+              <FilterChips
+                filters={filtros}
+                onSelect={(filter) => console.log('Filtro selecionado:', filter)}
+              />
               <FeaturedCarousel data={movieListTest} />
               <SectionCarousel
                 title="Ação e Aventura"
@@ -83,6 +88,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 10,
+    marginBottom: -10,
     zIndex: 1,
   },
   headerText: {

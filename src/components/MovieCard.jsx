@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
       height: 200,
       overflow: 'hidden',
       marginRight: 15,
+      borderRadius: 4,
     },
     image: {
       flex: 1,
