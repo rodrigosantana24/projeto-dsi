@@ -1,4 +1,4 @@
-import Config from "react-native-config";
+
 
 
 export default function MockLogin(email, senha) {
