@@ -9,7 +9,7 @@ import { LoginTextInput } from '../components/LoginTextInput';
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState(); 
-  const {isLoading,error,data,handleLogin} = useLogin()
+  const {isLoading,error,data,handleLogin} = useLogin(navigation)
 
 
   const login = ()=>{
@@ -38,7 +38,7 @@ export default function LoginScreen({ navigation }) {
          onPress={login}/>
          
 
-      {error && <Text style={styles.footerText}>{error}</Text>}
+      {error && <Text style={styles.errorText}>{error}</Text>}
       <Text style={styles.footerText}>
         Não tem conta? {' '}
         <Text style={styles.cadastro} onPress={() => navigation.navigate('SingUp')}>Cadastre-se!</Text>
@@ -77,5 +77,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
 
-  }
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
