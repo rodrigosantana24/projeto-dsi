@@ -2,18 +2,17 @@ import React from 'react';
 import { View, TextInput as RNInput, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-export function TextInput({ placeholder, secure, iconName ,onChangeText,valueText }) {
+export function LoginTextInput({ placeHolder, iconName ,onChangeText,value}) {
   return (
     <View style={styles.container}>
       <RNInput
-        value={valueText}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        secureTextEntry={secure}
+        placeholder={placeHolder}
         style={styles.input}
         placeholderTextColor="#999"
+        onChangeText={onChangeText}
+        value={value}
       />
-      <Ionicons name={iconName} size={20} style={styles.icon} />
+      <Ionicons name={ iconName } size={20} style={styles.icon} />
     </View>
   );
 }
@@ -28,11 +27,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginVertical: 8,
     height: 50,
+    
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color:"#fff"
+    color: "#fff",
   },
   icon: {
     marginLeft: 10,
