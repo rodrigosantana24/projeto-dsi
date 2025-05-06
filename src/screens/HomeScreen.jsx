@@ -11,8 +11,18 @@ const filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama']
 
 const movieListTest = [
   { 
-    title: 'Velozes e Furiosos 10',
-    image: require('../assets/velozes_furiosos.jpg'),
+    title: 'Tropa de Elite 2',
+    image: require('../assets/teste6.webp'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'Pecadores',
+    image: require('../assets/teste5.jpg'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'Morbius',
+    image: require('../assets/teste2.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
@@ -21,13 +31,49 @@ const movieListTest = [
     themeSession: 'Mais Assistidos',
   },
   { 
-    title: 'Velozes e Furiosos 10',
-    image: require('../assets/velozes_furiosos.jpg'),
+    title: 'The Beast Within',
+    image: require('../assets/teste1.png'),
+    themeSession: 'Mais Assistidos',
+  }
+];
+
+const movieListTest2 = [
+  { 
+    title: 'Titanic',
+    image: require('../assets/teste7.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
-    title: 'Velozes e Furiosos 10',
-    image: require('../assets/velozes_furiosos.jpg'),
+    title: 'Premonição 6',
+    image: require('../assets/teste8.webp'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'Tropa de Elite 2',
+    image: require('../assets/teste6.webp'),
+    themeSession: 'Mais Assistidos',
+  }
+];
+
+const movieListTest3 = [
+  { 
+    title: 'O Retrato',
+    image: require('../assets/teste10.webp'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'Harry Potter',
+    image: require('../assets/teste11.jpg'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'Pantera Negra',
+    image: require('../assets/teste12.jpg'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    title: 'The Beast Within',
+    image: require('../assets/teste8.webp'),
     themeSession: 'Mais Assistidos',
   }
 ];
@@ -55,7 +101,7 @@ export default function HomeScreen( { navigation} ) {
                 filters={filtros}
                 onSelect={(filter) => console.log('Filtro selecionado:', filter)}
               />
-              <FeaturedCarousel data={movieListTest} />
+              <FeaturedCarousel data={movieListTest3} />
               <SectionCarousel
                 title="Ação e Aventura"
                 data={movieListTest}
@@ -64,7 +110,7 @@ export default function HomeScreen( { navigation} ) {
                 />
               <SectionCarousel
               title="Drama e Suspense"
-              data={movieListTest}
+              data={movieListTest2}
               onViewAll={() => handleViewAll('Drama e Suspense')}
               contentContainerStyle={{ paddingLeft: 0 }}
               />
