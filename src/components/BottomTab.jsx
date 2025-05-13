@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: 4,
     marginHorizontal: 4,
   },
   selectedTabContainer: {

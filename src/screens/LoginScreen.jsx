@@ -36,9 +36,12 @@ export default function LoginScreen({ navigation }) {
          title={isLoading ? "Carregando..." : "Entrar"} 
          disabled={isLoading}
          onPress={login}/>
+      {error && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
          
-
-      {error && <Text style={styles.errorText}>{error}</Text>}
       <Text style={styles.footerText}>
         Não tem conta? {' '}
         <Text style={styles.cadastro} onPress={() => navigation.navigate('SingUp')}>Cadastre-se!</Text>
@@ -76,13 +79,20 @@ const styles = StyleSheet.create({
     color:'#f4a03f',
     fontWeight: 'bold',
     fontSize: 16,
-
   },
   errorText: {
-    color: 'red',
-    marginTop: 10,
+    color: '#F44336',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  errorContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.237)',
+    borderWidth: 1,
+    borderColor: '#F44336',
+    borderRadius: 4,
+    padding: 8,
+    marginTop: 10,
+    width: '100%',
   },
 });
