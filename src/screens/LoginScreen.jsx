@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LoginButton } from '../components/LoginButton';
-import { Logo } from '../components/Logo';
-import { PasswordTextInput } from '../components/PasswordTextInput';
+import { LoginButton } from '../components/buttons/LoginButton';
+import { Logo } from '../components/logo/Logo';
+import { PasswordTextInput } from '../components/inputs/PasswordTextInput';
 import { useLogin } from '../hooks/useLogin';
 import { useState } from 'react';
-import { LoginTextInput } from '../components/LoginTextInput';
+import { LoginTextInput } from '../components/inputs/LoginTextInput';
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState(); 
