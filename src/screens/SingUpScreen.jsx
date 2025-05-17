@@ -1,10 +1,10 @@
 // src/screens/SingUpScreen.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, StatusBar } from 'react-native';
-import { Logo } from '../components/Logo';
-import { LoginTextInput } from '../components/LoginTextInput';
-import { PasswordTextInput } from '../components/PasswordTextInput';
-import { LoginButton } from '../components/LoginButton';
+import { Logo } from '../components/logo/Logo';
+import { LoginTextInput } from '../components/inputs/LoginTextInput';
+import { PasswordTextInput } from '../components/inputs/PasswordTextInput';
+import { LoginButton } from '../components/buttons/LoginButton';
 import { useSignUp } from '../hooks/useSignUp';
 
 
