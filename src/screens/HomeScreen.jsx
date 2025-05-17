@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ScrollView, Text, StyleSheet} from 'react-native';
-import BottomTab from '../components/BottomTab';
-import { Logo } from '../components/Logo';
-import SearchBar from '../components/SearchBar';
+import BottomTab from '../components/navi/BottomTab';
+import { Logo } from '../components/logo/Logo';
+import SearchBar from '../components/search/SearchBar';
 import SectionCarousel from '../components/SectionCarousel';
-import FeaturedCarousel from '../components/FeaturedCarousel';
-import FilterChips from '../components/FilterChips';
+import FeaturedCarousel from '../components/carousels/FeaturedCarousel';
+import FilterChips from '../components/chips/FilterChips';
 
 const filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama'];
 

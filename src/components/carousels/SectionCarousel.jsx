@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import MovieCard from './MovieCard';
+import MovieCard from './cards/MovieCard';
 
 export default function SectionCarousel({
   title,
