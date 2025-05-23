@@ -3,7 +3,7 @@ import { View, ScrollView, Text, StyleSheet} from 'react-native';
 import BottomTab from '../components/navi/BottomTab';
 import { Logo } from '../components/logo/Logo';
 import SearchBar from '../components/search/SearchBar';
-import SectionCarousel from '../components/SectionCarousel';
+import SectionCarousel from '../components/carousels/SectionCarousel';
 import FeaturedCarousel from '../components/carousels/FeaturedCarousel';
 import FilterChips from '../components/chips/FilterChips';
 
@@ -12,27 +12,27 @@ const filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama']
 const movieListTest = [
   { 
     title: 'Tropa de Elite 2',
-    image: require('../assets/teste6.webp'),
+    image: require('../assets/cards/teste6.webp'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Pecadores',
-    image: require('../assets/teste5.jpg'),
+    image: require('../assets/cards/teste5.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Morbius',
-    image: require('../assets/teste2.jpg'),
+    image: require('../assets/cards/teste2.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Velozes e Furiosos 10',
-    image: require('../assets/velozes_furiosos.jpg'),
+    image: require('../assets/cards/velozes_furiosos.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'The Beast Within',
-    image: require('../assets/teste1.png'),
+    image: require('../assets/cards/teste1.png'),
     themeSession: 'Mais Assistidos',
   }
 ];
@@ -40,17 +40,17 @@ const movieListTest = [
 const movieListTest2 = [
   { 
     title: 'Titanic',
-    image: require('../assets/teste7.jpg'),
+    image: require('../assets/cards/teste7.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Premonição 6',
-    image: require('../assets/teste8.webp'),
+    image: require('../assets/cards/teste8.webp'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Tropa de Elite 2',
-    image: require('../assets/teste6.webp'),
+    image: require('../assets/cards/teste6.webp'),
     themeSession: 'Mais Assistidos',
   }
 ];
@@ -58,22 +58,22 @@ const movieListTest2 = [
 const movieListTest3 = [
   { 
     title: 'O Retrato',
-    image: require('../assets/teste10.webp'),
+    image: require('../assets/cards/teste10.webp'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Harry Potter',
-    image: require('../assets/teste11.jpg'),
+    image: require('../assets/cards/teste11.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'Pantera Negra',
-    image: require('../assets/teste12.jpg'),
+    image: require('../assets/cards/teste12.jpg'),
     themeSession: 'Mais Assistidos',
   },
   { 
     title: 'The Beast Within',
-    image: require('../assets/teste8.webp'),
+    image: require('../assets/cards/teste8.webp'),
     themeSession: 'Mais Assistidos',
   }
 ];

@@ -4,7 +4,7 @@ import { View, Image, StyleSheet } from 'react-native';
 export function Logo({ style = {} }) {
   return (
     <View style={styles.logoContainer}>
-      <Image source={require('../assets/ruralflix.png')} style={[styles.logo, style]} resizeMode="contain" />
+      <Image source={require('../../assets/logo/ruralflix.png')} style={[styles.logo, style]} resizeMode="contain" />
     </View>
   );
 }
