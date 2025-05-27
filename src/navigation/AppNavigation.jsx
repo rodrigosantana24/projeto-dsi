@@ -2,6 +2,7 @@ import React from 'react';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
+import MenuScreen from '../screens/MenuScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -23,6 +24,11 @@ const AppNavigation = ()=> {
            name="SingUp" 
            component={SingUpScreen} 
            options={{ headerShown: false }}/>
+        <Stack.Screen
+          name="Menu"
+          component={MenuScreen} 
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
