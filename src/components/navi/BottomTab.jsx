@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function BottomTab() {
 
-  const [selected, setSelected] = useState('Home');
+  const route = useRoute();
+  const navigation = useNavigation();
 
   const tabs = [
     { key: 'Home', label: 'Home', icon: 'home-outline' },
@@ -13,10 +15,16 @@ export default function BottomTab() {
     { key: 'Menu', label: 'Menu', icon: 'menu-outline' },
   ];
 
+  const handlePress = (tab) => {
+          navigation.navigate(tab.key)
+        }
+
   return (
     <View style={styles.bottomTab}>
       {tabs.map(tab => {
-        const isSelected = selected === tab.key;
+        const isSelected = route.name === tab.key;
+
+        
         return (
           <View
             key={tab.key}
@@ -25,7 +33,7 @@ export default function BottomTab() {
             <TouchableOpacity
               style={styles.tabItem}
               activeOpacity={0.7}
-              onPress={() => setSelected(tab.key)}
+              onPress={() => handlePress(tab)}
             >
               <Icon
                 name={tab.icon}
