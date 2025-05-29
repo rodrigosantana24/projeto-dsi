@@ -3,6 +3,7 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
 import MenuScreen from '../screens/MenuScreen';
+import ToWatch from '../screens/ToWatchScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -23,11 +24,17 @@ const AppNavigation = ()=> {
         <Stack.Screen
            name="SingUp" 
            component={SingUpScreen} 
-           options={{ headerShown: false }}/>
+           options={{ headerShown: false }}
+           />
         <Stack.Screen
           name="Menu"
           component={MenuScreen} 
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ToWatch" 
+          component={ToWatch}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
