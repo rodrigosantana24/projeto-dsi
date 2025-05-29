@@ -1,37 +1,53 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList } from "react-native";
-import MovieCard from "../components/cards/MovieCard";
+import ListCard from "../components/cards/ListsCard";
 
 const moviesToWatch = [
   { 
+    id: '1',
     title: 'Tropa de Elite 2',
     image: require('../assets/cards/teste6.webp'),
     themeSession: 'Assistir mais tarde',
   },
-
   { 
+    id: '2',
     title: 'Velozes e Furiosos 10',
     image: require('../assets/cards/velozes_furiosos.jpg'),
     themeSession: 'Assistir mais tarde',
   },
+  { 
+    id: '3',
+    title: 'Harry Potter',
+    image: require('../assets/cards/teste11.jpg'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    id: '4',
+    title: 'Pantera Negra',
+    image: require('../assets/cards/teste12.jpg'),
+    themeSession: 'Mais Assistidos',
+  },
+  { 
+    id: '5',
+    title: 'The Beast Within',
+    image: require('../assets/cards/teste8.webp'),
+    themeSession: 'Mais Assistidos',
+  }
 ];
 
 export default function ToWatch() {
   const renderMovieItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.movieCardItemContainer}
-      onPress={() => console.log("Pressed:", item.title)} 
-    >
-      <MovieCard
-        title={item.title}
-        image={item.image}
-      />
-    </TouchableOpacity>
+    <ListCard
+      title={item.title}
+      image={item.image}
+      onPress={() => console.log("Card:", item.title)} 
+      style={styles.movieCardStyle} 
+    />
   );
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.headerSection}>
         <Text style={styles.title}>Assistir mais tarde</Text>
         <View style={styles.divider} />
         <TouchableOpacity style={styles.filterButton}>
@@ -42,8 +58,11 @@ export default function ToWatch() {
       <FlatList
         data={moviesToWatch}
         renderItem={renderMovieItem}
-        keyExtractor={(item) => item.id || item.title} 
-        contentContainerStyle={styles.flatListContentContainer}
+        keyExtractor={(item) => item.id} 
+        numColumns={2}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.flatListContentContainer} 
+        columnWrapperStyle={styles.columnWrapperStyle}
       />
 
       <TouchableOpacity style={styles.addButton}>
@@ -57,8 +76,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#192936", 
-    paddingTop: 40,
-    paddingHorizontal: 20,
+    paddingTop: 50,
+  },
+  headerSection: {
+    paddingHorizontal: 15, 
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
@@ -69,12 +91,10 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#ccc', 
-    marginTop: 0,
     marginBottom: 20,       
   },
   filterButton: {
     alignSelf: "flex-start",
-    marginBottom: 20,
     borderWidth: 1.5,
     borderColor: "#f4a03f",  
     backgroundColor: "transparent",
@@ -86,21 +106,26 @@ const styles = StyleSheet.create({
     color: "#f4a03f",
     fontSize: 16,
   },
- scrollContentContainer: {
-    paddingHorizontal: 20, 
-    paddingBottom: 20,
-    alignItems: 'center', 
+ flatListContentContainer: {
+    paddingHorizontal: 10, 
+    paddingBottom: 20, 
   },
-  movieCardItemContainer: {
-    marginBottom: 16, 
+  columnWrapperStyle: {
+    justifyContent: 'space-between', 
   },
+  movieCardStyle: {
+    marginHorizontal: 5, 
+    marginBottom: 15,
+  },  
   addButton: {
     backgroundColor: "#f4a03f", 
     paddingVertical: 15,
     borderRadius: 25,
     alignItems: "center",
-    marginTop: 20,
-    marginBottom: 30,
+    marginTop: 10,
+    marginBottom: 35,
+    width: "90%", 
+    alignSelf: "center",
   },
   addButtonText: {
     color: "#fff",
