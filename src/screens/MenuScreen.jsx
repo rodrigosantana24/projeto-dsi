@@ -3,28 +3,56 @@ import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
+import { useNavigation, useRoute } from '@react-navigation/native';
+import ToWatch from './ToWatchScreen';
+
 
 const ProfileScreen = () => {
-    return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.header}>
-                    <Text style={styles.username}>Nome de usuário</Text>
-                    <FontAwesome name="user-circle-o" size={80} color="white"/>
-                </View>
+  const navigation = useNavigation();
+  const route = useRoute();
 
-            <ProfileButton icon={<Ionicons name="eye-outline" size={24} color={"white"}/>} text="Assistidos" />
-            <ProfileButton icon={<Ionicons name="time-outline" size={24} color={"white"}/>} text="Assistir mais tarde" />
-            <ProfileButton icon={<Ionicons name="heart-outline" size={24} color={"white"}/>} text="Favoritos"/>
-            <ProfileButton icon={<Feather name="edit" size={24} color="white"/>} text="Editar perfil" showArrow={false} />
-            <ProfileButton icon={<MaterialIcons name="power-settings-new" size={24} color="white"/>} text="Logout" showArrow={false} />
-            </View>
+  return ( 
+      <View style={styles.container}>
+          <View style={styles.content}>
+              <View style={styles.header}>
+                  <Text style={styles.username}>Nome de usuário</Text>
+                  <FontAwesome name="user-circle-o" size={80} color="white"/>
+              </View>
 
-            <View style={styles.footer}>
-                <BottomTab/>
-            </View>
-        </View>
-    );
+          <ProfileButton 
+            icon={<Ionicons name="eye-outline" size={24} color={"white"}/>} 
+            text="Assistidos" 
+          />
+          
+          <ProfileButton 
+            icon= {<Ionicons name="time-outline" size={24} color={"white"}/>} 
+            text="Assistir mais tarde" 
+            onPress={() => {
+              navigation.navigate(ToWatch);
+            }}
+          />
+          
+          <ProfileButton 
+            icon={<Ionicons name="heart-outline" size={24} color={"white"}/>} 
+            text="Favoritos"
+          />
+          
+          <ProfileButton 
+            icon={<Feather name="edit" size={24} color="white"/>} 
+            text="Editar perfil" showArrow={false} 
+          />
+          
+          <ProfileButton 
+            icon={<MaterialIcons name="power-settings-new" size={24} color="white"/>} 
+            text="Sair" showArrow={false} 
+            />
+          </View>
+
+          <View style={styles.footer}>
+              <BottomTab/>
+          </View>
+      </View>
+  );
 };
 
 const styles = StyleSheet.create({
