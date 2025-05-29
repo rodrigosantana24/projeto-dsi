@@ -23,13 +23,13 @@ export default function LoginScreen({ navigation }) {
       <LoginTextInput
         valueText={email}
         onChangeText={setEmail}
-        placeHolder={"Login"} 
+        placeHolder={"Email"} 
         secure={false}
         iconName="mail-outline" />
       <PasswordTextInput
         valueText={password}
         onChangeText={setPassword}
-        placeHolder={"Password"}
+        placeHolder={"Senha"}
         secure={true}
         iconName="eye-outline" />
       <LoginButton
