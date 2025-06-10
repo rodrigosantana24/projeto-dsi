@@ -11,10 +11,7 @@ import { ref, onValue, query, limitToFirst } from 'firebase/database';
 
 const filtros = ['Ação', 'Comédia', 'Terror', 'Romance', 'Suspense', 'Drama'];
 
-
-
 export default function HomeScreen({ navigation }) {
-    // Estados para armazenar os filmes vindos do Firebase
     const [featuredMovies, setFeaturedMovies] = useState([]);
     const [popularMovies, setPopularMovies] = useState([]);
     const [suggestedMovies, setSuggestedMovies] = useState([]);
@@ -26,7 +23,6 @@ export default function HomeScreen({ navigation }) {
         });
     }, [navigation]);
 
-    // useEffect para buscar os dados quando o componente montar
     useEffect(() => {
         const moviesRef = ref(database, 'movies/');
 
@@ -43,7 +39,6 @@ export default function HomeScreen({ navigation }) {
                     }
                 });
 
-                // Simplesmente divide a lista de filmes para os carrosséis
                 setFeaturedMovies(allMovies.slice(0, 10));
                 setPopularMovies(allMovies.slice(10, 20));
                 setSuggestedMovies(allMovies.slice(20, 30));
@@ -53,7 +48,6 @@ export default function HomeScreen({ navigation }) {
                 setLoading(false);
             }
         }, (error) => {
-            // Callback de erro, pode ser usado para tratar falhas de permissão etc.
             setLoading(false);
         });
 
