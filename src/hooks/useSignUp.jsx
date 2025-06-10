@@ -2,11 +2,14 @@
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { mockSignUp } from '../services/authService';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { ref, set } from 'firebase/database';
+import { auth, database } from '../configs/firebaseConfig';
+import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
 
 export function useSignUp(navigation) { // Recebe navigation como parâmetro
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [data, setData] = useState(null);
 
   const handleSignUp = async (name, email, password, confirmPassword) => {
     if (!validateInput(name, email, password, confirmPassword)) {
@@ -14,8 +17,18 @@ export function useSignUp(navigation) { // Recebe navigation como parâmetro
     }
     setIsLoading(true);
     try {
-      const res = await mockSignUp({ name, email, password });
-      setData(res);
+      const userCredential = await createUserWithEmailAndPassword( auth, email, password );
+      const uid = userCredential.user.uid;
+      
+      await set(ref(database,`usuarios/${uid}`),{
+        amigos:[],
+        cinemas:[],
+        email,
+        favoritos:[2,3,5],
+        filmes:[2,3,4],
+        name
+      })
+
 
       // Exibe o Alert de sucesso e redireciona após o usuário pressionar "OK"
       Alert.alert(
@@ -29,11 +42,9 @@ export function useSignUp(navigation) { // Recebe navigation como parâmetro
         ]
       );
 
-      return res;
     } catch (err) {
-      setError(err.message);
-
-      // Exibe o Alert de erro
+      const messageError = getFirebaseErrorMessage(err)
+      setError(messageError);
       Alert.alert('Erro', 'Erro ao realizar o cadastro. Tente novamente!');
       throw err;
     } finally {
@@ -63,5 +74,5 @@ export function useSignUp(navigation) { // Recebe navigation como parâmetro
     return true;
   };
 
-  return { isLoading, error, data, handleSignUp };
+  return { isLoading, error, handleSignUp };
 }
