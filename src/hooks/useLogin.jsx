@@ -1,6 +1,9 @@
 // src/hooks/useLogin.js
 import { useState } from 'react';
-import { mockLogin } from '../services/authService';
+import { signInWithEmailAndPassword  } from 'firebase/auth';
+import { auth } from '../configs/firebaseConfig';
+import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
+
 
 export function useLogin(navigation) {
   const [isLoading, setIsLoading] = useState(false);
@@ -13,14 +16,13 @@ export function useLogin(navigation) {
   }
     setIsLoading(true);
     try {
-      const res = await mockLogin({ email, password });
-      setData(res);
-      if (res.response === "ok") {
-        navigation.navigate("Home"); // Navega para a tela Home
-      }
+      const userCredential = await signInWithEmailAndPassword(auth , email, password );
+      const user = userCredential.user;
+      setData(user);
+      navigation.navigate("Home"); // Navega para a tela Home
     } catch (err) {
-      setError(err.message);
-      throw err;
+      const messageApi = getFirebaseErrorMessage(err.code)
+      setError(messageApi);
     } finally {
       setIsLoading(false);
     }
