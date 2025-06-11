@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import ListCard from "../components/cards/ListsCard";
 
 const moviesToWatch = [
@@ -7,35 +7,30 @@ const moviesToWatch = [
     id: '1',
     title: 'Tropa de Elite 2',
     image: require('../assets/cards/teste6.webp'),
-    themeSession: 'Assistir mais tarde',
   },
   { 
     id: '2',
     title: 'Velozes e Furiosos 10',
     image: require('../assets/cards/velozes_furiosos.jpg'),
-    themeSession: 'Assistir mais tarde',
   },
   { 
     id: '3',
     title: 'Harry Potter',
     image: require('../assets/cards/teste11.jpg'),
-    themeSession: 'Mais Assistidos',
   },
   { 
     id: '4',
     title: 'Pantera Negra',
     image: require('../assets/cards/teste12.jpg'),
-    themeSession: 'Mais Assistidos',
   },
   { 
     id: '5',
     title: 'The Beast Within',
     image: require('../assets/cards/teste8.webp'),
-    themeSession: 'Mais Assistidos',
   }
 ];
 
-export default function ToWatch() {
+export default function WatchLaterScreen() {
   const renderMovieItem = ({ item }) => (
     <ListCard
       title={item.title}

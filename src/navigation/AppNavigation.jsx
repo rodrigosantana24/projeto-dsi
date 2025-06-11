@@ -3,7 +3,8 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
 import MenuScreen from '../screens/MenuScreen';
-import ToWatch from '../screens/ToWatchScreen';
+import WatchLaterScreen from '../screens/WatchLaterScreen';
+import AddMovieScreen from '../screens/AddMovieScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
@@ -32,8 +33,13 @@ const AppNavigation = ()=> {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="ToWatch" 
-          component={ToWatch}
+          name="WatchLaterScreen" 
+          component={WatchLaterScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AddMovieScreen" 
+          component={AddMovieScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
