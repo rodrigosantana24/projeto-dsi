@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import WatchLaterScreen from './WatchLaterScreen';
-import AddMovieScreen from './AddMovieScreen';
+import AddMovieScreen from '../screens/AddMovieScreen';
 
 
 const ProfileScreen = () => {
