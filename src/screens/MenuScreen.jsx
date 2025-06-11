@@ -4,7 +4,8 @@ import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icon
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
-import ToWatch from './ToWatchScreen';
+import WatchLaterScreen from './WatchLaterScreen';
+import AddMovieScreen from './AddMovieScreen';
 
 
 const ProfileScreen = () => {
@@ -13,22 +14,18 @@ const ProfileScreen = () => {
 
   return ( 
       <View style={styles.container}>
-          <View style={styles.content}>
-              <View style={styles.header}>
-                  <Text style={styles.username}>Nome de usuário</Text>
-                  <FontAwesome name="user-circle-o" size={80} color="white"/>
-              </View>
-
-          <ProfileButton 
-            icon={<Ionicons name="eye-outline" size={24} color={"white"}/>} 
-            text="Assistidos" 
-          />
-          
+        
+        <View style={styles.header}>
+          <Text style={styles.username}>Nome de usuário</Text>
+          <FontAwesome name="user-circle-o" size={80} color="white"/>
+        </View>
+        
+        <View style={styles.content}>
           <ProfileButton 
             icon= {<Ionicons name="time-outline" size={24} color={"white"}/>} 
             text="Assistir mais tarde" 
             onPress={() => {
-              navigation.navigate(ToWatch);
+              navigation.navigate(WatchLaterScreen);
             }}
           />
           
@@ -36,10 +33,13 @@ const ProfileScreen = () => {
             icon={<Ionicons name="heart-outline" size={24} color={"white"}/>} 
             text="Favoritos"
           />
-          
+
           <ProfileButton 
-            icon={<Feather name="edit" size={24} color="white"/>} 
-            text="Editar perfil" showArrow={false} 
+            icon={<Ionicons name="add" size={24} color={"white"}/>} 
+            text="Adicionar filme" 
+            onPress={() => {
+              navigation.navigate(AddMovieScreen);
+            }}
           />
           
           <ProfileButton 
@@ -78,12 +78,12 @@ const styles = StyleSheet.create({
     justifyContent:'flex-end',
     gap: 50,
     marginRight: 10,
-    marginBottom: 30,
+    marginBottom: 100,
   },
   username: {
     marginTop: 10,
     color: 'white',
-    fontSize: 25,
+    fontSize: 29,
     fontWeight: 'bold',
   },
   menuContainer: {
