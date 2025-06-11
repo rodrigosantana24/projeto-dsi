@@ -26,7 +26,7 @@ export default function SectionCarousel({
         renderItem={({ item }) => (
           <MovieCard
             title={item.title}
-            image={item.image}
+            image={{ uri: item.getImageUrl() }}
           />
         )}
         contentContainerStyle={contentContainerStyle}
