@@ -8,26 +8,6 @@ const moviesToWatch = [
     title: 'Tropa de Elite 2',
     image: require('../assets/cards/teste6.webp'),
   },
-  { 
-    id: '2',
-    title: 'Velozes e Furiosos 10',
-    image: require('../assets/cards/velozes_furiosos.jpg'),
-  },
-  { 
-    id: '3',
-    title: 'Harry Potter',
-    image: require('../assets/cards/teste11.jpg'),
-  },
-  { 
-    id: '4',
-    title: 'Pantera Negra',
-    image: require('../assets/cards/teste12.jpg'),
-  },
-  { 
-    id: '5',
-    title: 'The Beast Within',
-    image: require('../assets/cards/teste8.webp'),
-  }
 ];
 
 export default function WatchLaterScreen() {
