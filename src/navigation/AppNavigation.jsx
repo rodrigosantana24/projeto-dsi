@@ -2,6 +2,7 @@ import React from 'react';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
+import CineScreen from '../screens/CineScreen';
 import MenuScreen from '../screens/MenuScreen';
 import WatchLaterScreen from '../screens/WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
@@ -26,7 +27,12 @@ const AppNavigation = ()=> {
            name="SingUp" 
            component={SingUpScreen} 
            options={{ headerShown: false }}
-           />
+        />
+        <Stack.Screen
+           name="CineScreen" 
+           component={CineScreen} 
+           options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Menu"
           component={MenuScreen} 
