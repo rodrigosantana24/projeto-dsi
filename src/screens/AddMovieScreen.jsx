@@ -14,6 +14,8 @@ import { ref, get, query, orderByKey, startAt, endAt } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 import FilmeService from '../models/FilmeService';
 
+const filmeService = new FilmeService();
+
 export default class AddMovieScreen extends React.Component {
   state = {
     filmes: [], 
@@ -33,12 +35,12 @@ export default class AddMovieScreen extends React.Component {
 
     try {
       if (editandoId) {
-        const updated = await FilmeService.updateFilme(editandoId, { title, poster_path, genero, atores });
+        const updated = await filmeService.update(editandoId, { title, poster_path, genero, atores });
         this.setState((prev) => ({
           filmes: prev.filmes.map(f => f.id === editandoId ? updated : f),
         }));
       } else {
-        const created = await FilmeService.createFilme({ title, poster_path, genero, atores });
+        const created = await filmeService.create({ title, poster_path, genero, atores });
         this.setState((prev) => ({ filmes: [...prev.filmes, created] }));
       }
 
@@ -67,7 +69,7 @@ export default class AddMovieScreen extends React.Component {
         style: 'destructive',
         onPress: async () => {
           try {
-            await FilmeService.deleteFilme(id);
+            await filmeService.delete(id);
             this.setState((prev) => ({ filmes: prev.filmes.filter(f => f.id !== id) }));
           } catch (error) {
             console.error(error);
