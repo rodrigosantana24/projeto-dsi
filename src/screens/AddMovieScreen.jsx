@@ -30,7 +30,6 @@ export default class AddMovieScreen extends React.Component {
   loadFilmes = async () => {
     try {
       const filmesData = await FilmeService.getAllFilmes();
-      // Instancia objetos Filme para garantir métodos
       const filmes = filmesData.map(
         f => new Filme(f.id, f.title, f.poster_path, f.genero, f.atores)
       );
