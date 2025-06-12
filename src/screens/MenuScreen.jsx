@@ -21,7 +21,7 @@ const ProfileScreen = () => {
         
         <View style={styles.content}>
           <ProfileButton 
-            icon= {<Ionicons name="time-outline" size={24} color={"white"}/>} 
+            icon= {<Ionicons name="time-outline" size={30} color={"white"}/>} 
             text="Assistir mais tarde" 
             onPress={() => {
               navigation.navigate(WatchLaterScreen);
@@ -29,7 +29,7 @@ const ProfileScreen = () => {
           />
 
           <ProfileButton 
-            icon={<Ionicons name="add" size={24} color={"white"}/>} 
+            icon={<Ionicons name="add" size={30} color={"white"}/>} 
             text="Adicionar filme" 
             onPress={() => {
               navigation.navigate(AddMovieScreen);
@@ -37,7 +37,7 @@ const ProfileScreen = () => {
           />
           
           <ProfileButton 
-            icon={<MaterialIcons name="power-settings-new" size={24} color="white"/>} 
+            icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
             text="Sair" showArrow={false} 
             />
           </View>
