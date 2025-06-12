@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
+    padding: 23,
     borderBottomColor: '#2f3e4f',
     borderBottomWidth: 1,
     backgroundColor: '#16222f',

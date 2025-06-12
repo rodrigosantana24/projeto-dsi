@@ -10,12 +10,13 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import Filme from '../models/Filme';
+import { ref, get, query, orderByKey, startAt, endAt } from 'firebase/database';
+import { database } from '../configs/firebaseConfig';
 import FilmeService from '../models/FilmeService';
 
 export default class AddMovieScreen extends React.Component {
   state = {
-    filmes: [],
+    filmes: [], 
     title: '',
     poster_path: '',
     genero: '',
@@ -23,47 +24,28 @@ export default class AddMovieScreen extends React.Component {
     editandoId: null,
   };
 
-  componentDidMount() {
-    this.loadFilmes();
-  }
-
-  loadFilmes = async () => {
-    try {
-      const filmesData = await FilmeService.getAllFilmes();
-      const filmes = filmesData.map(
-        f => new Filme(f.id, f.title, f.poster_path, f.genero, f.atores)
-      );
-      this.setState({ filmes });
-    } catch (e) {
-      Alert.alert('Erro', e.message);
-    }
-  };
-
   handleSave = async () => {
     const { title, poster_path, genero, atores, editandoId } = this.state;
-    const filme = new Filme(editandoId, title, poster_path, genero, atores);
 
-    if (!filme.isValid()) {
+    if (!title || !poster_path || !genero || !atores) {
       return Alert.alert('Erro', 'Preencha todos os campos');
     }
 
     try {
       if (editandoId) {
-        await FilmeService.updateFilme(filme);
+        const updated = await FilmeService.updateFilme(editandoId, { title, poster_path, genero, atores });
+        this.setState((prev) => ({
+          filmes: prev.filmes.map(f => f.id === editandoId ? updated : f),
+        }));
       } else {
-        await FilmeService.addFilme(filme);
+        const created = await FilmeService.createFilme({ title, poster_path, genero, atores });
+        this.setState((prev) => ({ filmes: [...prev.filmes, created] }));
       }
-      // Limpa campos e recarrega lista
-      this.setState({
-        title: '',
-        poster_path: '',
-        genero: '',
-        atores: '',
-        editandoId: null,
-      });
-      this.loadFilmes();
-    } catch (e) {
-      Alert.alert('Erro', e.message);
+
+      this.setState({ title: '', poster_path: '', genero: '', atores: '', editandoId: null });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', error.message);
     }
   };
 
@@ -84,24 +66,21 @@ export default class AddMovieScreen extends React.Component {
         text: 'Excluir',
         style: 'destructive',
         onPress: async () => {
-          await FilmeService.deleteFilme(id);
-          this.loadFilmes();
+          try {
+            await FilmeService.deleteFilme(id);
+            this.setState((prev) => ({ filmes: prev.filmes.filter(f => f.id !== id) }));
+          } catch (error) {
+            console.error(error);
+            Alert.alert('Erro', 'Falha ao excluir filme');
+          }
         },
       },
     ]);
   };
 
-  onPressCard = (filme) => {
-    // futura implementação de leitura
-    console.log('Card pressed:', filme.id);
-  };
-
   renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => this.onPressCard(item)}
-    >
-      {item.getImageUrl() && (
+    <TouchableOpacity style={styles.item}>
+      {item.poster_path && (
         <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
       )}
       <View style={styles.info}>
