@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Image, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
@@ -10,8 +10,7 @@ export default function BottomTab() {
 
   const tabs = [
     { key: 'Home', label: 'Home', icon: 'home-outline' },
-    { key: 'Cartaz', label: 'Em cartaz', icon: 'film-outline' },
-    { key: 'Cinemas', label: 'Cinemas', icon: 'location-outline' },
+    { key: 'CineScreen', label: 'Cinemas', icon: 'location-outline' },
     { key: 'Menu', label: 'Menu', icon: 'menu-outline' },
   ];
 
@@ -63,15 +62,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     backgroundColor: '#072330',
-    paddingVertical: 4,
-    borderTopWidth: 1,
+    paddingVertical: 30,
+    paddingTop: 5,
     borderTopColor: '#061d29',
   },
   tabContainer: {
     flex: 1,
     alignItems: 'center',
     paddingVertical: 8,
-    borderRadius: 4,
+    borderRadius: 15,
     marginHorizontal: 4,
   },
   selectedTabContainer: {

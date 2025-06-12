@@ -10,7 +10,6 @@ import AddMovieScreen from '../screens/AddMovieScreen';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const route = useRoute();
 
   return ( 
       <View style={styles.container}>
@@ -27,11 +26,6 @@ const ProfileScreen = () => {
             onPress={() => {
               navigation.navigate(WatchLaterScreen);
             }}
-          />
-          
-          <ProfileButton 
-            icon={<Ionicons name="heart-outline" size={24} color={"white"}/>} 
-            text="Favoritos"
           />
 
           <ProfileButton 
