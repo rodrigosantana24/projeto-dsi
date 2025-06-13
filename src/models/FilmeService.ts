@@ -29,7 +29,6 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
     if (!filme.isValid()) {
       throw new Error('Dados do filme inválidos');
     }
-
     const filmesRef = ref(database, 'filmes');
     const newRef = push(filmesRef);
     await set(newRef, filme.toFirebase());

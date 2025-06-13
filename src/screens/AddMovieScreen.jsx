@@ -10,8 +10,6 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { ref, get, query, orderByKey, startAt, endAt } from 'firebase/database';
-import { database } from '../configs/firebaseConfig';
 import FilmeService from '../models/FilmeService';
 
 const filmeService = new FilmeService();
@@ -26,6 +24,36 @@ export default class AddMovieScreen extends React.Component {
     editandoId: null,
   };
 
+    unsubscribeFocus = null;
+
+  async componentDidMount() {
+    this.loadFilmes();
+
+    // Se estiver usando React Navigation
+    if (this.props.navigation && this.props.navigation.addListener) {
+      this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+        this.loadFilmes();
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribeFocus) {
+      this.unsubscribeFocus();
+    }
+  }
+
+  loadFilmes = async () => {
+    try {
+      const todosFilmes = await filmeService.read({ useCache: false });
+      const filmesDoApp = todosFilmes.filter(filme => filme.id?.startsWith('-OS'));
+      this.setState({ filmes: filmesDoApp });
+    } catch (error) {
+      console.error('Erro ao carregar filmes:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os filmes');
+    }
+  }
+
   handleSave = async () => {
     const { title, poster_path, genero, atores, editandoId } = this.state;
 
@@ -35,7 +63,7 @@ export default class AddMovieScreen extends React.Component {
 
     try {
       if (editandoId) {
-        const updated = await filmeService.update(editandoId, { title, poster_path, genero, atores });
+        const updated = await filmeService.update({ id: editandoId, title, poster_path, genero, atores });
         this.setState((prev) => ({
           filmes: prev.filmes.map(f => f.id === editandoId ? updated : f),
         }));
@@ -69,7 +97,7 @@ export default class AddMovieScreen extends React.Component {
         style: 'destructive',
         onPress: async () => {
           try {
-            await filmeService.delete(id);
+            await filmeService.delete({ id });
             this.setState((prev) => ({ filmes: prev.filmes.filter(f => f.id !== id) }));
           } catch (error) {
             console.error(error);
