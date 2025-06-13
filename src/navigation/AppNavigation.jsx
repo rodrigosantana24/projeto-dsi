@@ -8,6 +8,7 @@ import WatchLaterScreen from '../screens/WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import FriendList from '../screens/FriendList';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,11 @@ const AppNavigation = ()=> {
         <Stack.Screen
           name="AddMovieScreen" 
           component={AddMovieScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='FriendList'
+          component={FriendList}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
