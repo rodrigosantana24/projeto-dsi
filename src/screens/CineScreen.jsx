@@ -1,17 +1,18 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import BottomTab from '../components/navi/BottomTab';
 import { useNavigation } from '@react-navigation/native';
+import MapaUsuario from "../components/map/mapaUsuario";
 
 export default function CineScreen() {
     const navigation = useNavigation();
     
     return (
         <View style={styles.container}>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#192936' }}>
-                <Text style={{ color: '#FFFFFF', fontSize: 24 }}>CineScreen</Text>
-            </View>
-
+                <SafeAreaView style={{ flex: 1}}>
+                    <MapaUsuario />
+                    <Text>a</Text>
+                </SafeAreaView>
             <View style={styles.footer}>
                 <BottomTab/>
             </View>
