@@ -7,6 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import WatchLaterScreen from './WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import { UserContext } from '../Context/UserProvider';
+import FriendList from './FriendList';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -30,14 +31,14 @@ const ProfileScreen = () => {
             />
 
             <ProfileButton 
-              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
+              icon= {<Ionicons name="earth-sharp" size={30} color={"white"}/>} 
               text="Amigos" 
               onPress={() => {
-                navigation.navigate(WatchLaterScreen);
+                navigation.navigate(FriendList);
               }}
             />
             <ProfileButton 
-              icon= {<Ionicons name="list-circle-outline" size={30} color={"white"}/>} 
+              icon= {<Ionicons name="list" size={30} color={"white"}/>} 
               text="Minhas Listas" 
               onPress={() => {
                 navigation.navigate(WatchLaterScreen);
