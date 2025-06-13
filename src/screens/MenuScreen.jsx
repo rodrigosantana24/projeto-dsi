@@ -1,50 +1,70 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import WatchLaterScreen from './WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
-
+import { UserContext } from '../Context/UserProvider';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-
+  const {userCredentials} = useContext(UserContext)
   return ( 
       <View style={styles.container}>
-        
+       
+
         <View style={styles.header}>
-          <Text style={styles.username}>Nome de usuário</Text>
-          <FontAwesome name="user-circle-o" size={80} color="white"/>
+            <Text style={styles.username}>{userCredentials.email}</Text>
+            <FontAwesome name="user-circle-o" size={50} color="white"/>
         </View>
-        
-        <View style={styles.content}>
-          <ProfileButton 
-            icon= {<Ionicons name="time-outline" size={30} color={"white"}/>} 
-            text="Assistir mais tarde" 
-            onPress={() => {
-              navigation.navigate(WatchLaterScreen);
-            }}
-          />
-
-          <ProfileButton 
-            icon={<Ionicons name="add" size={30} color={"white"}/>} 
-            text="Adicionar filme" 
-            onPress={() => {
-              navigation.navigate(AddMovieScreen);
-            }}
-          />
-          
-          <ProfileButton 
-            icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
-            text="Sair" showArrow={false} 
+        <ScrollView>
+          <View style={styles.content}>
+            <ProfileButton 
+              icon= {<Ionicons name="time-outline" size={30} color={"white"}/>} 
+              text="Assistir mais tarde" 
+              onPress={() => {
+                navigation.navigate(WatchLaterScreen);
+              }}
             />
-          </View>
 
-          <View style={styles.footer}>
+            <ProfileButton 
+              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
+              text="Amigos" 
+              onPress={() => {
+                navigation.navigate(WatchLaterScreen);
+              }}
+            />
+            <ProfileButton 
+              icon= {<Ionicons name="list-circle-outline" size={30} color={"white"}/>} 
+              text="Minhas Listas" 
+              onPress={() => {
+                navigation.navigate(WatchLaterScreen);
+              }}
+            />
+
+
+            <ProfileButton 
+              icon={<Ionicons name="add" size={30} color={"white"}/>} 
+              text="Adicionar filme" 
+              onPress={() => {
+                navigation.navigate(AddMovieScreen);
+              }}
+            />
+            
+            
+            <ProfileButton 
+              icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
+              text="Sair" showArrow={false} 
+              />
+            </View>
+        </ScrollView>
+        <View style={styles.footer}>
               <BottomTab/>
-          </View>
+        </View>
+
+   
       </View>
   );
 };
