@@ -10,8 +10,6 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import { ref, get, query, orderByKey, startAt, endAt } from 'firebase/database';
-import { database } from '../configs/firebaseConfig';
 import FilmeService from '../models/FilmeService';
 
 export default class AddMovieScreen extends React.Component {
