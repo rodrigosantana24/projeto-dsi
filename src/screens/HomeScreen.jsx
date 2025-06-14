@@ -52,6 +52,7 @@ export default function HomeScreen({ navigation }) {
           <SectionCarousel
             title="Ação e Aventura"
             data={controller.getFilmes()}
+            navigation={navigation}
             onViewAll={() => controller.verTodos('Ação e Aventura')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
@@ -59,6 +60,7 @@ export default function HomeScreen({ navigation }) {
           <SectionCarousel
             title="Drama e Suspense"
             data={controller.getFilmes()}
+            navigation={navigation}
             onViewAll={() => controller.verTodos('Drama e Suspense')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
@@ -75,7 +77,8 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#192936'
+    backgroundColor: '#072330',
+    paddingTop: 25
   },
   loadingContainer: {
     justifyContent: 'center',
