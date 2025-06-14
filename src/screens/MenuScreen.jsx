@@ -9,6 +9,7 @@ import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
+import AddFriend from '../screens/AddFriend';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -32,20 +33,20 @@ const ProfileScreen = () => {
             />
 
             <ProfileButton 
+              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
+              text="Adicionar Amigo" 
+              onPress={() => {
+                navigation.navigate(AddFriend);
+              }}
+            />
+
+            <ProfileButton 
               icon= {<Ionicons name="earth-sharp" size={30} color={"white"}/>} 
               text="Amigos" 
               onPress={() => {
                 navigation.navigate(FriendList);
               }}
             />
-            <ProfileButton 
-              icon= {<Ionicons name="list" size={30} color={"white"}/>} 
-              text="Minhas Listas" 
-              onPress={() => {
-                navigation.navigate(WatchLaterScreen);
-              }}
-            />
-
 
             <ProfileButton 
               icon={<Ionicons name="add" size={30} color={"white"}/>} 
