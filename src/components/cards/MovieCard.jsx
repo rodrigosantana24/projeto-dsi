@@ -16,7 +16,7 @@ export default function MovieCard({ title, image }) {
 const styles = StyleSheet.create({
     session: {
       width: 125,
-      height: 200,
+      height: 180,
       overflow: 'hidden',
       marginRight: 15,
       borderRadius: 4,
@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
     image: {
       flex: 1,
       justifyContent: 'flex-end',
+      resizeMode: 'cover',
     },
     textContainer: {
       position: 'absolute',

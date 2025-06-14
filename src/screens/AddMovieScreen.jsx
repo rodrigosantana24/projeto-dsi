@@ -10,12 +10,13 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import Filme from '../models/Filme';
 import FilmeService from '../models/FilmeService';
+
+const filmeService = new FilmeService();
 
 export default class AddMovieScreen extends React.Component {
   state = {
-    filmes: [],
+    filmes: [], 
     title: '',
     poster_path: '',
     genero: '',
@@ -23,47 +24,58 @@ export default class AddMovieScreen extends React.Component {
     editandoId: null,
   };
 
-  componentDidMount() {
+    unsubscribeFocus = null;
+
+  async componentDidMount() {
     this.loadFilmes();
+
+    // Se estiver usando React Navigation
+    if (this.props.navigation && this.props.navigation.addListener) {
+      this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+        this.loadFilmes();
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribeFocus) {
+      this.unsubscribeFocus();
+    }
   }
 
   loadFilmes = async () => {
     try {
-      const filmesData = await FilmeService.getAllFilmes();
-      const filmes = filmesData.map(
-        f => new Filme(f.id, f.title, f.poster_path, f.genero, f.atores)
-      );
-      this.setState({ filmes });
-    } catch (e) {
-      Alert.alert('Erro', e.message);
+      const todosFilmes = await filmeService.read({ useCache: false });
+      const filmesDoApp = todosFilmes.filter(filme => filme.id?.startsWith('-OS'));
+      this.setState({ filmes: filmesDoApp });
+    } catch (error) {
+      console.error('Erro ao carregar filmes:', error);
+      Alert.alert('Erro', 'Não foi possível carregar os filmes');
     }
-  };
+  }
 
   handleSave = async () => {
     const { title, poster_path, genero, atores, editandoId } = this.state;
-    const filme = new Filme(editandoId, title, poster_path, genero, atores);
 
-    if (!filme.isValid()) {
+    if (!title || !poster_path || !genero || !atores) {
       return Alert.alert('Erro', 'Preencha todos os campos');
     }
 
     try {
       if (editandoId) {
-        await FilmeService.updateFilme(filme);
+        const updated = await filmeService.update({ id: editandoId, title, poster_path, genero, atores });
+        this.setState((prev) => ({
+          filmes: prev.filmes.map(f => f.id === editandoId ? updated : f),
+        }));
       } else {
-        await FilmeService.addFilme(filme);
+        const created = await filmeService.create({ title, poster_path, genero, atores });
+        this.setState((prev) => ({ filmes: [...prev.filmes, created] }));
       }
-      // Limpa campos e recarrega lista
-      this.setState({
-        title: '',
-        poster_path: '',
-        genero: '',
-        atores: '',
-        editandoId: null,
-      });
-      this.loadFilmes();
-    } catch (e) {
-      Alert.alert('Erro', e.message);
+
+      this.setState({ title: '', poster_path: '', genero: '', atores: '', editandoId: null });
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Erro', error.message);
     }
   };
 
@@ -84,24 +96,21 @@ export default class AddMovieScreen extends React.Component {
         text: 'Excluir',
         style: 'destructive',
         onPress: async () => {
-          await FilmeService.deleteFilme(id);
-          this.loadFilmes();
+          try {
+            await filmeService.delete({ id });
+            this.setState((prev) => ({ filmes: prev.filmes.filter(f => f.id !== id) }));
+          } catch (error) {
+            console.error(error);
+            Alert.alert('Erro', 'Falha ao excluir filme');
+          }
         },
       },
     ]);
   };
 
-  onPressCard = (filme) => {
-    // futura implementação de leitura
-    console.log('Card pressed:', filme.id);
-  };
-
   renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.item}
-      onPress={() => this.onPressCard(item)}
-    >
-      {item.getImageUrl() && (
+    <TouchableOpacity style={styles.item}>
+      {item.poster_path && (
         <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
       )}
       <View style={styles.info}>

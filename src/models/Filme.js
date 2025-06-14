@@ -18,7 +18,7 @@ export default class Filme {
   }
 
   isValid() {
-    return this.title && this.genero && this.atores;
+    return !!(this.title && this.genero && this.atores);
   }
 
   toFirebase() {
@@ -35,29 +35,25 @@ export default class Filme {
     return new Filme(
       id,
       data.title || 'Título não disponível',
-      data.poster_path || ''
+      data.poster_path || '',
+      data.genero || '',
+      data.atores || ''
     );
   }
 
   static async getFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
-
     const filmesRef = ref(database, 'filmes');
     const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(20));
     const snapshot = await get(filmesQuery);
-
     if (!snapshot.exists()) {
-      throw new Error('Nenhum filme encontrado');
+      return [];
     }
-
     const data = snapshot.val();
-
     const filmes = Object.entries(data).map(
       ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
     );
-
     if (useCache) this.cache = filmes;
-
     return filmes;
   }
 }
