@@ -24,7 +24,7 @@ const GeneroItem = ({ genero, onEdit, onDelete }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#243b4a',
+    backgroundColor: '#113342',
     padding: 12,
     marginBottom: 8,
     borderRadius: 8,

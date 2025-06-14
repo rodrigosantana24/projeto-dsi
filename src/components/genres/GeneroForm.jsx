@@ -33,7 +33,7 @@ const GeneroForm = ({ nome, descricao, onChangeNome, onChangeDescricao, onSubmit
 
 const styles = StyleSheet.create({
   form: {
-    backgroundColor: '#243b4a',
+    backgroundColor: '#113342',
     borderRadius: 8,
     padding: 16,
     marginBottom: 20,

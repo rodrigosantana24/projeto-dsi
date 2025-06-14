@@ -8,7 +8,7 @@ export default function CineScreen() {
     
     return (
         <View style={styles.container}>
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#192936' }}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#072330' }}>
                 <Text style={{ color: '#FFFFFF', fontSize: 24 }}>CineScreen</Text>
             </View>
 
@@ -22,7 +22,7 @@ export default function CineScreen() {
 const styles = StyleSheet.create({
     container: {
     flex: 1,
-    backgroundColor: '#192936',
+    backgroundColor: '#072330',
     paddingTop: 60,
     paddingHorizontal: 20,
   },
