@@ -1,14 +1,15 @@
 // src/hooks/useLogin.js
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { signInWithEmailAndPassword  } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
-
+import { UserContext } from '../Context/UserProvider';
 
 export function useLogin(navigation) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState(null);
   const [data, setData]           = useState(null);
+  const {setUserCredentials} = useContext(UserContext); 
 
   const handleLogin = async (email, password) => {
     if (!validateInput(email,password)) {
@@ -18,7 +19,7 @@ export function useLogin(navigation) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth , email, password );
       const user = userCredential.user;
-      setData(user);
+      setUserCredentials(user)
       navigation.navigate("Home"); // Navega para a tela Home
     } catch (err) {
       const messageApi = getFirebaseErrorMessage(err.code)
