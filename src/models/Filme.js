@@ -2,12 +2,40 @@ import { ref, get, query, limitToFirst, orderByKey } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Filme {
-  constructor(id, title, poster_path, genero = '', atores = '') {
+  constructor(
+    id, 
+    title, 
+    poster_path, 
+    genero = '', 
+    atores = '',
+    overview = '',
+    budget = 0,
+    revenue = 0,
+    runtime = 0,
+    status = '',
+    original_language = '',
+    popularity = 0,
+    production_companies = '',
+    release_date = '',
+    vote_average = 0,
+    vote_count = 0
+  ) {
     this.id = id;
     this.title = title;
     this.poster_path = poster_path;
     this.genero = genero;
     this.atores = atores;
+    this.overview = overview;
+    this.budget = budget;
+    this.revenue = revenue;
+    this.runtime = runtime;
+    this.status = status;
+    this.original_language = original_language;
+    this.popularity = popularity;
+    this.production_companies = production_companies;
+    this.release_date = release_date;
+    this.vote_average = vote_average;
+    this.vote_count = vote_count;
   }
 
   getImageUrl() {
@@ -37,7 +65,18 @@ export default class Filme {
       data.title || 'Título não disponível',
       data.poster_path || '',
       data.genero || '',
-      data.atores || ''
+      data.atores || '',
+      data.overview || '',
+      data.budget || 0,
+      data.revenue || 0,
+      data.runtime || 0,
+      data.status || '',
+      data.original_language || '',
+      data.popularity || 0,
+      data.production_companies || '',
+      data.release_date || '',
+      data.vote_average || 0,
+      data.vote_count || 0
     );
   }
 
