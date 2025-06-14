@@ -10,7 +10,8 @@ import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
-import AddFriend from '../screens/AddFriend';
+import MovieDetailsScreen from '../screens/MovieDetailsScreen';
+
 const Stack = createNativeStackNavigator();
 
 const AppNavigation = ()=> {
@@ -61,8 +62,8 @@ const AppNavigation = ()=> {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name='AddFriend'
-          component={AddFriend}
+          name='MovieDetailsScreen'
+          component={MovieDetailsScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
