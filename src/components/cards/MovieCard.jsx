@@ -1,15 +1,18 @@
 import React from 'react';
-import { View, ImageBackground, Text, StyleSheet } from 'react-native';
+import { View, ImageBackground, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export default function MovieCard({ title, image }) {
+export default function MovieCard({ id, title, image, onPress}) {
   return (
-    <View style={styles.session}>
+    <TouchableOpacity 
+      onPress={() => onPress(id)} 
+      style={styles.session}
+    >
       <ImageBackground source={image} style={styles.image}>
         <View style={styles.textContainer}>
-            <Text style={styles.title}>{title}</Text>
+          <Text style={styles.title}>{title}</Text>
         </View>
       </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 }
 
