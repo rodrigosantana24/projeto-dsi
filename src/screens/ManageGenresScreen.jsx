@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  FlatList,
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import { View, FlatList, Alert, StyleSheet, Button, Text } from 'react-native';
 import GeneroService from '../models/GeneroService';
+import GeneroForm from '../components/genres/GeneroForm';
+import GeneroItem from '../components/genres/GeneroItem';
+import HeaderBar from '../components/navi/HeaderBar';
 
 const generoService = new GeneroService();
 
@@ -25,7 +19,6 @@ export default class ManageGenresScreen extends React.Component {
 
   async componentDidMount() {
     this.loadGeneros();
-
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
         this.loadGeneros();
@@ -42,7 +35,6 @@ export default class ManageGenresScreen extends React.Component {
   loadGeneros = async () => {
     try {
       const generos = await generoService.read({ useCache: false });
-      console.log('Gêneros carregados:', generos);
       this.setState({ generos });
     } catch (error) {
       console.error('Erro ao carregar gêneros:', error);
@@ -104,54 +96,36 @@ export default class ManageGenresScreen extends React.Component {
     ]);
   };
 
-  renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.item}>
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.nome}</Text>
-        <Text style={styles.text}>Descrição: {item.descricao}</Text>
-        {item.nativo && (
-            <Text style={styles.nativo}>Gênero nativo</Text>
-        )}
-        {!item.nativo && (
-            <View style={styles.buttons}>
-            <Button title="Editar" onPress={() => this.startEdit(item)} />
-            <Button title="Excluir" onPress={() => this.handleDelete(item.id)} color="red" />
-            </View>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
   render() {
-    const { nome, descricao, generos, editandoId } = this.state;
+    const { generos, nome, descricao, editandoId } = this.state;
 
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>{editandoId ? 'Editar Gênero' : 'Adicionar Gênero'}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome do Gênero"
-          placeholderTextColor="#FFF"
-          value={nome}
-          onChangeText={(t) => this.setState({ nome: t })}
+        <HeaderBar
+          title="Gerenciar Gêneros"
+          onBack={() => this.props.navigation.navigate('Menu')}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Descrição"
-          placeholderTextColor="#FFF"
-          value={descricao}
-          onChangeText={(t) => this.setState({ descricao: t })}
+        <GeneroForm
+          nome={nome}
+          descricao={descricao}
+          editandoId={editandoId}
+          title={editandoId ? 'Editar Gênero' : 'Adicionar Gênero'}
+          onChangeNome={(nome) => this.setState({ nome })}
+          onChangeDescricao={(descricao) => this.setState({ descricao })}
+          onSubmit={this.handleSave}
+          onCancel={editandoId ? () => this.setState({ nome: '', descricao: '', editandoId: null }) : null}
         />
-        <Button
-          title={editandoId ? 'Atualizar' : 'Salvar'}
-          onPress={this.handleSave}
-        />
-
+        <Text style={styles.subheader}>Gêneros cadastrados</Text>
         <FlatList
           data={generos}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={this.renderItem}
-          style={styles.list}
+          renderItem={({ item }) => (
+            <GeneroItem
+              genero={item}
+              onEdit={() => this.startEdit(item)}
+              onDelete={() => this.handleDelete(item.id)}
+            />
+          )}
         />
       </View>
     );
@@ -162,50 +136,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingTop: 60,
-    backgroundColor: '#192936'
+    paddingTop: 20,
+    backgroundColor: '#192936',
   },
-  header: {
-    fontSize: 20,
-    marginBottom: 30,
-    color: '#FFF'
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#CCC',
-    marginBottom: 8,
-    padding: 8,
-    borderRadius: 4,
-    color: '#FFF',
-  },
-  list: {
-    marginTop: 16
-  },
-  item: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderColor: '#EEE'
-  },
-  info: {
-    flex: 1
-  },
-  title: {
+  subheader: {
     fontSize: 16,
     fontWeight: 'bold',
-    paddingTop: 4,
-    color: '#FFF'
-  },
-  text: {
     color: '#FFF',
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 8
-  },
-  nativo: {
-    marginTop: 6,
-    fontStyle: 'italic',
-    color: '#FFD700', // cor dourada para destacar
+    marginBottom: 12,
+    marginTop: -4,
+    marginLeft: 4,
   },
 });
