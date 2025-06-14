@@ -37,6 +37,13 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
+              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
+              text="Adicionar Amigo" 
+              onPress={() => {
+                navigation.navigate(AddFriend);
+              }}
+            />
+            <ProfileButton 
               icon= {<Ionicons name="list" size={30} color={"white"}/>} 
               text="Minhas Listas" 
               onPress={() => {
