@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -15,8 +15,6 @@ const ProfileScreen = () => {
   const {userCredentials} = useContext(UserContext)
   return ( 
       <View style={styles.container}>
-       
-
         <View style={styles.header}>
             <Text style={styles.username}>{userCredentials.email}</Text>
             <FontAwesome name="user-circle-o" size={50} color="white"/>
@@ -30,7 +28,6 @@ const ProfileScreen = () => {
                 navigation.navigate(WatchLaterScreen);
               }}
             />
-
             <ProfileButton 
               icon= {<Ionicons name="earth-sharp" size={30} color={"white"}/>} 
               text="Amigos" 
@@ -45,8 +42,6 @@ const ProfileScreen = () => {
                 navigation.navigate(WatchLaterScreen);
               }}
             />
-
-
             <ProfileButton 
               icon={<Ionicons name="add" size={30} color={"white"}/>} 
               text="Adicionar filme" 
@@ -54,16 +49,13 @@ const ProfileScreen = () => {
                 navigation.navigate(AddMovieScreen);
               }}
             />
-
             <ProfileButton 
-              icon={<Ionicons name="add" size={30} color={"white"}/>} 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
               text="Gerenciar gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
               }}
             />
-            
-            
             <ProfileButton 
               icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
               text="Sair" showArrow={false} 
@@ -73,8 +65,6 @@ const ProfileScreen = () => {
         <View style={styles.footer}>
               <BottomTab/>
         </View>
-
-   
       </View>
   );
 };
@@ -82,7 +72,7 @@ const ProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#192936',
+    backgroundColor: '#072330',
     paddingTop: 60,
     paddingHorizontal: 20,
   },
