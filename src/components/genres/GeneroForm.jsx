@@ -8,14 +8,14 @@ const GeneroForm = ({ nome, descricao, onChangeNome, onChangeDescricao, onSubmit
       <TextInput
         style={styles.input}
         placeholder="Nome do Gênero"
-        placeholderTextColor="#CCC"
+        placeholderTextColor="#999"
         value={nome}
         onChangeText={onChangeNome}
       />
       <TextInput
         style={styles.input}
         placeholder="Descrição"
-        placeholderTextColor="#CCC"
+        placeholderTextColor="#999"
         value={descricao}
         onChangeText={onChangeDescricao}
       />
