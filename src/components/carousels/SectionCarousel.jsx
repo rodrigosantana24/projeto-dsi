@@ -5,8 +5,9 @@ import MovieCard from '../cards/MovieCard';
 export default function SectionCarousel({
   title,
   data,
+  navigation,
   onViewAll,
-  contentContainerStyle,
+  contentContainerStyle
 }) {
   return (
     <View style={styles.section}>
@@ -25,8 +26,10 @@ export default function SectionCarousel({
         keyExtractor={(item, idx) => idx.toString()}
         renderItem={({ item }) => (
           <MovieCard
+            id={item.id}
             title={item.title}
             image={{ uri: item.getImageUrl() }}
+            onPress={(id) => navigation.navigate('MovieDetailsScreen', { id })}
           />
         )}
         contentContainerStyle={contentContainerStyle}
