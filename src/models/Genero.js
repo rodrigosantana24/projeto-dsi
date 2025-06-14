@@ -2,7 +2,7 @@ import { ref, get, query, limitToFirst, orderByKey } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Genero {
-  constructor(id, nome, descricao, nativo = true) {
+  constructor(id, nome, descricao, nativo = false) {
     this.id = id;
     this.nome = nome;
     this.descricao = descricao;
