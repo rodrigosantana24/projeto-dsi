@@ -6,6 +6,7 @@ import CineScreen from '../screens/CineScreen';
 import MenuScreen from '../screens/MenuScreen';
 import WatchLaterScreen from '../screens/WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
+import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
@@ -47,6 +48,11 @@ const AppNavigation = ()=> {
         <Stack.Screen
           name="AddMovieScreen" 
           component={AddMovieScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ManageGenresScreen" 
+          component={ManageGenresScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen

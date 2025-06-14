@@ -6,6 +6,7 @@ import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import WatchLaterScreen from './WatchLaterScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
+import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 
@@ -51,6 +52,14 @@ const ProfileScreen = () => {
               text="Adicionar filme" 
               onPress={() => {
                 navigation.navigate(AddMovieScreen);
+              }}
+            />
+
+            <ProfileButton 
+              icon={<Ionicons name="add" size={30} color={"white"}/>} 
+              text="Gerenciar gêneros" 
+              onPress={() => {
+                navigation.navigate(ManageGenresScreen);
               }}
             />
             
