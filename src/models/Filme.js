@@ -44,7 +44,7 @@ export default class Filme {
   static async getFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
     const filmesRef = ref(database, 'filmes');
-    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(20));
+    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(100));
     const snapshot = await get(filmesQuery);
     if (!snapshot.exists()) {
       return [];
