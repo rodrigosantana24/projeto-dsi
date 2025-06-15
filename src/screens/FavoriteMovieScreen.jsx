@@ -4,7 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { ref, get } from 'firebase/database';
 import { database } from "../configs/firebaseConfig"; 
-import ListsCard from "../components/cards/ListsCard"; // substituído ListCard por MovieCard
+import ListsCard from "../components/cards/ListsCard"; 
 import Filme from "../models/Filme";
 
 export default function FavoriteMovieScreen() {
@@ -12,7 +12,6 @@ export default function FavoriteMovieScreen() {
   const [favoriteMovies, setFavoriteMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Opcional: atualizar favoritos ao focar na tela
   useFocusEffect(
     React.useCallback(() => {
       fetchFavoriteMovies();
