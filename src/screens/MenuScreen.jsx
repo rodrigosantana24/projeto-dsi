@@ -1,10 +1,10 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
-import WatchLaterScreen from './WatchLaterScreen';
+import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { UserContext } from '../Context/UserProvider';
@@ -23,10 +23,10 @@ const ProfileScreen = () => {
         <ScrollView>
           <View style={styles.content}>
             <ProfileButton 
-              icon= {<Ionicons name="time-outline" size={30} color={"white"}/>} 
-              text="Assistir mais tarde" 
+              icon= {<Ionicons name="heart" size={30} color={"white"}/>} 
+              text="Favoritos" 
               onPress={() => {
-                navigation.navigate(WatchLaterScreen);
+                navigation.navigate(FavoriteMovieScreen);
               }}
             />
             <ProfileButton 
@@ -47,7 +47,7 @@ const ProfileScreen = () => {
               icon= {<Ionicons name="list" size={30} color={"white"}/>} 
               text="Minhas Listas" 
               onPress={() => {
-                navigation.navigate(WatchLaterScreen);
+                alert("Minhas Listas");
               }}
             />
             <ProfileButton 
