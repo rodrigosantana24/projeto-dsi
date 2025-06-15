@@ -2,10 +2,16 @@ import React from 'react';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
+import CineScreen from '../screens/CineScreen';
 import MenuScreen from '../screens/MenuScreen';
-import ToWatch from '../screens/ToWatchScreen';
+import WatchLaterScreen from '../screens/WatchLaterScreen';
+import AddMovieScreen from '../screens/AddMovieScreen';
+import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import FriendList from '../screens/FriendList';
+import MovieDetailsScreen from '../screens/MovieDetailsScreen';
+import AddFriend from '../screens/AddFriend';
 
 const Stack = createNativeStackNavigator();
 
@@ -25,15 +31,45 @@ const AppNavigation = ()=> {
            name="SingUp" 
            component={SingUpScreen} 
            options={{ headerShown: false }}
-           />
+        />
+        <Stack.Screen
+           name="CineScreen" 
+           component={CineScreen} 
+           options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Menu"
           component={MenuScreen} 
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="ToWatch" 
-          component={ToWatch}
+          name="WatchLaterScreen" 
+          component={WatchLaterScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AddMovieScreen" 
+          component={AddMovieScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ManageGenresScreen" 
+          component={ManageGenresScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='FriendList'
+          component={FriendList}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='MovieDetailsScreen'
+          component={MovieDetailsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='AddFriend'
+          component={AddFriend}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
