@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     justifyContent:'flex-end',
     gap: 50,
     marginRight: 10,
-    marginBottom: 100,
+    marginBottom: 60,
   },
   username: {
     marginTop: 10,
