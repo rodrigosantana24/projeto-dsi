@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Ionicons, Feather, MaterialIcons, FontAwesome } from '@expo/vector-icons';
@@ -53,6 +54,8 @@ const ProfileScreen = () => {
               <BottomTab/>
           </View>
 =======
+=======
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
@@ -128,6 +131,9 @@ const ProfileScreen = () => {
         <View style={styles.footer}>
               <BottomTab/>
         </View>
+<<<<<<< HEAD
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
+=======
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
       </View>
   );
@@ -137,7 +143,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
     backgroundColor: '#192936',
+=======
+    backgroundColor: '#072330',
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 =======
     backgroundColor: '#072330',
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
@@ -161,7 +171,11 @@ const styles = StyleSheet.create({
     gap: 50,
     marginRight: 10,
 <<<<<<< HEAD
+<<<<<<< HEAD
     marginBottom: 30,
+=======
+    marginBottom: 100,
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 =======
     marginBottom: 100,
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
@@ -170,7 +184,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: 'white',
 <<<<<<< HEAD
+<<<<<<< HEAD
     fontSize: 25,
+=======
+    fontSize: 29,
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 =======
     fontSize: 29,
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
