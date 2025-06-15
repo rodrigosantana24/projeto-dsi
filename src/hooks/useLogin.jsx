@@ -1,16 +1,22 @@
 // src/hooks/useLogin.js
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useState } from 'react';
 import { signInWithEmailAndPassword  } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
 
 =======
+=======
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 import { useContext, useState } from 'react';
 import { signInWithEmailAndPassword  } from 'firebase/auth';
 import { auth } from '../configs/firebaseConfig';
 import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
 import { UserContext } from '../Context/UserProvider';
+<<<<<<< HEAD
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
+=======
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 
 export function useLogin(navigation) {
@@ -28,7 +34,11 @@ export function useLogin(navigation) {
       const userCredential = await signInWithEmailAndPassword(auth , email, password );
       const user = userCredential.user;
 <<<<<<< HEAD
+<<<<<<< HEAD
       setData(user);
+=======
+      setUserCredentials(user)
+>>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
 =======
       setUserCredentials(user)
 >>>>>>> 9ca0c5da9e4a84918b9b873398ca965b5c40ef5f
