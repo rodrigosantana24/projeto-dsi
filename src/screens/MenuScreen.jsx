@@ -9,6 +9,7 @@ import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
+import ManageActorsScreen from './ManageActorsScreen';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -54,6 +55,13 @@ const ProfileScreen = () => {
               text="Gerenciar gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
+              }}
+            />
+            <ProfileButton 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Gerenciar Atores" 
+              onPress={() => {
+                navigation.navigate(ManageActorsScreen);
               }}
             />
             <ProfileButton 
