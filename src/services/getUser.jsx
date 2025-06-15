@@ -2,9 +2,7 @@ import { getDatabase, ref, get } from 'firebase/database';
 import {database} from "../configs/firebaseConfig";
 
 // Inicialize o app Firebase
-
 const db = database
-
 export default async function getUser(uid) {
     try {
         const userRef = ref(db, `usuarios/${uid}`);

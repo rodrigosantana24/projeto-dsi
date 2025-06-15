@@ -4,7 +4,7 @@ import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
 import CineScreen from '../screens/CineScreen';
 import MenuScreen from '../screens/MenuScreen';
-import WatchLaterScreen from '../screens/WatchLaterScreen';
+import FavoriteMovieScreen from '../screens/FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import { NavigationContainer } from '@react-navigation/native';
@@ -43,8 +43,8 @@ const AppNavigation = ()=> {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="WatchLaterScreen" 
-          component={WatchLaterScreen}
+          name="FavoriteMovieScreen" 
+          component={FavoriteMovieScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
