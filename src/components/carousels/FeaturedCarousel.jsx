@@ -14,7 +14,7 @@ const Carousel = ({ data }) => {
 
   const renderItem = ({ item }) => (
     <ImageBackground
-      source={item.image}
+      source={{ uri: item.getImageUrl() }}
       style={styles.card}
       imageStyle={styles.imageStyle}
     >

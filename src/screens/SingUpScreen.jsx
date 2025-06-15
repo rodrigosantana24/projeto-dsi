@@ -73,7 +73,7 @@ export default function SingUpScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingHorizontal: 24, paddingTop: 40, backgroundColor: '#192936', alignItems: 'center' },
+  container: { flex: 1, paddingHorizontal: 24, paddingTop: 40, backgroundColor: '#072330', alignItems: 'center' },
   title: { fontSize: 24, fontWeight: '700', marginBottom: 10, color: '#fff' },
   footerText: { marginTop: 10, fontSize: 14, color: '#fff' },
   cadastro: { color: '#f4a03f', fontWeight: 'bold', fontSize: 16 },
