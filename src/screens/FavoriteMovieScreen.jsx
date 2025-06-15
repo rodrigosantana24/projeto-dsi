@@ -1,63 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
 import { ref, get } from 'firebase/database';
 import { database } from "../configs/firebaseConfig"; 
-import ListCard from "../components/cards/ListsCard";
+import ListsCard from "../components/cards/ListsCard"; // substituído ListCard por MovieCard
 import Filme from "../models/Filme";
 
 export default function FavoriteMovieScreen() {
+  const navigation = useNavigation();
   const [favoriteMovies, setFavoriteMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchFavoriteMovies = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
+  // Opcional: atualizar favoritos ao focar na tela
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchFavoriteMovies();
+    }, [])
+  );
 
-        if (user) {
-          const userFavoritesRef = ref(database, `usuarios/${user.uid}/favoritos`);
-          const snapshot = await get(userFavoritesRef);
+  const fetchFavoriteMovies = async () => {
+    setLoading(true);
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
 
-          if (snapshot.exists()) {
-            const favoriteIds = snapshot.val(); 
+      if (user) {
+        const userFavoritesRef = ref(database, `usuarios/${user.uid}/favoritos`);
+        const snapshot = await get(userFavoritesRef);
 
-            const moviePromises = favoriteIds.map(id => {
-              const movieRef = ref(database, `filmes/${id}`);
-              return get(movieRef);
-            });
+        if (snapshot.exists()) {
+          const favoriteIds = snapshot.val(); 
 
-            const movieSnapshots = await Promise.all(moviePromises);
-            
-            const moviesData = movieSnapshots.map((snap, index) => {
+          const moviePromises = favoriteIds.map(id => {
+            const movieRef = ref(database, `filmes/${id}`);
+            return get(movieRef);
+          });
+
+          const movieSnapshots = await Promise.all(moviePromises);
+          const moviesData = movieSnapshots
+            .map((snap, index) => {
               if (snap.exists()) {
                 return Filme.fromFirebase(favoriteIds[index], snap.val());
               }
               return null;
-            }).filter(movie => movie !== null); 
+            })
+            .filter(movie => movie !== null);
 
-            setFavoriteMovies(moviesData);
-          } else {
-            setFavoriteMovies([]);
-          }
+          setFavoriteMovies(moviesData);
+        } else {
+          setFavoriteMovies([]);
         }
-      } catch (error) {
-        console.error("Erro ao buscar filmes favoritos:", error);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchFavoriteMovies();
-  }, []);
+    } catch (error) {
+      console.error("Erro ao buscar filmes favoritos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderMovieItem = ({ item }) => (
-    <ListCard
+    <ListsCard
+      id={item.id}
       title={item.title}
-      image={{ uri: item.getImageUrl() }} 
-      onPress={() => console.log("Card:", item.title)} 
-      style={styles.movieCardStyle} 
+      image={{ uri: item.getImageUrl() }}
+      onPress={(movieId) => navigation.navigate('MovieDetailsScreen', { id: movieId })}
+      style={styles.movieCardStyle}
     />
   );
 
@@ -78,23 +86,19 @@ export default function FavoriteMovieScreen() {
 
       {favoriteMovies.length === 0 ? (
         <View style={styles.center}>
-            <Text style={styles.emptyText}>Você ainda não adicionou filmes aos favoritos.</Text>
+          <Text style={styles.emptyText}>Você ainda não adicionou filmes aos favoritos.</Text>
         </View>
       ) : (
         <FlatList
           data={favoriteMovies}
           renderItem={renderMovieItem}
-          keyExtractor={(item) => item.id.toString()} 
+          keyExtractor={(item) => item.id.toString()}
           numColumns={2}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.flatListContentContainer} 
+          contentContainerStyle={styles.flatListContentContainer}
           columnWrapperStyle={styles.columnWrapperStyle}
         />
       )}
-
-      <TouchableOpacity style={styles.addButton}>
-        <Text style={styles.addButtonText}>ADICIONAR/REMOVER FILMES</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -140,20 +144,5 @@ const styles = StyleSheet.create({
   movieCardStyle: {
     marginHorizontal: 5, 
     marginBottom: 15,
-  }, 
-  addButton: {
-    backgroundColor: "#f4a03f", 
-    paddingVertical: 15,
-    borderRadius: 25,
-    alignItems: "center",
-    marginTop: 10,
-    marginBottom: 35,
-    width: "90%", 
-    alignSelf: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
