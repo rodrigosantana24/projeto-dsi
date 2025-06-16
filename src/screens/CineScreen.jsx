@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, StyleSheet, SafeAreaView } from "react-native";
 import BottomTab from '../components/navi/BottomTab';
 import { useNavigation } from '@react-navigation/native';
-import MapaUsuario from "../components/map/MapaUsuario";
+import MapaUsuario from "../components/map/mapaUsuario";
 
 export default function CineScreen() {
     const navigation = useNavigation();
