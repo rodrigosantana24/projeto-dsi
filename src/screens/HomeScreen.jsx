@@ -11,6 +11,8 @@ import HomeController from '../controllers/HomeController';
 export default function HomeScreen({ navigation }) {
   const [controller] = useState(new HomeController(navigation));
   const [carregando, setCarregando] = useState(true);
+  const [acaoAventuraFilmes, setAcaoAventuraFilmes] = useState([]);
+  const [dramaSuspenseFilmes, setDramaSuspenseFilmes] = useState([]);
 
   useLayoutEffect(() => {
     controller.configurarLayout();
@@ -19,6 +21,12 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const carregarDados = async () => {
       await controller.carregarFilmes();
+      // Busca filmes com primary_genre_id = 0 para "Ação e Aventura"
+      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreId(0);
+      setAcaoAventuraFilmes(filmesAcaoAventura);
+      // Busca filmes com primary_genre_id = 6 para "Drama e Suspense"
+      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreId(6);
+      setDramaSuspenseFilmes(filmesDramaSuspense);
       setCarregando(false);
     };
     carregarDados();
@@ -51,7 +59,7 @@ export default function HomeScreen({ navigation }) {
           />
           <SectionCarousel
             title="Ação e Aventura"
-            data={controller.getFilmes()}
+            data={acaoAventuraFilmes}
             navigation={navigation}
             onViewAll={() => controller.verTodos('Ação e Aventura')}
             contentContainerStyle={{ paddingLeft: 0 }}
@@ -59,7 +67,7 @@ export default function HomeScreen({ navigation }) {
           />
           <SectionCarousel
             title="Drama e Suspense"
-            data={controller.getFilmes()}
+            data={dramaSuspenseFilmes}
             navigation={navigation}
             onViewAll={() => controller.verTodos('Drama e Suspense')}
             contentContainerStyle={{ paddingLeft: 0 }}
