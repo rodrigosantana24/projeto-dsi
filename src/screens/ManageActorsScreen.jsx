@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, FlatList, Alert, StyleSheet, Button, Text } from 'react-native';
+import { View, FlatList, Alert, StyleSheet, Button, Text, TouchableOpacity } from 'react-native';
 import AtorService from '../models/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
+import Ator from '../models/Ator'; 
 import HeaderBar from '../components/navi/HeaderBar';
 
 const atorService = new AtorService();
@@ -14,6 +15,7 @@ export default class ManageActorsScreen extends React.Component {
     nacionalidade: '',
     sexo: '',
     editandoId: null,
+    filtroSexo: 'todos',
   };
 
   unsubscribeFocus = null;
@@ -26,30 +28,31 @@ export default class ManageActorsScreen extends React.Component {
       });
     }
   }
-
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
       this.unsubscribeFocus();
     }
   }
-
   loadAtores = async () => {
     try {
-      const atores = await atorService.read({ useCache: false });
+      let atores = [];
+      if (this.state.filtroSexo === 'todos') {
+        atores =  await atorService.read({useCache: false})
+      } else {
+        atores = await Ator.getAtoresBySexoFromFirebase(this.state.filtroSexo, false);
+      }
       this.setState({ atores });
     } catch (error) {
       console.error('Erro ao carregar atores:', error);
       Alert.alert('Erro', 'Não foi possível carregar os atores');
     }
   };
-
   handleSave = async () => {
     const { nome, nacionalidade, sexo, editandoId } = this.state;
 
     if (!nome || !nacionalidade || !sexo) {
       return Alert.alert('Erro', 'Preencha todos os campos');
     }
-
     try {
       if (editandoId) {
         const updated = await atorService.update({ id: editandoId, nome, nacionalidade, sexo });
@@ -67,7 +70,6 @@ export default class ManageActorsScreen extends React.Component {
       Alert.alert('Erro', error.message);
     }
   };
-
   startEdit = (ator) => {
     this.setState({
       nome: ator.nome,
@@ -76,7 +78,6 @@ export default class ManageActorsScreen extends React.Component {
       editandoId: ator.id,
     });
   };
-
   handleDelete = (id) => {
     Alert.alert('Confirmar', 'Deseja excluir este ator?', [
       { text: 'Cancelar', style: 'cancel' },
@@ -98,8 +99,13 @@ export default class ManageActorsScreen extends React.Component {
     ]);
   };
 
+  setFiltroSexo = async (filtroSexo) => {
+    await this.setState({ filtroSexo });
+    this.loadAtores();
+  };
+
   render() {
-    const { atores, nome, nacionalidade, sexo, editandoId } = this.state;
+    const { atores, nome, nacionalidade, sexo, editandoId, filtroSexo } = this.state;
 
     return (
       <View style={styles.container}>
@@ -119,6 +125,29 @@ export default class ManageActorsScreen extends React.Component {
           onSubmit={this.handleSave}
           onCancel={editandoId ? () => this.setState({ nome: '', nacionalidade: '', sexo: '', editandoId: null }) : null}
         />
+
+        {/* Filtros de sexo */}
+        <View style={styles.filtrosContainer}>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtroSexo === 'todos' && styles.filtroSelecionado]}
+            onPress={() => this.setFiltroSexo('todos')}
+          >
+            <Text style={styles.filtroTexto}>Todos</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtroSexo === 'Masculino' && styles.filtroSelecionado]}
+            onPress={() => this.setFiltroSexo('Masculino')}
+          >
+            <Text style={styles.filtroTexto}>Masculino</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtroSexo === 'Feminino' && styles.filtroSelecionado]}
+            onPress={() => this.setFiltroSexo('Feminino')}
+          >
+            <Text style={styles.filtroTexto}>Feminino</Text>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.subheader}>Atores cadastrados</Text>
         <FlatList
           data={atores}
@@ -150,5 +179,24 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: -4,
     marginLeft: 4,
+  },
+  filtrosContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    marginTop: 10,
+    justifyContent: 'center',
+  },
+  filtroBotao: {
+    padding: 8,
+    marginHorizontal: 4,
+    borderRadius: 6,
+    backgroundColor: '#0a3d5c',
+  },
+  filtroSelecionado: {
+    backgroundColor: '#1e90ff',
+  },
+  filtroTexto: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
