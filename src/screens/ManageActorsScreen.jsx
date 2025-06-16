@@ -7,6 +7,7 @@ import Ator from '../models/Ator';
 import HeaderBar from '../components/navi/HeaderBar';
 
 const atorService = new AtorService();
+const PAGE_SIZE = 20;
 
 export default class ManageActorsScreen extends React.Component {
   state = {
@@ -16,8 +17,10 @@ export default class ManageActorsScreen extends React.Component {
     sexo: '',
     editandoId: null,
     filtroSexo: 'todos',
-    buscaNome: '', // novo estado
-    atoresFiltrados: [], // novo estado para exibir resultado da busca
+    buscaNome: '',
+    atoresFiltrados: [],
+    page: 1, // novo estado
+    loadingMore: false, // novo estado
   };
 
   unsubscribeFocus = null;
@@ -101,29 +104,38 @@ export default class ManageActorsScreen extends React.Component {
     ]);
   };
 
-  setFiltroSexo = async (filtroSexo) => {
-    await this.setState({ filtroSexo, buscaNome: '' });
-    await this.loadAtores();
-  };
-
-  handleBuscaNome = (text) => {
-    this.setState({ buscaNome: text });
-  };
-
+  // Sempre que filtrar/buscar, reseta a página para 1
   buscarPorNome = () => {
     const { atores, buscaNome } = this.state;
     if (!buscaNome.trim()) {
-      this.setState({ atoresFiltrados: atores });
+      this.setState({ atoresFiltrados: atores, page: 1 });
+      Keyboard.dismiss();
       return;
     }
     const termo = buscaNome.trim().toLowerCase();
     const filtrados = atores.filter(a => a.nome.toLowerCase().startsWith(termo));
-    this.setState({ atoresFiltrados: filtrados });
+    this.setState({ atoresFiltrados: filtrados, page: 1 });
     Keyboard.dismiss();
   };
 
+  setFiltroSexo = async (filtroSexo) => {
+    await this.setState({ filtroSexo, buscaNome: '', page: 1 });
+    await this.loadAtores();
+  };
+
+  // Função chamada ao chegar no fim da lista
+  handleEndReached = () => {
+    const { page, atoresFiltrados } = this.state;
+    if ((page * PAGE_SIZE) < atoresFiltrados.length) {
+      this.setState({ page: page + 1 });
+    }
+  };
+
   render() {
-    const { atoresFiltrados, nome, nacionalidade, sexo, editandoId, filtroSexo, buscaNome } = this.state;
+    const { atoresFiltrados, nome, nacionalidade, sexo, editandoId, filtroSexo, buscaNome, page } = this.state;
+
+    // Mostra apenas os itens da página atual
+    const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
       <View style={styles.container}>
@@ -179,7 +191,7 @@ export default class ManageActorsScreen extends React.Component {
 
         <Text style={styles.subheader}>Atores cadastrados</Text>
         <FlatList
-          data={atoresFiltrados}
+          data={dataToShow}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <AtorItem
@@ -188,6 +200,13 @@ export default class ManageActorsScreen extends React.Component {
               onDelete={() => this.handleDelete(item.id)}
             />
           )}
+          onEndReached={this.handleEndReached}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            (page * PAGE_SIZE) < atoresFiltrados.length
+              ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
+              : null
+          }
         />
       </View>
     );
