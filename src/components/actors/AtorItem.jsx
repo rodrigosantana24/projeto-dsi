@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const GeneroItem = ({ ator, onEdit, onDelete }) => {
+const AtorItem = ({ ator, onEdit, onDelete }) => {
 return (
     <View style={styles.container}>
         <Text style={styles.nome}>{ator.nome}</Text>
@@ -64,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GeneroItem;
+export default AtorItem;
