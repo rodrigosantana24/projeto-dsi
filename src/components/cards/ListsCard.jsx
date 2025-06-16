@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, ImageBackground, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function ListCard({ title, image, onPress, style }) {
+export default function ListCard({ id, title, image, onPress, style }) {
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.session, style]} activeOpacity={0.8}>
+    <TouchableOpacity onPress={() => onPress(id)} style={[styles.session, style]} activeOpacity={0.8}>
       <ImageBackground 
         source={image} 
         style={styles.imageBackground} 
