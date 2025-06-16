@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     flex: 1, 
     padding: 16, 
     paddingTop: 60,
-    backgroundColor: '#192936'
+    backgroundColor: '#072330'
   },
   header: { 
     fontSize: 20, 
