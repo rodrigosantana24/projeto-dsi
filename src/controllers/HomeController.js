@@ -49,4 +49,8 @@ export default class HomeController {
   getErro() {
     return this.erro;
   }
+
+  async getFilmesByPrimaryGenreId(genreId, limit = 20) {
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
+  }
 }

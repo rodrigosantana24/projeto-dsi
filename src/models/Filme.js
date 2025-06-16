@@ -1,4 +1,4 @@
-import { ref, get, query, limitToFirst, orderByKey } from 'firebase/database';
+import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Filme {
@@ -94,5 +94,29 @@ export default class Filme {
     );
     if (useCache) this.cache = filmes;
     return filmes;
+  }
+
+  /**
+   * Busca filmes filtrando pelo campo primary_genre_id diretamente no Firebase.
+   * @param {string|number} genreId - O valor de primary_genre_id para filtrar.
+   * @param {number} limit - Limite de resultados (opcional).
+   * @returns {Promise<Filme[]>}
+   */
+  static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(
+      filmesRef,
+      orderByChild('primary_genre_id'),
+      equalTo(genreId),
+      limitToFirst(limit)
+    );
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    return Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
   }
 }
