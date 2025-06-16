@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, Alert, StyleSheet, Button, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, Alert, StyleSheet, Text, TouchableOpacity, TextInput, Keyboard } from 'react-native';
 import AtorService from '../models/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
@@ -16,12 +16,14 @@ export default class ManageActorsScreen extends React.Component {
     sexo: '',
     editandoId: null,
     filtroSexo: 'todos',
+    buscaNome: '', // novo estado
+    atoresFiltrados: [], // novo estado para exibir resultado da busca
   };
 
   unsubscribeFocus = null;
 
   async componentDidMount() {
-    this.loadAtores();
+    await this.loadAtores();
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
         this.loadAtores();
@@ -37,11 +39,11 @@ export default class ManageActorsScreen extends React.Component {
     try {
       let atores = [];
       if (this.state.filtroSexo === 'todos') {
-        atores =  await atorService.read({useCache: false})
+        atores = await atorService.read({ useCache: false });
       } else {
         atores = await Ator.getAtoresBySexoFromFirebase(this.state.filtroSexo, false);
       }
-      this.setState({ atores });
+      this.setState({ atores, atoresFiltrados: atores });
     } catch (error) {
       console.error('Erro ao carregar atores:', error);
       Alert.alert('Erro', 'Não foi possível carregar os atores');
@@ -100,12 +102,28 @@ export default class ManageActorsScreen extends React.Component {
   };
 
   setFiltroSexo = async (filtroSexo) => {
-    await this.setState({ filtroSexo });
-    this.loadAtores();
+    await this.setState({ filtroSexo, buscaNome: '' });
+    await this.loadAtores();
+  };
+
+  handleBuscaNome = (text) => {
+    this.setState({ buscaNome: text });
+  };
+
+  buscarPorNome = () => {
+    const { atores, buscaNome } = this.state;
+    if (!buscaNome.trim()) {
+      this.setState({ atoresFiltrados: atores });
+      return;
+    }
+    const termo = buscaNome.trim().toLowerCase();
+    const filtrados = atores.filter(a => a.nome.toLowerCase().startsWith(termo));
+    this.setState({ atoresFiltrados: filtrados });
+    Keyboard.dismiss();
   };
 
   render() {
-    const { atores, nome, nacionalidade, sexo, editandoId, filtroSexo } = this.state;
+    const { atoresFiltrados, nome, nacionalidade, sexo, editandoId, filtroSexo, buscaNome } = this.state;
 
     return (
       <View style={styles.container}>
@@ -148,9 +166,20 @@ export default class ManageActorsScreen extends React.Component {
           </TouchableOpacity>
         </View>
 
+        {/* Campo de busca por nome */}
+        <TextInput
+          style={styles.inputBusca}
+          placeholder="Digite o nome do ator"
+          placeholderTextColor="#aaa"
+          value={buscaNome}
+          onChangeText={this.handleBuscaNome}
+          onSubmitEditing={this.buscarPorNome}
+          returnKeyType="search"
+        />
+
         <Text style={styles.subheader}>Atores cadastrados</Text>
         <FlatList
-          data={atores}
+          data={atoresFiltrados}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <AtorItem
@@ -198,5 +227,14 @@ const styles = StyleSheet.create({
   filtroTexto: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  inputBusca: {
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    padding: 8,
+    marginBottom: 10,
+    marginTop: 10,
+    fontSize: 16,
+    color: '#222',
   },
 });
