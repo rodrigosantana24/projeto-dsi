@@ -35,6 +35,7 @@ export default function FriendList() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moviesContainer}>
                 {amigo.favoritos.map((filme) => (
                   <View key={filme.id} style={styles.movieCard}>
+                    <Text style={styles.title_movie}>{filme.title}</Text>
                     <Image
                       source={{ uri: filme.poster_path 
                           ? "https://image.tmdb.org/t/p/original"+filme.poster_path 
@@ -92,6 +93,14 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     marginBottom: 10,
+  },
+  title_movie: {
+    marginTop: 8,
+    fontWeight: 'bold',
+    color: 'white',
+    fontSize: 10,
+    marginBottom: 10,
+    alignSelf:"center"
   },
   moviesContainer: {
     marginTop: 5,
