@@ -1,15 +1,17 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
-import WatchLaterScreen from './WatchLaterScreen';
+import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
+import ManageActorsScreen from './ManageActorsScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
+
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -23,10 +25,10 @@ const ProfileScreen = () => {
         <ScrollView>
           <View style={styles.content}>
             <ProfileButton 
-              icon= {<Ionicons name="time-outline" size={30} color={"white"}/>} 
-              text="Assistir mais tarde" 
+              icon= {<Ionicons name="heart" size={30} color={"white"}/>} 
+              text="Favoritos" 
               onPress={() => {
-                navigation.navigate(WatchLaterScreen);
+                navigation.navigate(FavoriteMovieScreen);
               }}
             />
             <ProfileButton 
@@ -37,10 +39,17 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
+              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
+              text="Adicionar Amigo" 
+              onPress={() => {
+                navigation.navigate(AddFriend);
+              }}
+            />
+            <ProfileButton 
               icon= {<Ionicons name="list" size={30} color={"white"}/>} 
               text="Minhas Listas" 
               onPress={() => {
-                navigation.navigate(WatchLaterScreen);
+                alert("Minhas Listas");
               }}
             />
             <ProfileButton 
@@ -55,6 +64,13 @@ const ProfileScreen = () => {
               text="Gerenciar gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
+              }}
+            />
+            <ProfileButton 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Gerenciar Atores" 
+              onPress={() => {
+                navigation.navigate(ManageActorsScreen);
               }}
             />
             <ProfileButton 
@@ -93,7 +109,7 @@ const styles = StyleSheet.create({
     justifyContent:'flex-end',
     gap: 50,
     marginRight: 10,
-    marginBottom: 100,
+    marginBottom: 60,
   },
   username: {
     marginTop: 10,
