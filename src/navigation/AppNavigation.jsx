@@ -4,14 +4,16 @@ import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
 import CineScreen from '../screens/CineScreen';
 import MenuScreen from '../screens/MenuScreen';
-import WatchLaterScreen from '../screens/WatchLaterScreen';
+import FavoriteMovieScreen from '../screens/FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
+import ManageActorsScreen from '../screens/ManageActorsScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
-import ManageActorsScreen from '../screens/ManageActorsScreen';
+import AddFriend from '../screens/AddFriend';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -43,8 +45,8 @@ const AppNavigation = ()=> {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="WatchLaterScreen" 
-          component={WatchLaterScreen}
+          name="FavoriteMovieScreen" 
+          component={FavoriteMovieScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
@@ -70,6 +72,11 @@ const AppNavigation = ()=> {
         <Stack.Screen
           name= "ManageActorsScreen"
           component={ManageActorsScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='AddFriend'
+          component={AddFriend}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

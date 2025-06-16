@@ -1,6 +1,3 @@
-// src/services/auth.js
-
-// Array em memória que armazenará os usuários cadastrados
 const users = [
   { nome: "teste", email: "teste@gmail.com", password: "Testee" } // Usuário pré-cadastrado
 ];
