@@ -2,34 +2,32 @@ import React from 'react';
 import {
   View,
   Text,
-  TextInput,
-  Button,
   FlatList,
-  Image,
   Alert,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import FilmeService from '../models/FilmeService';
+import AddedForm from '../components/addedmovies/AddedForm'; 
+import AddedList from '../components/addedmovies/AddedList'; 
 
 const filmeService = new FilmeService();
-
 export default class AddMovieScreen extends React.Component {
   state = {
-    filmes: [], 
+    filmes: [],
     title: '',
     poster_path: '',
     genero: '',
     atores: '',
     editandoId: null,
   };
-
-    unsubscribeFocus = null;
+  unsubscribeFocus = null;
 
   async componentDidMount() {
     this.loadFilmes();
-
-    // Se estiver usando React Navigation
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
         this.loadFilmes();
@@ -52,7 +50,11 @@ export default class AddMovieScreen extends React.Component {
       console.error('Erro ao carregar filmes:', error);
       Alert.alert('Erro', 'Não foi possível carregar os filmes');
     }
-  }
+  };
+
+  handleChange = (name, value) => {
+    this.setState({ [name]: value });
+  };
 
   handleSave = async () => {
     const { title, poster_path, genero, atores, editandoId } = this.state;
@@ -60,7 +62,6 @@ export default class AddMovieScreen extends React.Component {
     if (!title || !poster_path || !genero || !atores) {
       return Alert.alert('Erro', 'Preencha todos os campos');
     }
-
     try {
       if (editandoId) {
         const updated = await filmeService.update({ id: editandoId, title, poster_path, genero, atores });
@@ -71,11 +72,10 @@ export default class AddMovieScreen extends React.Component {
         const created = await filmeService.create({ title, poster_path, genero, atores });
         this.setState((prev) => ({ filmes: [...prev.filmes, created] }));
       }
-
       this.setState({ title: '', poster_path: '', genero: '', atores: '', editandoId: null });
     } catch (error) {
       console.error(error);
-      Alert.alert('Erro', error.message);
+      Alert.alert('Erro', 'Falha ao salvar o filme.');
     }
   };
 
@@ -87,10 +87,11 @@ export default class AddMovieScreen extends React.Component {
       atores: filme.atores,
       editandoId: filme.id,
     });
+    this.scrollView.scrollTo({ y: 0, animated: true });
   };
 
   handleDelete = (id) => {
-    Alert.alert('Confirmar', 'Deseja excluir este filme?', [
+    Alert.alert('Confirmar', 'Tem certeza que deseja excluir este filme?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Excluir',
@@ -101,7 +102,7 @@ export default class AddMovieScreen extends React.Component {
             this.setState((prev) => ({ filmes: prev.filmes.filter(f => f.id !== id) }));
           } catch (error) {
             console.error(error);
-            Alert.alert('Erro', 'Falha ao excluir filme');
+            Alert.alert('Erro', 'Falha ao excluir o filme.');
           }
         },
       },
@@ -109,120 +110,84 @@ export default class AddMovieScreen extends React.Component {
   };
 
   renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.item}>
-      {item.poster_path && (
-        <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
-      )}
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.text}>Gênero: {item.genero}</Text>
-        <Text style={styles.text}>Atores: {item.atores}</Text>
-        <View style={styles.buttons}>
-          <Button title="Editar" onPress={() => this.startEdit(item)} />
-          <Button title="Excluir" onPress={() => this.handleDelete(item.id)} color="red" />
-        </View>
-      </View>
-    </TouchableOpacity>
+    <AddedList
+      item={item}
+      onEdit={this.startEdit}
+      onDelete={this.handleDelete}
+    />
   );
 
   render() {
     const { title, poster_path, genero, atores, filmes, editandoId } = this.state;
     return (
-      <View style={styles.container}>
-        <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Adicionar Filme'}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Título"
-          placeholderTextColor="#FFF"
-          value={title}
-          onChangeText={(t) => this.setState({ title: t })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="URL do Poster"
-          placeholderTextColor="#FFF"
-          value={poster_path}
-          onChangeText={(t) => this.setState({ poster_path: t })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Gênero"
-          placeholderTextColor="#FFF"
-          value={genero}
-          onChangeText={(t) => this.setState({ genero: t })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Atores (separados por vírgula)"
-          placeholderTextColor="#FFF"
-          value={atores}
-          onChangeText={(t) => this.setState({ atores: t })}
-        />
-        <Button
-          title={editandoId ? 'Atualizar' : 'Salvar'}
-          onPress={this.handleSave}
-        />
+      <KeyboardAvoidingView style={styles.container}>
+        <ScrollView 
+            ref={(ref) => { this.scrollView = ref; }} 
+            contentContainerStyle={styles.scrollContainer}
+        >
+          <View style={styles.headerContainer}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => this.props.navigation.goBack()}
+            >
+              <Icon name="arrow-left" size={24} color="#EFEFEF" />
+            </TouchableOpacity>
+            <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Adicionar Filme'}</Text>
+          </View>
+          
+          <AddedForm
+            title={title}
+            poster_path={poster_path}
+            genero={genero}
+            atores={atores}
+            editandoId={editandoId}
+            onChange={this.handleChange}
+            onSave={this.handleSave}
+          />
 
-        <FlatList
-          data={filmes}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={this.renderItem}
-          style={styles.list}
-        />
-      </View>
+          <FlatList
+            data={filmes}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={this.renderItem}
+            style={styles.list}
+            scrollEnabled={false} 
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 }
 
+// podem ser removidos, já que agora são gerenciados por AddedList.jsx
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    padding: 16, 
-    paddingTop: 60,
-    backgroundColor: '#072330'
+  container: {
+    flex: 1,
+    backgroundColor: '#071A24',
   },
-  header: { 
-    fontSize: 20, 
-    marginBottom: 30, 
-    color: '#FFF'
+  scrollContainer: {
+    padding: 20,
+    paddingTop: 50,
   },
-  input: { 
-    borderWidth: 1, 
-    borderColor: '#CCC', 
-    marginBottom: 8, 
-    padding: 8, 
-    borderRadius: 4,
-    color: '#FFF', 
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center', 
+    position: 'relative',   
+    marginBottom: 24,
   },
-  list: { 
-    marginTop: 16 
+  backButton: {
+    position: 'absolute', 
+    left: 0,              
+    padding: 10,          
+    zIndex: 1,          
   },
-  item: { 
-    flexDirection: 'row', 
-    padding: 12, 
-    borderBottomWidth: 1, 
-    borderColor: '#EEE' 
-  },
-  poster: { 
-    width: 64, 
-    height: 96, 
-    marginRight: 12 
-  },
-  info: { 
-    flex: 1
-  },
-  title: { 
-    fontSize: 16, 
+  header: {
+    fontSize: 22,
     fontWeight: 'bold',
-    paddingTop: 4,
-    color: '#FFF'
+    color: '#EFEFEF',
+    textAlign: 'center',
   },
-  text: {
-    color: '#FFF',
-  },
-  buttons: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginTop: 8 
+  list: {
+    marginTop: 16,
   },
 });
