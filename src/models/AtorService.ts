@@ -33,28 +33,24 @@ export default class AtorService implements ICrud<AtorDTO, AtorReadParams, AtorU
     await set(newRef, ator.toFirebase());
     return Ator.fromFirebase(newRef.key, ator.toFirebase());
   }
-
   async read(params: AtorReadParams): Promise<any> {
     const { useCache = true } = params;
     return await Ator.getAtoresFromFirebase(useCache);
   }
-
   async update(params: AtorUpdateDTO): Promise<any> {
     const { id, nome, nacionalidade, sexo } = params;
     const ator = new Ator(id, nome, nacionalidade, sexo);
     if (!ator.isValid()) {
       throw new Error('Dados do gênero inválidos');
     }
-
-    const atorRef = ref(database, `ators/${id}`);
+    const atorRef = ref(database, `atores/${id}`);
     await set(atorRef, ator.toFirebase());
     return ator;
   }
-
   async delete(params: AtorDeleteDTO): Promise<void> {
     const { id } = params;
     if (!id) throw new Error('ID do ator é necessário para excluir');
-    const AtorRef = ref(database, `ators/${id}`);
+    const AtorRef = ref(database, `atores/${id}`);
     await remove(AtorRef);
   }
 }
