@@ -1,12 +1,12 @@
-import { ref, get, query, limitToFirst, orderByKey } from 'firebase/database';
+import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Filme {
   constructor(
-    id, 
-    title, 
-    poster_path, 
-    genero = '', 
+    id,
+    title,
+    poster_path,
+    genero = '',
     atores = '',
     nativo,
     overview = '',
@@ -74,7 +74,7 @@ export default class Filme {
       data.title || 'Título não disponível',
       data.poster_path || '',
       generoDoFilme,
-      data.atores || '', 
+      data.atores || '',
       data.nativo ?? true,
       data.overview || '',
       data.budget || 0,
@@ -105,6 +105,7 @@ export default class Filme {
     if (useCache) this.cache = filmes;
     return filmes;
   }
+
   static async getAllFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
     const filmesRef = ref(database, 'filmes');
@@ -138,6 +139,7 @@ export default class Filme {
       ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
     );
   }
+
   static async getFilmesCriadosFromFirebase(useCache = true) {
     if (useCache && this.cacheAlt) return this.cacheAlt;
     const filmesRef = ref(database, 'filmes_criados');
@@ -146,8 +148,9 @@ export default class Filme {
       return [];
     }
     const data = snapshot.val();
-    const filmes = Object.entries(data)
-      .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData));
+    const filmes = Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
     if (useCache) this.cacheAlt = filmes;
     return filmes;
   }
