@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.body}>
           <SearchBar
             onSearch={(searchTerm) => {
-              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: `${searchTerm}` });
+              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: null });
             }}
           />
           <FilterChips
