@@ -35,12 +35,14 @@ export default function FilteringMovieScreen({ navigation, route }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backArrow}>{'←'}</Text>
         </TouchableOpacity>
-        <SearchBar
-          style={{ flex: 1, marginLeft: 10 }}
-          onSearch={(searchTerm) => {
-            navigation.setParams({ searchTerm, generoId: null, generoLabel: `Resultados para "${searchTerm}"` });
-          }}
-        />
+        <View style={{ flex: 1, alignItems: 'center' }}>
+          <SearchBar
+            style={{ width: '100%' }}
+            onSearch={(searchTerm) => {
+              navigation.setParams({ searchTerm, generoId: null, generoLabel: null });
+            }}
+          />
+        </View>
       </View>
       <Text style={styles.sectionTitle}>{generoLabel}</Text>
       {carregando ? (
@@ -64,11 +66,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 25,
+    paddingTop: 30,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // alinhamento centralizado
     paddingHorizontal: 20,
     marginBottom: 10,
   },
