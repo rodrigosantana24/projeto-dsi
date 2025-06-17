@@ -3,6 +3,7 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import SingUpScreen from '../screens/SingUpScreen';
 import CineScreen from '../screens/CineScreen';
+import ToScheduleScreen from '../screens/ToScheduleScreen';
 import MenuScreen from '../screens/MenuScreen';
 import FavoriteMovieScreen from '../screens/FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
@@ -14,6 +15,7 @@ import FriendList from '../screens/FriendList';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
 import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -78,6 +80,11 @@ const AppNavigation = ()=> {
         <Stack.Screen
           name='AddFriend'
           component={AddFriend}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen 
+          name='ToScheduleScreen'
+          component={ToScheduleScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen

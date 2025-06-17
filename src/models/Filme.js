@@ -92,18 +92,52 @@ export default class Filme {
 
   static async getFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
-    const filmesRef = ref(database, 'filmes');
-    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(20));
-    const snapshot = await get(filmesQuery);
-    if (!snapshot.exists()) {
+
+    try {
+      const filmesRef = ref(database, 'filmes');
+      const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(20));
+      const snapshot = await get(filmesQuery);
+
+      if (!snapshot.exists()) return [];
+
+      const data = snapshot.val();
+      const filmes = Object.entries(data).map(
+        ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+      );
+
+      if (useCache) this.cache = filmes;
+      return filmes;
+    } catch (error) {
+      console.error('Erro ao buscar filmes:', error);
       return [];
     }
-    const data = snapshot.val();
-    const filmes = Object.entries(data).map(
-      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
-    );
-    if (useCache) this.cache = filmes;
-    return filmes;
+  }
+
+  static async getFilmesFirebaseFiltrados(termo) {
+    if (!termo || termo.trim() === '') return [];
+
+    const termoLower = termo.toLowerCase();
+
+    try {
+      const filmesRef = ref(database, 'filmes');
+      const snapshot = await get(filmesRef);
+
+      if (!snapshot.exists()) return [];
+
+      const data = snapshot.val();
+      const todosFilmes = Object.entries(data).map(
+        ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+      );
+
+      const filtrados = todosFilmes.filter(filme =>
+        filme.title.toLowerCase().startsWith(termoLower)
+      );
+
+      return filtrados;
+    } catch (error) {
+      console.error('Erro ao buscar filmes filtrados:', error);
+      return [];
+    }
   }
 
   static async getAllFilmesFromFirebase(useCache = true) {
