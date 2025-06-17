@@ -169,6 +169,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     marginBottom: 20,
+    zIndex: 20, // <-- Adicione isso
+    elevation: 20, // <-- Para Android
   },
   formTitle: {
     color: '#FFF',
@@ -212,14 +214,14 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#e6f2fa',
     borderRadius: 8,
-    zIndex: 10,
+    zIndex: 100, // <-- Aumente aqui
+    elevation: 30, // <-- Para Android
     borderWidth: 1,
     borderColor: '#3d5564',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-    elevation: 5,
   },
   dropdownOption: {
     padding: 12,
