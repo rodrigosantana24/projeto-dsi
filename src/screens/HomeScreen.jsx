@@ -42,7 +42,9 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 100 }} // ajuste conforme a altura do BottomTab
+      >
         <View style={styles.header}>
           <Text style={styles.headerText}>Encontre seu filme preferido!</Text>
           <Logo style={{ width: 75, height: 75 }} />
@@ -120,7 +122,6 @@ const styles = StyleSheet.create({
   body: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingBottom: 70,
   },
   footer: {
     position: 'absolute',

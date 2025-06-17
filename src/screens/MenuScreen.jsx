@@ -23,7 +23,9 @@ const ProfileScreen = () => {
             <Text style={styles.username}>{userCredentials.email}</Text>
             <FontAwesome name="user-circle-o" size={50} color="white"/>
         </View>
-        <ScrollView>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }} // ajuste conforme a altura do BottomTab
+        >
           <View style={styles.content}>
             <ProfileButton 
               icon= {<Ionicons name="heart" size={30} color={"white"}/>} 
