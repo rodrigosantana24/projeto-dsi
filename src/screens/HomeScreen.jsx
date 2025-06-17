@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, ScrollView, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
 import BottomTab from '../components/navi/BottomTab';
 import { Logo } from '../components/logo/Logo';
 import SearchBar from '../components/search/SearchBar';
@@ -51,7 +51,9 @@ export default function HomeScreen({ navigation }) {
           <SearchBar />
           <FilterChips
             filters={controller.getFiltros()}
-            onSelect={(filter) => controller.aoSelecionarFiltro(filter)}
+            onSelect={(filter) => {
+              navigation.navigate('FilteringMovieScreen', { generoId: filter.id, generoLabel: filter.label });
+            }}
           />
           <FeaturedCarousel 
             data={controller.getFilmes()} 

@@ -1,0 +1,97 @@
+import React from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import MovieCard from '../cards/MovieCard';
+
+export default function FilteringSectionCarousel({
+  title,
+  data,
+  navigation,
+  onViewAll,
+  contentContainerStyle
+}) {
+  return (
+    <View style={styles.section}>
+      <View style={styles.carouselBackground}>
+        <FlatList
+          data={data}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item, idx) => idx.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <MovieCard
+                id={item.id}
+                title={item.titulo || item.title}
+                image={{ uri: item.imagem || (item.getImageUrl && item.getImageUrl()) }}
+                onPress={(id) => navigation.navigate('Detalhes', { id })}
+              />
+              <View style={styles.infoContainer}>
+                <Text style={styles.movieName}>{item.titulo || item.title}</Text>
+                {item.release_date && (
+                  <Text style={styles.movieInfo}>Lançamento: {item.release_date}</Text>
+                )}
+                {item.runtime && (
+                  <Text style={styles.movieInfo}>Duração: {item.runtime} min</Text>
+                )}
+                {item.vote_average && (
+                  <Text style={styles.movieInfo}>Nota: {item.vote_average}</Text>
+                )}
+              </View>
+            </View>
+          )}
+          contentContainerStyle={contentContainerStyle}
+        />
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  section: {
+    marginTop: 14,
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  title: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  viewAll: {
+    color: '#f4a03f',
+    fontSize: 14,
+  },
+  carouselBackground: {
+    borderRadius: 12,
+    padding: 8,
+    flex: 1,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 8,
+    padding: 6,
+  },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 16,
+    justifyContent: 'center',
+  },
+  movieName: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  movieInfo: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 1,
+  },
+});
