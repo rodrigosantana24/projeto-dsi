@@ -106,7 +106,38 @@ export default class Filme {
     if (useCache) this.cache = filmes;
     return filmes;
   }
-  
+  static async getAllFilmesFromFirebase(useCache = true) {
+    if (useCache && this.cache) return this.cache;
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    const filmes = Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
+    if (useCache) this.cache = filmes;
+    return filmes;
+  }
+
+  static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(
+      filmesRef,
+      orderByChild('primary_genre_id'),
+      equalTo(genreId),
+      limitToFirst(limit)
+    );
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    return Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
   static async getFilmesCriadosFromFirebase(useCache = true) {
   if (useCache && this.cacheAlt) return this.cacheAlt;
   const filmesRef = ref(database, 'filmes_criados');
