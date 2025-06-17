@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const AddedForm = ({ title, poster_path, genero, atores, editandoId, onChange, onSave }) => (
+const AddForm = ({ title, poster_path, genero, atores, editandoId, onChange, onSave }) => (
   <View style={styles.form}>
     <TextInput
       style={styles.input}
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddedForm;
+export default AddForm;

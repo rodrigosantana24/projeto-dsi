@@ -11,8 +11,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import FilmeService from '../models/FilmeService';
-import AddedForm from '../components/addedmovies/AddedForm'; 
-import AddedList from '../components/addedmovies/AddedList'; 
+import AddForm from '../components/addmovies/AddForm'; 
+import AddList from '../components/addmovies/AddList'; 
 
 const filmeService = new FilmeService();
 export default class AddMovieScreen extends React.Component {
@@ -110,7 +110,7 @@ export default class AddMovieScreen extends React.Component {
   };
 
   renderItem = ({ item }) => (
-    <AddedList
+    <AddList
       item={item}
       onEdit={this.startEdit}
       onDelete={this.handleDelete}
@@ -135,7 +135,7 @@ export default class AddMovieScreen extends React.Component {
             <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Adicionar Filme'}</Text>
           </View>
           
-          <AddedForm
+          <AddForm
             title={title}
             poster_path={poster_path}
             genero={genero}
@@ -158,7 +158,6 @@ export default class AddMovieScreen extends React.Component {
   }
 }
 
-// podem ser removidos, já que agora são gerenciados por AddedList.jsx
 const styles = StyleSheet.create({
   container: {
     flex: 1,
