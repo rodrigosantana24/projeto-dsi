@@ -27,7 +27,6 @@ export default class AddMovieScreen extends React.Component {
     title: '',
     poster_path: '',
     genero: '',
-    atores: '',
     editandoId: null,
   };
   unsubscribeFocus = null;
@@ -96,19 +95,19 @@ export default class AddMovieScreen extends React.Component {
   };
 
   handleSave = async () => {
-    const { title, poster_path, genero, atores, editandoId } = this.state;
-    if (!title || !poster_path || !genero || !atores) {
+    const { title, poster_path, genero, editandoId } = this.state;
+    if (!title || !poster_path || !genero) {
       return Alert.alert('Erro', 'Preencha todos os campos');
     }
     try {
       if (editandoId) {
-        const updated = await filmeService.update({ id: editandoId, title, poster_path, genero, atores });
+        const updated = await filmeService.update({ id: editandoId, title, poster_path, genero });
         this.setState((prev) => ({ filmesCriados: prev.filmesCriados.map(f => f.id === editandoId ? updated : f) }), this.applyFilters);
       } else {
-        const created = await filmeService.create({ title, poster_path, genero, atores });
+        const created = await filmeService.create({ title, poster_path, genero });
         this.setState((prev) => ({ filmesCriados: [...prev.filmesCriados, created] }), this.applyFilters);
       }
-      this.setState({ title: '', poster_path: '', genero: '', atores: '', editandoId: null });
+      this.setState({ title: '', poster_path: '', genero: '', editandoId: null });
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', 'Falha ao salvar o filme.');
@@ -120,7 +119,6 @@ export default class AddMovieScreen extends React.Component {
       title: filme.title,
       poster_path: filme.poster_path,
       genero: filme.genero,
-      atores: filme.atores,
       editandoId: filme.id,
     });
     this.scrollView.scrollTo({ y: 0, animated: true });
@@ -154,7 +152,7 @@ export default class AddMovieScreen extends React.Component {
   );
 
   render() {
-    const { title, poster_path, genero, atores, filmesExibidos, editandoId, filter, searchQuery } = this.state;
+    const { title, poster_path, genero, filmesExibidos, editandoId, filter, searchQuery } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
         <ScrollView
@@ -168,14 +166,13 @@ export default class AddMovieScreen extends React.Component {
             >
               <Icon name="arrow-left" size={24} color="#EFEFEF" />
             </TouchableOpacity>
-            <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Gerenciar Filmes'}</Text>
+            <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Novo Filme'}</Text>
           </View>
 
           <AddForm
             title={title}
             poster_path={poster_path}
             genero={genero}
-            atores={atores}
             editandoId={editandoId}
             onChange={this.handleChange}
             onSave={this.handleSave}
