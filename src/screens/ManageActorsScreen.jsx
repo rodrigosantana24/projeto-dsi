@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, FlatList, Alert, StyleSheet, Text, TouchableOpacity, TextInput, Keyboard } from 'react-native';
+import { View, FlatList, Alert, StyleSheet, Text } from 'react-native';
 import AtorService from '../models/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
 import Ator from '../models/Ator'; 
 import HeaderBar from '../components/navi/HeaderBar';
+import SearchBy from '../components/search/SearchBy';
+import SelectBy from '../components/search/SelectBy';
 
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
@@ -104,23 +106,27 @@ export default class ManageActorsScreen extends React.Component {
     ]);
   };
 
-  // Sempre que filtrar/buscar, reseta a página para 1
-  buscarPorNome = () => {
-    const { atores, buscaNome } = this.state;
-    if (!buscaNome.trim()) {
-      this.setState({ atoresFiltrados: atores, page: 1 });
-      Keyboard.dismiss();
-      return;
-    }
-    const termo = buscaNome.trim().toLowerCase();
-    const filtrados = atores.filter(a => a.nome.toLowerCase().startsWith(termo));
-    this.setState({ atoresFiltrados: filtrados, page: 1 });
-    Keyboard.dismiss();
-  };
-
   setFiltroSexo = async (filtroSexo) => {
     await this.setState({ filtroSexo, buscaNome: '', page: 1 });
     await this.loadAtores();
+  };
+
+  handleBuscaNome = (buscaNome) => {
+    this.setState({ buscaNome }, this.applyFilters);
+  };
+
+  applyFilters = () => {
+    const { atores, buscaNome, filtroSexo } = this.state;
+    let filtrados = atores;
+
+    if (filtroSexo !== 'todos') {
+      filtrados = filtrados.filter(a => a.sexo === filtroSexo);
+    }
+    if (buscaNome.trim()) {
+      const termo = buscaNome.trim().toLowerCase();
+      filtrados = filtrados.filter(a => a.nome.toLowerCase().includes(termo));
+    }
+    this.setState({ atoresFiltrados: filtrados, page: 1 });
   };
 
   // Função chamada ao chegar no fim da lista
@@ -129,10 +135,6 @@ export default class ManageActorsScreen extends React.Component {
     if ((page * PAGE_SIZE) < atoresFiltrados.length) {
       this.setState({ page: page + 1 });
     }
-  };
-
-  handleBuscaNome = (buscaNome) => {
-    this.setState({ buscaNome });
   };
 
   render() {
@@ -160,38 +162,26 @@ export default class ManageActorsScreen extends React.Component {
           onCancel={editandoId ? () => this.setState({ nome: '', nacionalidade: '', sexo: '', editandoId: null }) : null}
         />
 
-        {/* Filtros de sexo */}
-        <View style={styles.filtrosContainer}>
-          <TouchableOpacity
-            style={[styles.filtroBotao, filtroSexo === 'todos' && styles.filtroSelecionado]}
-            onPress={() => this.setFiltroSexo('todos')}
-          >
-            <Text style={styles.filtroTexto}>Todos</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filtroBotao, filtroSexo === 'Masculino' && styles.filtroSelecionado]}
-            onPress={() => this.setFiltroSexo('Masculino')}
-          >
-            <Text style={styles.filtroTexto}>Masculino</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filtroBotao, filtroSexo === 'Feminino' && styles.filtroSelecionado]}
-            onPress={() => this.setFiltroSexo('Feminino')}
-          >
-            <Text style={styles.filtroTexto}>Feminino</Text>
-          </TouchableOpacity>
+        {/* Filtros e busca */}
+        <View style={styles.filterContainer}>
+          <View style={styles.searchContainer}>
+            <SearchBy
+              placeholder="Pesquisar atores..."
+              onSearch={this.handleBuscaNome}
+            />
+          </View>
+          <View style={styles.selectContainer}>
+            <SelectBy
+              options={[
+                { label: 'Todos', value: 'todos' },
+                { label: 'Masculino', value: 'Masculino' },
+                { label: 'Feminino', value: 'Feminino' },
+              ]}
+              initialValue="todos"
+              onSelect={this.setFiltroSexo}
+            />
+          </View>
         </View>
-
-        {/* Campo de busca por nome */}
-        <TextInput
-          style={styles.inputBusca}
-          placeholder="Digite o nome do ator"
-          placeholderTextColor="#aaa"
-          value={buscaNome}
-          onChangeText={this.handleBuscaNome}
-          onSubmitEditing={this.buscarPorNome}
-          returnKeyType="search"
-        />
 
         <Text style={styles.subheader}>Atores cadastrados</Text>
         <FlatList
@@ -224,6 +214,17 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     backgroundColor: '#072330',
   },
+  filterContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  searchContainer: {
+    flex: 2,
+    marginRight: 8,
+  },
+  selectContainer: {
+    flex: 1,
+  },
   subheader: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -231,33 +232,5 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: -4,
     marginLeft: 4,
-  },
-  filtrosContainer: {
-    flexDirection: 'row',
-    marginBottom: 10,
-    marginTop: 10,
-    justifyContent: 'center',
-  },
-  filtroBotao: {
-    padding: 8,
-    marginHorizontal: 4,
-    borderRadius: 6,
-    backgroundColor: '#0a3d5c',
-  },
-  filtroSelecionado: {
-    backgroundColor: '#1e90ff',
-  },
-  filtroTexto: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  inputBusca: {
-    backgroundColor: '#fff',
-    borderRadius: 6,
-    padding: 8,
-    marginBottom: 10,
-    marginTop: 10,
-    fontSize: 16,
-    color: '#222',
   },
 });

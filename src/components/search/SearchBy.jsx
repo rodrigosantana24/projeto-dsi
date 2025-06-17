@@ -21,7 +21,7 @@ export default class SearchBy extends React.Component {
       <View style={styles.container}>
         <TextInput
           style={styles.input}
-          placeholder="Pesquisar gêneros..."
+          placeholder={this.props.placeholder || "Pesquisar..."}
           placeholderTextColor="#999"
           value={this.state.searchText}
           onChangeText={this.handleSearchChange}
