@@ -1,4 +1,4 @@
-import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo } from 'firebase/database';
+import { ref, get, query, limitToFirst, orderByKey } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Filme {
@@ -48,7 +48,7 @@ export default class Filme {
   }
 
   isValid() {
-    return !!(this.title && this.genero);
+    return !!(this.title && this.genero && this.atores);
   }
 
   toFirebase() {
@@ -63,18 +63,11 @@ export default class Filme {
 
   static fromFirebase(id, data) {
     if (!data) return null;
-    
-    let generoDoFilme = data.genero || ''; 
-    if (data.genres && Array.isArray(data.genres) && data.genres.length > 0) {
-      generoDoFilme = data.genres[0].name;
-    }
-
     return new Filme(
       id,
       data.title || 'Título não disponível',
       data.poster_path || '',
       data.genero || '',
-      generoDoFilme,
       data.atores || '',
       data.nativo ?? true,
       data.overview || '',
@@ -119,5 +112,5 @@ export default class Filme {
     .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData));
   if (useCache) this.cacheAlt = filmes;
   return filmes;
-  }
+}
 }
