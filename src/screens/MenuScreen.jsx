@@ -11,6 +11,7 @@ import ManageActorsScreen from './ManageActorsScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
+import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 
 
 const ProfileScreen = () => {
@@ -22,7 +23,9 @@ const ProfileScreen = () => {
             <Text style={styles.username}>{userCredentials.email}</Text>
             <FontAwesome name="user-circle-o" size={50} color="white"/>
         </View>
-        <ScrollView>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }} // ajuste conforme a altura do BottomTab
+        >
           <View style={styles.content}>
             <ProfileButton 
               icon= {<Ionicons name="heart" size={30} color={"white"}/>} 
@@ -46,21 +49,21 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="videocamera" size={30} color={"white"}/>} 
               text="Gerenciar Filmes" 
               onPress={() => {
                 navigation.navigate(AddMovieScreen);
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="plus" size={30} color={"white"}/>} 
               text="Gerenciar Gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="user" size={30} color={"white"}/>} 
               text="Gerenciar Atores" 
               onPress={() => {
                 navigation.navigate(ManageActorsScreen);

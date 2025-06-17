@@ -63,12 +63,18 @@ export default class Filme {
 
   static fromFirebase(id, data) {
     if (!data) return null;
+
+    let generoDoFilme = data.genero || '';
+    if (data.genres && Array.isArray(data.genres) && data.genres.length > 0) {
+      generoDoFilme = data.genres[0].name;
+    }
+
     return new Filme(
       id,
       data.title || 'Título não disponível',
       data.poster_path || '',
-      data.genero || '',
-      data.atores || '',
+      generoDoFilme,
+      data.atores || '', 
       data.nativo ?? true,
       data.overview || '',
       data.budget || 0,
@@ -99,18 +105,50 @@ export default class Filme {
     if (useCache) this.cache = filmes;
     return filmes;
   }
-  
-  static async getFilmesCriadosFromFirebase(useCache = true) {
-  if (useCache && this.cacheAlt) return this.cacheAlt;
-  const filmesRef = ref(database, 'filmes_criados');
-  const snapshot = await get(filmesRef);
-  if (!snapshot.exists()) {
-    return [];
+  static async getAllFilmesFromFirebase(useCache = true) {
+    if (useCache && this.cache) return this.cache;
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    const filmes = Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
+    if (useCache) this.cache = filmes;
+    return filmes;
   }
-  const data = snapshot.val();
-  const filmes = Object.entries(data)
-    .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData));
-  if (useCache) this.cacheAlt = filmes;
-  return filmes;
-}
+
+  static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(
+      filmesRef,
+      orderByChild('primary_genre_id'),
+      equalTo(genreId),
+      limitToFirst(limit)
+    );
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    return Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
+  }
+  static async getFilmesCriadosFromFirebase(useCache = true) {
+    if (useCache && this.cacheAlt) return this.cacheAlt;
+    const filmesRef = ref(database, 'filmes_criados');
+    const snapshot = await get(filmesRef);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    const filmes = Object.entries(data)
+      .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData));
+    if (useCache) this.cacheAlt = filmes;
+    return filmes;
+  }
 }
