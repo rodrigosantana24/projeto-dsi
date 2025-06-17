@@ -178,10 +178,21 @@ export default class ManageGenresScreen extends React.Component {
         />
         <View style={styles.filterContainer}>
           <View style={styles.searchContainer}>
-            <SearchBy onSearch={this.handleSearch} />
+            <SearchBy
+              placeholder="Pesquisar atores..."
+              onSearch={this.handleBuscaNome}
+            />
           </View>
           <View style={styles.selectContainer}>
-            <SelectBy onSelect={this.handleFilter} initialValue="all" />
+            <SelectBy
+              options={[
+                { label: 'Todos', value: 'all' },
+                { label: 'Nativos', value: 'true' },
+                { label: 'Não nativos', value: 'false' },
+              ]}
+              initialValue="all"
+              onSelect={this.handleFilter}
+            />
           </View>
         </View>
         <Text style={styles.subheader}>Gêneros cadastrados</Text>

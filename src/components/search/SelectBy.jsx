@@ -6,7 +6,7 @@ export default class SelectBy extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedValue: props.initialValue || 'all',
+      selectedValue: props.initialValue || (props.options?.[0]?.value ?? ''),
     };
   }
 
@@ -18,6 +18,7 @@ export default class SelectBy extends React.Component {
   };
 
   render() {
+    const { options = [], placeholder } = this.props;
     return (
       <View style={styles.container}>
         <Picker
@@ -26,9 +27,12 @@ export default class SelectBy extends React.Component {
           onValueChange={this.handleValueChange}
           mode="dropdown"
         >
-          <Picker.Item label="Todos" value="all" />
-          <Picker.Item label="Nativos" value="true" />
-          <Picker.Item label="Não nativos" value="false" />
+          {placeholder && (
+            <Picker.Item label={placeholder} value="" />
+          )}
+          {options.map(opt => (
+            <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+          ))}
         </Picker>
       </View>
     );

@@ -72,11 +72,11 @@ export default class HomeController {
   }
 
   async searchFilmesByName(searchTerm) {
-  const filmes = await Filme.getAllFilmesFromFirebase();
-  if (!searchTerm) return filmes;
-  const lower = searchTerm.toLowerCase();
-  return filmes.filter(f =>
-    (f.title || f.titulo || '').toLowerCase().startsWith(lower)
-  );
-}
+    const filmes = await Filme.getAllFilmesFromFirebase();
+    if (!searchTerm) return filmes;
+    const lower = searchTerm.toLowerCase();
+    return filmes.filter(f =>
+      (f.title || f.titulo || '').toLowerCase().includes(lower)
+    );
+  }
 }
