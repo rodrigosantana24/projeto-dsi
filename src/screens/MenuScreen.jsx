@@ -47,31 +47,24 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="videocamera" size={30} color={"white"}/>} 
               text="Gerenciar Filmes" 
               onPress={() => {
                 navigation.navigate(AddMovieScreen);
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="plus" size={30} color={"white"}/>} 
               text="Gerenciar Gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
               }}
             />
             <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              icon={<AntDesign name="user" size={30} color={"white"}/>} 
               text="Gerenciar Atores" 
               onPress={() => {
                 navigation.navigate(ManageActorsScreen);
-              }}
-            />
-            <ProfileButton 
-              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
-              text="Tela de Filmes Filtrados" 
-              onPress={() => {
-                navigation.navigate(FilteringMovieScreen);
               }}
             />
             <ProfileButton 
