@@ -14,6 +14,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
 import AddFriend from '../screens/AddFriend';
+import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 
 
 
@@ -84,6 +85,11 @@ const AppNavigation = ()=> {
         <Stack.Screen 
           name='ToScheduleScreen'
           component={ToScheduleScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name='FilteringMovieScreen'
+          component={FilteringMovieScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
