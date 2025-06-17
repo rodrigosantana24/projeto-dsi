@@ -3,6 +3,8 @@ import { View, FlatList, Alert, StyleSheet, Button, Text } from 'react-native';
 import GeneroService from '../models/GeneroService';
 import GeneroForm from '../components/genres/GeneroForm';
 import GeneroItem from '../components/genres/GeneroItem';
+import SearchBy from '../components/search/SearchBy';
+import SelectBy from '../components/search/SelectBy';
 import HeaderBar from '../components/navi/HeaderBar';
 
 const generoService = new GeneroService();
@@ -10,9 +12,12 @@ const generoService = new GeneroService();
 export default class ManageGenresScreen extends React.Component {
   state = {
     generos: [],
+    filteredGeneros: [],
     nome: '',
     descricao: '',
     editandoId: null,
+    searchText: '',
+    filterNativo: 'all',
   };
 
   unsubscribeFocus = null;
@@ -35,11 +40,52 @@ export default class ManageGenresScreen extends React.Component {
   loadGeneros = async () => {
     try {
       const generos = await generoService.read({ useCache: false });
-      this.setState({ generos });
+      this.setState({ generos }, this.applyFilters);
     } catch (error) {
       console.error('Erro ao carregar gêneros:', error);
       Alert.alert('Erro', 'Não foi possível carregar os gêneros');
     }
+  };
+
+  filterGeneros = () => {
+    const { generos, searchText, filterNativo } = this.state;
+    let filtered = generos;
+    if (searchText) {
+      filtered = filtered.filter(genero =>
+        genero.nome.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+    if (filterNativo !== 'all') {
+      const nativoFilter = filterNativo === 'true';
+      filtered = filtered.filter(genero => genero.nativo === nativoFilter);
+    }
+    this.setState({ filteredGeneros: filtered });
+  };
+
+  applyFilters = () => {
+    const { generos, searchText, filterNativo } = this.state;
+    let filtered = generos;
+
+    if (searchText) {
+      filtered = filtered.filter(genero =>
+        genero.nome.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    if (filterNativo !== 'all') {
+      const nativo = filterNativo === 'true';
+      filtered = filtered.filter(genero => genero.nativo === nativo);
+    }
+
+    this.setState({ filteredGeneros: filtered });
+  };
+
+  handleSearch = (text) => {
+    this.setState({ searchText: text }, this.applyFilters);
+  };
+
+  handleFilter = (value) => {
+    this.setState({ filterNativo: value }, this.applyFilters);
   };
 
   handleSave = async () => {
@@ -60,7 +106,17 @@ export default class ManageGenresScreen extends React.Component {
         this.setState((prev) => ({ generos: [...prev.generos, created] }));
       }
 
-      this.setState({ nome: '', descricao: '', editandoId: null });
+      this.setState(
+        (prev) => ({
+          generos: editandoId
+            ? prev.generos.map(g => g.id === editandoId ? updated : g)
+            : [...prev.generos, created],
+          nome: '',
+          descricao: '',
+          editandoId: null,
+        }),
+        this.applyFilters
+      );
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', error.message);
@@ -84,9 +140,12 @@ export default class ManageGenresScreen extends React.Component {
         onPress: async () => {
           try {
             await generoService.delete({ id });
-            this.setState((prev) => ({
-              generos: prev.generos.filter(g => g.id !== id)
-            }));
+            this.setState(
+              (prev) => ({
+                generos: prev.generos.filter(g => g.id !== id)
+              }),
+              this.applyFilters
+            );
           } catch (error) {
             console.error(error);
             Alert.alert('Erro', 'Falha ao excluir gênero');
@@ -115,9 +174,17 @@ export default class ManageGenresScreen extends React.Component {
           onSubmit={this.handleSave}
           onCancel={editandoId ? () => this.setState({ nome: '', descricao: '', editandoId: null }) : null}
         />
+        <View style={styles.filterContainer}>
+          <View style={styles.searchContainer}>
+            <SearchBy onSearch={this.handleSearch} />
+          </View>
+          <View style={styles.selectContainer}>
+            <SelectBy onSelect={this.handleFilter} initialValue="all" />
+          </View>
+        </View>
         <Text style={styles.subheader}>Gêneros cadastrados</Text>
         <FlatList
-          data={generos}
+          data={this.state.filteredGeneros}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <GeneroItem
@@ -138,6 +205,17 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingTop: 25,
     backgroundColor: '#072330',
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  searchContainer: {
+    flex: 2,
+    marginRight: 8,
+  },
+  selectContainer: {
+    flex: 1,
   },
   subheader: {
     fontSize: 16,

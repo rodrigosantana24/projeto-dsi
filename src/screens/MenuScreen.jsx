@@ -7,9 +7,11 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
+import ManageActorsScreen from './ManageActorsScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
+
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -55,6 +57,13 @@ const ProfileScreen = () => {
               text="Gerenciar gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
+              }}
+            />
+            <ProfileButton 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Gerenciar Atores" 
+              onPress={() => {
+                navigation.navigate(ManageActorsScreen);
               }}
             />
             <ProfileButton 
