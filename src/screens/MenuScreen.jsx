@@ -8,6 +8,7 @@ import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import ManageActorsScreen from './ManageActorsScreen';
+import ToScheduleScreen from './ToScheduleScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
@@ -69,11 +70,19 @@ const ProfileScreen = () => {
                 navigation.navigate(ManageActorsScreen);
               }}
             />
+            <ProfileButton
+              icon={<AntDesign name="setting" size={30} color={'white'}/>}
+              text="Agendar" showArrow={true} 
+              onPress={() => {
+                navigation.navigate('ToScheduleScreen')
+              }}
+            />
             <ProfileButton 
               icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
               text="Sair" showArrow={false} 
               />
             </View>
+            
         </ScrollView>
         <View style={styles.footer}>
               <BottomTab/>
