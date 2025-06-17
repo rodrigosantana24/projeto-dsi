@@ -131,6 +131,10 @@ export default class ManageActorsScreen extends React.Component {
     }
   };
 
+  handleBuscaNome = (buscaNome) => {
+    this.setState({ buscaNome });
+  };
+
   render() {
     const { atoresFiltrados, nome, nacionalidade, sexo, editandoId, filtroSexo, buscaNome, page } = this.state;
 

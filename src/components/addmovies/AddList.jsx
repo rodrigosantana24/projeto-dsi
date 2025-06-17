@@ -1,15 +1,18 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-const AddedList = ({ item, onEdit, onDelete }) => (
+const AddList = ({ item, onEdit, onDelete }) => (
   <View style={styles.card}>
     {item.poster_path && (
       <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
     )}
+
+    
     <View style={styles.info}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.text}>Gênero: {item.genero}</Text>
-      <Text style={styles.text}>Atores: {item.atores}</Text>
+    
+    {item.nativo == false && (
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => onEdit(item)}>
           <Text style={styles.actionButtonText}>Editar</Text>
@@ -18,8 +21,12 @@ const AddedList = ({ item, onEdit, onDelete }) => (
           <Text style={styles.actionButtonText}>Excluir</Text>
         </TouchableOpacity>
       </View>
+    )}
+
     </View>
   </View>
+  
+
 );
 
 const styles = StyleSheet.create({
@@ -81,4 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddedList;
+export default AddList;

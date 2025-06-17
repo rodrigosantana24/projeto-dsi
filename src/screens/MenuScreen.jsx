@@ -46,22 +46,15 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon= {<Ionicons name="list" size={30} color={"white"}/>} 
-              text="Minhas Listas" 
-              onPress={() => {
-                alert("Minhas Listas");
-              }}
-            />
-            <ProfileButton 
-              icon={<Ionicons name="add" size={30} color={"white"}/>} 
-              text="Adicionar filme" 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Gerenciar Filmes" 
               onPress={() => {
                 navigation.navigate(AddMovieScreen);
               }}
             />
             <ProfileButton 
               icon={<AntDesign name="setting" size={30} color={"white"}/>} 
-              text="Gerenciar gêneros" 
+              text="Gerenciar Gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
               }}
@@ -114,7 +107,7 @@ const styles = StyleSheet.create({
   username: {
     marginTop: 10,
     color: 'white',
-    fontSize: 29,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   menuContainer: {
