@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, StyleSheet } from 'react-native';
 import MovieCard from '../cards/MovieCard';
 
 export default function FilteringSectionCarousel({
@@ -9,11 +9,20 @@ export default function FilteringSectionCarousel({
   onViewAll,
   contentContainerStyle
 }) {
+  const PAGE_SIZE = 20;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const handleEndReached = () => {
+    if (visibleCount < data.length) {
+      setVisibleCount(prev => Math.min(prev + PAGE_SIZE, data.length));
+    }
+  };
+
   return (
     <View style={styles.section}>
       <View style={styles.carouselBackground}>
         <FlatList
-          data={data}
+          data={data.slice(0, visibleCount)}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item, idx) => idx.toString()}
           renderItem={({ item }) => (
@@ -39,6 +48,8 @@ export default function FilteringSectionCarousel({
             </View>
           )}
           contentContainerStyle={contentContainerStyle}
+          onEndReached={handleEndReached}
+          onEndReachedThreshold={0.5}
         />
       </View>
     </View>

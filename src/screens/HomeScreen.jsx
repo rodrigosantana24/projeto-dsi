@@ -22,10 +22,10 @@ export default function HomeScreen({ navigation }) {
     const carregarDados = async () => {
       await controller.carregarFilmes();
       // Busca filmes com primary_genre_id = 0 para "Ação e Aventura"
-      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreId(0);
+      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreIdLimited(0);
       setAcaoAventuraFilmes(filmesAcaoAventura);
       // Busca filmes com primary_genre_id = 6 para "Drama e Suspense"
-      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreId(6);
+      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreIdLimited(6);
       setDramaSuspenseFilmes(filmesDramaSuspense);
       setCarregando(false);
     };
@@ -48,7 +48,11 @@ export default function HomeScreen({ navigation }) {
           <Logo style={{ width: 75, height: 75 }} />
         </View>
         <View style={styles.body}>
-          <SearchBar />
+          <SearchBar
+            onSearch={(searchTerm) => {
+              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: `Resultados para "${searchTerm}"` });
+            }}
+          />
           <FilterChips
             filters={controller.getFiltros()}
             onSelect={(filter) => {
@@ -66,6 +70,8 @@ export default function HomeScreen({ navigation }) {
             onViewAll={() => controller.verTodos('Ação e Aventura')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
+            generoId={0}
+            generoLabel="Ação e Aventura"
           />
           <SectionCarousel
             title="Drama e Suspense"
@@ -74,6 +80,8 @@ export default function HomeScreen({ navigation }) {
             onViewAll={() => controller.verTodos('Drama e Suspense')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
+            generoId={6}
+            generoLabel="Drama e Suspense"
           />
         </View>
       </ScrollView>

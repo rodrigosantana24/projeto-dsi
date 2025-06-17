@@ -63,7 +63,20 @@ export default class HomeController {
     return this.erro;
   }
 
-  async getFilmesByPrimaryGenreId(genreId, limit = 20) {
+  async getFilmesByPrimaryGenreIdLimited(genreId, limit = 10) {
     return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
   }
+
+  async getFilmesByPrimaryGenreId(genreId, limit = 100) {
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
+  }
+
+  async searchFilmesByName(searchTerm) {
+  const filmes = await Filme.getAllFilmesFromFirebase();
+  if (!searchTerm) return filmes;
+  const lower = searchTerm.toLowerCase();
+  return filmes.filter(f =>
+    (f.title || f.titulo || '').toLowerCase().startsWith(lower)
+  );
+}
 }

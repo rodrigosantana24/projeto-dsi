@@ -12,16 +12,22 @@ export default function FilteringMovieScreen({ navigation, route }) {
   const [filmes, setFilmes] = useState([]);
   const generoId = route?.params?.generoId ?? null;
   const generoLabel = route?.params?.generoLabel ?? 'Filmes';
+  const searchTerm = route?.params?.searchTerm ?? null;
 
   useEffect(() => {
     const carregar = async () => {
       setCarregando(true);
-      const lista = await controller.getFilmesByPrimaryGenreId(generoId);
+      let lista = [];
+      if (searchTerm) {
+        lista = await controller.searchFilmesByName(searchTerm);
+      } else {
+        lista = await controller.getFilmesByPrimaryGenreId(generoId);
+      }
       setFilmes(lista);
       setCarregando(false);
     };
     carregar();
-  }, [generoId]);
+  }, [generoId, searchTerm]);
 
   return (
     <View style={styles.container}>
@@ -29,7 +35,12 @@ export default function FilteringMovieScreen({ navigation, route }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Text style={styles.backArrow}>{'←'}</Text>
         </TouchableOpacity>
-        <SearchBar style={{ flex: 1, marginLeft: 10 }} />
+        <SearchBar
+          style={{ flex: 1, marginLeft: 10 }}
+          onSearch={(searchTerm) => {
+            navigation.setParams({ searchTerm, generoId: null, generoLabel: `Resultados para "${searchTerm}"` });
+          }}
+        />
       </View>
       <Text style={styles.sectionTitle}>{generoLabel}</Text>
       {carregando ? (
