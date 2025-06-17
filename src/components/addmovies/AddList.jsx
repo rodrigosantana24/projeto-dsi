@@ -6,9 +6,13 @@ const AddList = ({ item, onEdit, onDelete }) => (
     {item.poster_path && (
       <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
     )}
+
+    
     <View style={styles.info}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.text}>Gênero: {item.genero}</Text>
+    
+    {item.nativo == false && (
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => onEdit(item)}>
           <Text style={styles.actionButtonText}>Editar</Text>
@@ -17,8 +21,12 @@ const AddList = ({ item, onEdit, onDelete }) => (
           <Text style={styles.actionButtonText}>Excluir</Text>
         </TouchableOpacity>
       </View>
+    )}
+
     </View>
   </View>
+  
+
 );
 
 const styles = StyleSheet.create({
