@@ -22,7 +22,7 @@ export default function FilteringSectionCarousel({
                 id={item.id}
                 title={item.titulo || item.title}
                 image={{ uri: item.imagem || (item.getImageUrl && item.getImageUrl()) }}
-                onPress={(id) => navigation.navigate('Detalhes', { id })}
+                onPress={(id) => navigation.navigate('MovieDetailsScreen', { id })}
               />
               <View style={styles.infoContainer}>
                 <Text style={styles.movieName}>{item.titulo || item.title}</Text>
