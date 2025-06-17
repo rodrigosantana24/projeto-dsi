@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Keyboard,
+  Alert,
 } from "react-native";
 import AgendamentoService from "../models/AgendamentoService";
 import Filme from "../models/Filme";
@@ -14,6 +15,7 @@ import { UserContext } from "../Context/UserProvider";
 import BottomTab from "../components/navi/BottomTab";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import EditScheduleModal from "../components/modals/EditScheduleModal";
 
 const PAGE_SIZE = 20;
 
@@ -22,17 +24,17 @@ export default function ToScheduleScreen() {
   const { userCredentials } = useContext(UserContext);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [buscaFilme, setBuscaFilme] = useState('');
   const [filmesFiltrados, setFilmesFiltrados] = useState([]);
   const [filmesPagina, setFilmesPagina] = useState([]);
   const [buscandoFilmes, setBuscandoFilmes] = useState(false);
   const [paginaAtual, setPaginaAtual] = useState(0);
-
   const [novoFilme, setNovoFilme] = useState('');
   const [novaData, setNovaData] = useState('');
   const [novaHora, setNovaHora] = useState('');
-
+  const [modalVisible, setModalVisible] = useState(false);
+  const [agendamentoEditando, setAgendamentoEditando] = useState(null);
+   
   const service = new AgendamentoService();
 
   const carregarAgendamentos = async () => {
@@ -46,6 +48,11 @@ export default function ToScheduleScreen() {
       setLoading(false);
     }
   };
+
+  function abrirModalEdicao(agendamento) {
+  setAgendamentoEditando(agendamento);
+  setModalVisible(true);
+  }
 
   const buscarFilmes = async () => {
     if (!buscaFilme.trim()) {
@@ -69,6 +76,27 @@ export default function ToScheduleScreen() {
       setBuscandoFilmes(false);
     }
   };
+
+  async function salvarEdicao({filmeId, data, hora}) {
+    try {
+        await service.update({id: agendamentoEditando.id, userId: agendamentoEditando.userId, filmeId, data, hora});
+        setModalVisible(false)
+        setAgendamentoEditando(null)
+        await carregarAgendamentos();
+    } catch (error){
+        console.error(error)
+    }
+  }
+
+  async function excluirAgendamento(id){
+    try {
+        await service.delete({userId: userCredentials.uid, id});
+        Alert.alert('Agendamento excluido')
+        setAgendamentos(prev => prev.filter(item => item.id !== id))
+    } catch (error) {
+        console.error(error)
+    }
+  }
 
   const carregarMaisFilmes = () => {
     if (buscandoFilmes) return;
@@ -107,16 +135,6 @@ export default function ToScheduleScreen() {
     }
   };
 
-  const handleUpdate = async (agendamento) => {
-    try {
-      const novoHorario = prompt('Digite a nova hora (HH:mm)', agendamento.hora);
-      if (!novoHorario) return;
-      await service.update({ ...agendamento, hora: novoHorario });
-      await carregarAgendamentos();
-    } catch (error) {
-      console.error("Erro ao atualizar agendamento:", error);
-    }
-  };
 
   useEffect(() => {
     carregarAgendamentos();
@@ -208,10 +226,10 @@ export default function ToScheduleScreen() {
               <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
               
               <View style={styles.cardButtons}>
-                <TouchableOpacity style={styles.editButton} onPress={() => handleUpdate(item)}>
+                <TouchableOpacity style={styles.editButton} onPress={() => abrirModalEdicao(item)}>
                   <Text style={styles.editButtonText}>Editar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.delButton}>
+                <TouchableOpacity style={styles.delButton} onPress={() => excluirAgendamento(item.id)}>
                   <Text style={styles.editButtonText}>Excluir</Text>
                 </TouchableOpacity>
               </View>
@@ -224,6 +242,8 @@ export default function ToScheduleScreen() {
       <View style={styles.footer}>
         <BottomTab />
       </View>
+
+      <EditScheduleModal visible={modalVisible} initialFilme={agendamentoEditando ? agendamentoEditando.filmeId : ""} initialTime={agendamentoEditando ? agendamentoEditando.hora : ""} onClose={() => setModalVisible(false)} onSave={salvarEdicao} />
     </View>
   );
 }
