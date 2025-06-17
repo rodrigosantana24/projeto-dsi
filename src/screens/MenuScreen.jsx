@@ -44,13 +44,6 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon= {<Ionicons name="list" size={30} color={"white"}/>} 
-              text="Minhas Listas" 
-              onPress={() => {
-                alert("Minhas Listas");
-              }}
-            />
-            <ProfileButton 
               icon={<Ionicons name="add" size={30} color={"white"}/>} 
               text="Adicionar filme" 
               onPress={() => {
@@ -105,7 +98,7 @@ const styles = StyleSheet.create({
   username: {
     marginTop: 10,
     color: 'white',
-    fontSize: 29,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   menuContainer: {
