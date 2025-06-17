@@ -34,9 +34,22 @@ export default class HomeController {
     }
   }
 
+  /*
   getFiltros() {
     return ['Todos', ...this.filtros];
   }
+  */
+
+  getFiltros() {
+  return [
+    { label: 'Ação', id: 0 },
+    { label: 'Comédia', id: 3 },
+    { label: 'Terror', id: 10 },
+    { label: 'Romance', id: 13 },
+    { label: 'Suspense', id: 16 },
+    { label: 'Drama', id: 6 },
+  ];
+}
 
   getFilmes() {
     return this.listaFilmes;

@@ -14,7 +14,7 @@ export default function SectionCarousel({
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
         {onViewAll && (
-          <TouchableOpacity onPress={onViewAll}>
+          <TouchableOpacity onPress={() => navigation.navigate('FilteringMovieScreen', { generoId: 0, generoLabel: "Ação" })}>
             <Text style={styles.viewAll}>Ver mais</Text>
           </TouchableOpacity>
         )}
