@@ -8,6 +8,7 @@ export default class Filme {
     poster_path, 
     genero = '', 
     atores = '',
+    nativo,
     overview = '',
     budget = 0,
     revenue = 0,
@@ -25,6 +26,7 @@ export default class Filme {
     this.poster_path = poster_path;
     this.genero = genero;
     this.atores = atores;
+    this.nativo = nativo;
     this.overview = overview;
     this.budget = budget;
     this.revenue = revenue;
@@ -46,7 +48,7 @@ export default class Filme {
   }
 
   isValid() {
-    return !!(this.title && this.genero && this.atores);
+    return !!(this.title && this.genero);
   }
 
   toFirebase() {
@@ -55,17 +57,26 @@ export default class Filme {
       poster_path: this.poster_path,
       genero: this.genero,
       atores: this.atores,
+      nativo: this.nativo ?? false,
     };
   }
 
   static fromFirebase(id, data) {
     if (!data) return null;
+    
+    let generoDoFilme = data.genero || ''; 
+    if (data.genres && Array.isArray(data.genres) && data.genres.length > 0) {
+      generoDoFilme = data.genres[0].name;
+    }
+
     return new Filme(
       id,
       data.title || 'Título não disponível',
       data.poster_path || '',
       data.genero || '',
+      generoDoFilme,
       data.atores || '',
+      data.nativo ?? true,
       data.overview || '',
       data.budget || 0,
       data.revenue || 0,
@@ -95,7 +106,6 @@ export default class Filme {
     if (useCache) this.cache = filmes;
     return filmes;
   }
-
   static async getAllFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
     const filmesRef = ref(database, 'filmes');
@@ -112,12 +122,6 @@ export default class Filme {
     return filmes;
   }
 
-  /**
-   * Busca filmes filtrando pelo campo primary_genre_id diretamente no Firebase.
-   * @param {string|number} genreId - O valor de primary_genre_id para filtrar.
-   * @param {number} limit - Limite de resultados (opcional).
-   * @returns {Promise<Filme[]>}
-   */
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
     const filmesRef = ref(database, 'filmes');
     const filmesQuery = query(
@@ -134,5 +138,17 @@ export default class Filme {
     return Object.entries(data).map(
       ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
     );
+  static async getFilmesCriadosFromFirebase(useCache = true) {
+  if (useCache && this.cacheAlt) return this.cacheAlt;
+  const filmesRef = ref(database, 'filmes_criados');
+  const snapshot = await get(filmesRef);
+  if (!snapshot.exists()) {
+    return [];
+  }
+  const data = snapshot.val();
+  const filmes = Object.entries(data)
+    .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData));
+  if (useCache) this.cacheAlt = filmes;
+  return filmes;
   }
 }
