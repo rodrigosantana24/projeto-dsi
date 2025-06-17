@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/Feather';
 const AddForm = ({ title, poster_path, genero, atores, generosList, atoresList, editandoId, onChange, onSave }) => {
   const [isGeneroModalVisible, setGeneroModalVisible] = useState(false);
   const [isAtoresModalVisible, setAtoresModalVisible] = useState(false);
+
   const handleSelectGenero = g => {
     onChange('genero', g);
     setGeneroModalVisible(false);
@@ -16,20 +17,22 @@ const AddForm = ({ title, poster_path, genero, atores, generosList, atoresList, 
     onChange('atores', newArr.join(', '));
   };
 
-  const selectedAtoresArray = atores ? atores.split(',').map(x => x.trim()) : [];
+  const selectedAtoresArray = atores ? atores.split(',').map(x => x.trim()).filter(Boolean) : [];
 
   return (
     <View style={styles.form}>
       <TextInput style={styles.input} placeholder="Título" placeholderTextColor="#888" value={title} onChangeText={t => onChange('title', t)} />
       <TextInput style={styles.input} placeholder="URL do Poster" placeholderTextColor="#888" value={poster_path} onChangeText={t => onChange('poster_path', t)} />
+      
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.selectButton} onPress={() => setGeneroModalVisible(true)}>
+            <Text style={styles.selectButtonText} numberOfLines={1}>{genero || 'Gênero'}</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.selectButton} onPress={() => setGeneroModalVisible(true)}>
-        <Text style={styles.selectButtonText}>{genero || 'Selecionar Gênero'}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.selectButton} onPress={() => setAtoresModalVisible(true)}>
-        <Text style={styles.selectButtonText} numberOfLines={1}>{atores || 'Selecionar Atores'}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.selectButton} onPress={() => setAtoresModalVisible(true)}>
+            <Text style={styles.selectButtonText} numberOfLines={1}>{atores || 'Atores'}</Text>
+        </TouchableOpacity>
+      </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={onSave}>
         <Text style={styles.saveButtonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
@@ -39,7 +42,7 @@ const AddForm = ({ title, poster_path, genero, atores, generosList, atoresList, 
         animationType="slide"
         transparent={false}
         visible={isGeneroModalVisible}
-        onRequestClose={() => setGeneroModalVisible(false)} 
+        onRequestClose={() => setGeneroModalVisible(false)}
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
@@ -64,7 +67,7 @@ const AddForm = ({ title, poster_path, genero, atores, generosList, atoresList, 
         animationType="slide"
         transparent={false}
         visible={isAtoresModalVisible}
-        onRequestClose={() => setAtoresModalVisible(false)} 
+        onRequestClose={() => setAtoresModalVisible(false)}
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
@@ -96,14 +99,20 @@ const styles = StyleSheet.create({
   form: { marginBottom: 16 },
   input: { backgroundColor: '#1C3F4F', color: '#FFF', padding: 12, borderRadius: 8, marginBottom: 12, borderWidth: 1, borderColor: '#2a5a75' },
   
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   selectButton: {
+    flex: 1, 
     backgroundColor: '#1C3F4F',
     borderWidth: 1,
     borderColor: '#2a5a75',
     borderRadius: 8,
     padding: 15,
-    marginBottom: 12,
     alignItems: 'center',
+    marginHorizontal: 4, 
   },
   selectButtonText: {
     color: '#FFF',
@@ -113,43 +122,13 @@ const styles = StyleSheet.create({
   saveButton: { backgroundColor: '#00BFA5', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 8 },
   saveButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
 
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#071A24',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
-  },
-  modalTitle: {
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  modalDoneText: {
-    color: '#00BFA5',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalOption: {
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
-  },
-  modalOptionSelected: {
-    backgroundColor: '#102A38',
-  },
-  modalOptionText: {
-    color: '#FFF',
-    fontSize: 18,
-  },
+  modalContainer: { flex: 1, backgroundColor: '#071A24' },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#1C3F4F' },
+  modalTitle: { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
+  modalDoneText: { color: '#00BFA5', fontSize: 16, fontWeight: 'bold' },
+  modalOption: { padding: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#1C3F4F' },
+  modalOptionSelected: { backgroundColor: '#102A38' },
+  modalOptionText: { color: '#FFF', fontSize: 18 },
 });
 
 export default AddForm;
