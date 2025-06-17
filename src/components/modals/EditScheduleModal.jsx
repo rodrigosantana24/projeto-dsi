@@ -144,7 +144,7 @@ export default function EditScheduleModal({
 
           <TextInput
             style={styles.input}
-            placeholder="Data (YYYY-MM-DD)"
+            placeholder="Data (DD/MM/AAAA)"
             placeholderTextColor="#a0b9d3"
             value={data}
             onChangeText={setData}
