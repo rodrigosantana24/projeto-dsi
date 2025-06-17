@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, ImageBackground, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import FeaturedCard from '../cards/FeaturedCard';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const Carousel = ({ data }) => {
+export default function FeaturedCarousel({ data, navigation }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const flatListRef = useRef();
 
@@ -13,15 +14,11 @@ const Carousel = ({ data }) => {
   };
 
   const renderItem = ({ item }) => (
-    <ImageBackground
-      source={{ uri: item.getImageUrl() }}
-      style={styles.card}
-      imageStyle={styles.imageStyle}
-    >
-      <View style={styles.overlay}>
-        <Text style={styles.title}>{item.title}</Text>
-      </View>
-    </ImageBackground>
+    <FeaturedCard
+      title={item.title}
+      imageUrl={item.getImageUrl()}
+      onPress={() => navigation.navigate('MovieDetailsScreen', { id: item.id })}
+    />
   );
 
   return (
@@ -55,46 +52,20 @@ const Carousel = ({ data }) => {
 };
 
 const styles = StyleSheet.create({
-    card: {
-        width: width,
-        height: 220,
-        justifyContent: 'flex-end',
-        marginTop: 10,
-    },
-    imageStyle: {
-        width: '100%',
-        height: '100%',
-    },
-    overlay: {
-        position: 'absolute',
-        right: 35,
-        bottom: 10,
-        backgroundColor: 'rgba(0,0,0,0.8)',
-        paddingHorizontal: 10,
-        paddingVertical: 6,
-        borderRadius: 6,
-    },
-    title: {
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    dotsContainer: {
-        position: 'absolute',
-        bottom: 16,
-        left: 16,
-        flexDirection: 'row',
-    },
-    dot: {
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: '#999',
-        marginHorizontal: 4,
-    },
-    activeDot: {
-        backgroundColor: 'white',
-    },
+  dotsContainer: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    flexDirection: 'row',
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#999',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: 'white',
+  },
 });
-
-export default Carousel;
