@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-const AddedList = ({ item, onEdit, onDelete }) => (
+const AddList = ({ item, onEdit, onDelete }) => (
   <View style={styles.card}>
     {item.poster_path && (
       <Image source={{ uri: item.getImageUrl() }} style={styles.poster} />
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddedList;
+export default AddList;
