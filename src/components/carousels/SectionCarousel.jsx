@@ -7,14 +7,23 @@ export default function SectionCarousel({
   data,
   navigation,
   onViewAll,
-  contentContainerStyle
+  contentContainerStyle,
+  generoId,
+  generoLabel = ''
 }) {
   return (
     <View style={styles.section}>
       <View style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        {onViewAll && (
-          <TouchableOpacity onPress={() => navigation.navigate('FilteringMovieScreen', { generoId: 0, generoLabel: "Ação" })}>
+        {onViewAll && data && data.length > 0 && (
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('FilteringMovieScreen', {
+                generoId: generoId,
+                generoLabel: generoLabel,
+              })
+            }
+          >
             <Text style={styles.viewAll}>Ver mais</Text>
           </TouchableOpacity>
         )}

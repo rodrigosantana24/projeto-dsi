@@ -96,6 +96,22 @@ export default class Filme {
     return filmes;
   }
 
+  static async getAllFilmesFromFirebase(useCache = true) {
+    if (useCache && this.cache) return this.cache;
+    const filmesRef = ref(database, 'filmes');
+    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
+    const snapshot = await get(filmesQuery);
+    if (!snapshot.exists()) {
+      return [];
+    }
+    const data = snapshot.val();
+    const filmes = Object.entries(data).map(
+      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+    );
+    if (useCache) this.cache = filmes;
+    return filmes;
+  }
+
   /**
    * Busca filmes filtrando pelo campo primary_genre_id diretamente no Firebase.
    * @param {string|number} genreId - O valor de primary_genre_id para filtrar.
