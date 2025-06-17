@@ -1,38 +1,39 @@
-import { View, Text , StyleSheet} from 'react-native';
+import { View, Text , StyleSheet, Alert} from 'react-native';
 import FriendForm from '../components/forms/FriendForm';
 import { UserContext } from '../Context/UserProvider';
 import AmigosService from '../models/AmigosService';
 import { useContext, useState} from 'react';
-
+import { useNavigation } from '@react-navigation/native';
+import HeaderBar from '../components/navi/HeaderBar';
 const amigoService = new AmigosService();
 
 const handleAdicionar = async({UserId,FriendId}) =>{
     try {
-        amigoService.create({userId : UserId , friendId : FriendId})
-        console.log("TUDO OK create");
-        
+        await amigoService.create({userId : UserId , friendId : FriendId})
+        Alert.alert("Amigo adicionado com sucesso!");
     } catch (error) {
         console.log("Erro ao adicionar");
-        
+        Alert.alert(error.message || "Erro ao adicionar amigo");
     } 
 }
 const handleRemover = async({UserId,FriendId}) =>{
         try {
-            amigoService.delete({userId : UserId , friendId : FriendId})
-            console.log("removido");
-            
+            await amigoService.delete({userId : UserId , friendId : FriendId})
+            Alert.alert("Amigo removido com sucesso!");
         } catch (error) {
-            console.log("ERRO AO REMOVER");
-        } 
+            Alert.alert(error.message || "Erro ao remover amigo");
+        }
     }
 
 
 export default function AddFriend(){
     const {userCredentials} = useContext(UserContext)
     const [id,setId] = useState("");
-
+    const navigation = useNavigation();
     return (
         <View style={styles.container}>
+            <HeaderBar onBack={() => navigation.navigate("Menu")} title={"Adicionar Amigo"}></HeaderBar>
+
             <FriendForm
              onChange={(text) => setId(text)} 
              valueId={id} 
@@ -44,12 +45,11 @@ export default function AddFriend(){
 }
 
 const styles = StyleSheet.create({
-  container: {
+container: {
     flex: 1,
     padding: 16,
-    paddingTop: 60,
-    backgroundColor: '#192936',
-    alignItems: "center",
+    paddingTop: 25,
+    backgroundColor: '#072330',
   },
   subheader: {
     fontSize: 16,
