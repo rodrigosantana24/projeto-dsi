@@ -34,9 +34,22 @@ export default class HomeController {
     }
   }
 
+  /*
   getFiltros() {
     return ['Todos', ...this.filtros];
   }
+  */
+
+  getFiltros() {
+  return [
+    { label: 'Ação', id: 0 },
+    { label: 'Comédia', id: 3 },
+    { label: 'Terror', id: 10 },
+    { label: 'Romance', id: 13 },
+    { label: 'Suspense', id: 16 },
+    { label: 'Drama', id: 6 },
+  ];
+}
 
   getFilmes() {
     return this.listaFilmes;
@@ -49,4 +62,21 @@ export default class HomeController {
   getErro() {
     return this.erro;
   }
+
+  async getFilmesByPrimaryGenreIdLimited(genreId, limit = 10) {
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
+  }
+
+  async getFilmesByPrimaryGenreId(genreId, limit = 100) {
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
+  }
+
+  async searchFilmesByName(searchTerm) {
+  const filmes = await Filme.getAllFilmesFromFirebase();
+  if (!searchTerm) return filmes;
+  const lower = searchTerm.toLowerCase();
+  return filmes.filter(f =>
+    (f.title || f.titulo || '').toLowerCase().startsWith(lower)
+  );
+}
 }

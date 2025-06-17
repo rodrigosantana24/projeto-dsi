@@ -11,6 +11,7 @@ import ManageActorsScreen from './ManageActorsScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
+import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 
 
 const ProfileScreen = () => {
@@ -64,6 +65,13 @@ const ProfileScreen = () => {
               text="Gerenciar Atores" 
               onPress={() => {
                 navigation.navigate(ManageActorsScreen);
+              }}
+            />
+            <ProfileButton 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Tela de Filmes Filtrados" 
+              onPress={() => {
+                navigation.navigate(FilteringMovieScreen);
               }}
             />
             <ProfileButton 

@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, ScrollView, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
 import BottomTab from '../components/navi/BottomTab';
 import { Logo } from '../components/logo/Logo';
 import SearchBar from '../components/search/SearchBar';
@@ -11,6 +11,8 @@ import HomeController from '../controllers/HomeController';
 export default function HomeScreen({ navigation }) {
   const [controller] = useState(new HomeController(navigation));
   const [carregando, setCarregando] = useState(true);
+  const [acaoAventuraFilmes, setAcaoAventuraFilmes] = useState([]);
+  const [dramaSuspenseFilmes, setDramaSuspenseFilmes] = useState([]);
 
   useLayoutEffect(() => {
     controller.configurarLayout();
@@ -19,6 +21,12 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const carregarDados = async () => {
       await controller.carregarFilmes();
+      // Busca filmes com primary_genre_id = 0 para "Ação e Aventura"
+      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreIdLimited(0);
+      setAcaoAventuraFilmes(filmesAcaoAventura);
+      // Busca filmes com primary_genre_id = 6 para "Drama e Suspense"
+      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreIdLimited(6);
+      setDramaSuspenseFilmes(filmesDramaSuspense);
       setCarregando(false);
     };
     carregarDados();
@@ -40,10 +48,16 @@ export default function HomeScreen({ navigation }) {
           <Logo style={{ width: 75, height: 75 }} />
         </View>
         <View style={styles.body}>
-          <SearchBar />
+          <SearchBar
+            onSearch={(searchTerm) => {
+              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: `Resultados para "${searchTerm}"` });
+            }}
+          />
           <FilterChips
             filters={controller.getFiltros()}
-            onSelect={(filter) => controller.aoSelecionarFiltro(filter)}
+            onSelect={(filter) => {
+              navigation.navigate('FilteringMovieScreen', { generoId: filter.id, generoLabel: filter.label });
+            }}
           />
           <FeaturedCarousel 
             data={controller.getFilmes()} 
@@ -51,19 +65,23 @@ export default function HomeScreen({ navigation }) {
           />
           <SectionCarousel
             title="Ação e Aventura"
-            data={controller.getFilmes()}
+            data={acaoAventuraFilmes}
             navigation={navigation}
             onViewAll={() => controller.verTodos('Ação e Aventura')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
+            generoId={0}
+            generoLabel="Ação e Aventura"
           />
           <SectionCarousel
             title="Drama e Suspense"
-            data={controller.getFilmes()}
+            data={dramaSuspenseFilmes}
             navigation={navigation}
             onViewAll={() => controller.verTodos('Drama e Suspense')}
             contentContainerStyle={{ paddingLeft: 0 }}
             keyExtractor={(item) => item.id}
+            generoId={6}
+            generoLabel="Drama e Suspense"
           />
         </View>
       </ScrollView>
