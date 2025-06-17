@@ -7,7 +7,6 @@ export interface FilmeDTO {
   title: string;
   poster_path: string;
   genero: string;
-  atores: string;
   nativo?: boolean; 
 }
 
@@ -25,8 +24,8 @@ export interface FilmeReadParams {
 
 export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, FilmeUpdateDTO, FilmeDeleteDTO> {
   async create(data: FilmeDTO): Promise<any> {
-  const { title, poster_path, genero, atores } = data;
-  const filme = new Filme(null, title, poster_path, genero, atores);
+  const { title, poster_path, genero } = data;
+  const filme = new Filme(null, title, poster_path, genero);
   filme.nativo = false;
   if (!filme.isValid()) {
     throw new Error('Dados do filme inválidos');
@@ -43,14 +42,14 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
   }
 
   async update(params: FilmeUpdateDTO): Promise<any> {
-    const { id, title, poster_path, genero, atores } = params;
+    const { id, title, poster_path, genero } = params;
     const filmeRef = ref(database, `filmes_criados/${id}`);
     const snapshot = await get(filmeRef);
     if (!snapshot.exists()) {
       throw new Error('Filme não encontrado para atualização');
     }
     const existingData = snapshot.val();
-    const filme = new Filme(id, title, poster_path, genero, atores, existingData.nativo);
+    const filme = new Filme(id, title, poster_path, genero, existingData.nativo);
     if (!filme.isValid()) {
       throw new Error('Dados do filme inválidos');
     }

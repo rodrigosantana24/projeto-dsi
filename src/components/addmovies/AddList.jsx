@@ -9,7 +9,6 @@ const AddList = ({ item, onEdit, onDelete }) => (
     <View style={styles.info}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.text}>Gênero: {item.genero}</Text>
-      <Text style={styles.text}>Atores: {item.atores}</Text>
       <View style={styles.actionsContainer}>
         <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={() => onEdit(item)}>
           <Text style={styles.actionButtonText}>Editar</Text>

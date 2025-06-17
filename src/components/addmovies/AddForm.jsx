@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const AddForm = ({ title, poster_path, genero, atores, editandoId, onChange, onSave }) => (
+const AddForm = ({ title, poster_path, genero, editandoId, onChange, onSave }) => (
   <View style={styles.form}>
     <TextInput
       style={styles.input}
@@ -23,13 +23,6 @@ const AddForm = ({ title, poster_path, genero, atores, editandoId, onChange, onS
       placeholderTextColor="#888"
       value={genero}
       onChangeText={(t) => onChange('genero', t)}
-    />
-    <TextInput
-      style={styles.input}
-      placeholder="Atores (separados por vírgula)"
-      placeholderTextColor="#888"
-      value={atores}
-      onChangeText={(t) => onChange('atores', t)}
     />
     <TouchableOpacity style={styles.saveButton} onPress={onSave}>
       <Text style={styles.saveButtonText}>
