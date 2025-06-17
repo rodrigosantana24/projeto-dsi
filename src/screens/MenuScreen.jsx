@@ -46,15 +46,15 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon={<Ionicons name="add" size={30} color={"white"}/>} 
-              text="Adicionar filme" 
+              icon={<AntDesign name="setting" size={30} color={"white"}/>} 
+              text="Gerenciar Filmes" 
               onPress={() => {
                 navigation.navigate(AddMovieScreen);
               }}
             />
             <ProfileButton 
               icon={<AntDesign name="setting" size={30} color={"white"}/>} 
-              text="Gerenciar gêneros" 
+              text="Gerenciar Gêneros" 
               onPress={() => {
                 navigation.navigate(ManageGenresScreen);
               }}
