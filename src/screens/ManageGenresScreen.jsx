@@ -98,25 +98,27 @@ export default class ManageGenresScreen extends React.Component {
     try {
       if (editandoId) {
         const updated = await generoService.update({ id: editandoId, nome, descricao });
-        this.setState((prev) => ({
-          generos: prev.generos.map(g => g.id === editandoId ? updated : g),
-        }));
+        this.setState(
+          (prev) => ({
+            generos: prev.generos.map(g => g.id === editandoId ? updated : g),
+            nome: '',
+            descricao: '',
+            editandoId: null,
+          }),
+          this.applyFilters
+        );
       } else {
         const created = await generoService.create({ nome, descricao });
-        this.setState((prev) => ({ generos: [...prev.generos, created] }));
+        this.setState(
+          (prev) => ({
+            generos: [...prev.generos, created],
+            nome: '',
+            descricao: '',
+            editandoId: null,
+          }),
+          this.applyFilters
+        );
       }
-
-      this.setState(
-        (prev) => ({
-          generos: editandoId
-            ? prev.generos.map(g => g.id === editandoId ? updated : g)
-            : [...prev.generos, created],
-          nome: '',
-          descricao: '',
-          editandoId: null,
-        }),
-        this.applyFilters
-      );
     } catch (error) {
       console.error(error);
       Alert.alert('Erro', error.message);
