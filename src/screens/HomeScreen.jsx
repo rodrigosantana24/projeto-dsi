@@ -52,7 +52,7 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.body}>
           <SearchBar
             onSearch={(searchTerm) => {
-              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: `Resultados para "${searchTerm}"` });
+              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: `${searchTerm}` });
             }}
           />
           <FilterChips
@@ -63,7 +63,7 @@ export default function HomeScreen({ navigation }) {
           />
           <FeaturedCarousel 
             data={controller.getFilmes()} 
-            keyExtractor={(item) => item.id}
+            navigation={navigation}
           />
           <SectionCarousel
             title="Ação e Aventura"
