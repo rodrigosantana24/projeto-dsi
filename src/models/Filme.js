@@ -90,12 +90,12 @@ export default class Filme {
     );
   }
 
-  static async getFilmesFromFirebase(useCache = true) {
+  static async getFilmesFromFirebase(qtdFilme = 5, useCache = true) {
     if (useCache && this.cache) return this.cache;
 
     try {
       const filmesRef = ref(database, 'filmes');
-      const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(20));
+      const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(5));
       const snapshot = await get(filmesQuery);
 
       if (!snapshot.exists()) return [];
@@ -142,19 +142,36 @@ export default class Filme {
 
   static async getAllFilmesFromFirebase(useCache = true) {
     if (useCache && this.cache) return this.cache;
-    const filmesRef = ref(database, 'filmes');
-    const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
-    const snapshot = await get(filmesQuery);
-    if (!snapshot.exists()) {
+
+    try {
+      const filmesRef = ref(database, 'filmes');
+      const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
+      const snapshot = await get(filmesQuery);
+
+      if (!snapshot.exists()) return [];
+
+      const data = snapshot.val();
+
+      const filmes = Object.entries(data)
+      .filter(([id, filmeData]) => {
+        // ✅ Mantém apenas objetos válidos que possuem a chave "id"
+        return (
+          typeof filmeData === 'object' &&
+          filmeData !== null &&
+          'id' in filmeData && !isNaN(Number(filmeData.id))
+        );
+      })
+      .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData))
+      .filter(filme => filme && filme.isValid()); // só instâncias válidas
+
+      if (useCache) this.cache = filmes;
+      return filmes;
+    } catch (error) {
+      console.error('Erro ao buscar todos os filmes:', error);
       return [];
     }
-    const data = snapshot.val();
-    const filmes = Object.entries(data).map(
-      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
-    );
-    if (useCache) this.cache = filmes;
-    return filmes;
   }
+
 
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
     const filmesRef = ref(database, 'filmes');

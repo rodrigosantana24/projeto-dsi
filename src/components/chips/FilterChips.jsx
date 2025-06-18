@@ -35,20 +35,19 @@ export default function FilterChips({ filters = [], onSelect }) {
 
 const styles = StyleSheet.create({
   chip: {
-    backgroundColor: '#FFF',
-    borderRadius: 20,
+    borderRadius: 4,
     paddingHorizontal: 18,
     paddingVertical: 7,
     marginRight: 10,
-    borderWidth: 2,
-    borderColor: '#f4a03f',
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   chipSelected: {
     backgroundColor: '#f4a03f',
-    borderColor: '#f4a03f',
+    borderColor: '#ddd',
   },
   chipText: {
-    color: '#072330',
+    color: '#FFF',
     fontWeight: 'bold',
     fontSize: 15,
   },
