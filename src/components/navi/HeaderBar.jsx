@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons, AntDesign  } from '@expo/vector-icons';
+import Icon from 'react-native-vector-icons/Feather';
 
 const HeaderBar = ({ title, onBack }) => {
   return (
     <View style={styles.header}>
       <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <AntDesign name="left" size={24} color="#FFF" />
+        <Icon name="arrow-left" size={28} color="#EFEFEF" />
       </TouchableOpacity>
       <Text style={styles.title}>{title}</Text>
     </View>
@@ -19,19 +19,16 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    justifyContent: 'center',
-    position: 'relative',
+    justifyContent: 'flex-start',
   },
   backButton: {
-    position: 'absolute',
-    left: 12,
-    zIndex: 1,
+    marginRight: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     color: '#FFF',
     fontWeight: 'bold',
+    marginBottom: 2
   },
 });
 

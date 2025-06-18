@@ -1,18 +1,22 @@
 import React, { useLayoutEffect, useState, useEffect } from 'react';
-import { View, ScrollView, Text, StyleSheet, ActivityIndicator, Button } from 'react-native';
+import { View, ScrollView, Text, StyleSheet, ActivityIndicator, Button , TouchableOpacity } from 'react-native';
 import BottomTab from '../components/navi/BottomTab';
 import { Logo } from '../components/logo/Logo';
 import SearchBar from '../components/search/SearchBar';
 import SectionCarousel from '../components/carousels/SectionCarousel';
 import FeaturedCarousel from '../components/carousels/FeaturedCarousel';
-import FilterChips from '../components/chips/FilterChips';
 import HomeController from '../controllers/HomeController';
+import { StatusBar } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
+import { Feather } from '@expo/vector-icons';
 
 export default function HomeScreen({ navigation }) {
   const [controller] = useState(new HomeController(navigation));
   const [carregando, setCarregando] = useState(true);
   const [acaoAventuraFilmes, setAcaoAventuraFilmes] = useState([]);
   const [dramaSuspenseFilmes, setDramaSuspenseFilmes] = useState([]);
+  const [terrorFilmes, setFilmesterrorFilmes] = useState([]);
+  NavigationBar.setVisibilityAsync('hidden');
 
   useLayoutEffect(() => {
     controller.configurarLayout();
@@ -27,6 +31,9 @@ export default function HomeScreen({ navigation }) {
       // Busca filmes com primary_genre_id = 6 para "Drama e Suspense"
       const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreIdLimited(6);
       setDramaSuspenseFilmes(filmesDramaSuspense);
+      // Busca filmes com primary_genre_id = 10 para "Terror"
+      const terrorFilmes = await controller.getFilmesByPrimaryGenreIdLimited(10);
+      setFilmesterrorFilmes(terrorFilmes);
       setCarregando(false);
     };
     carregarDados();
@@ -42,25 +49,22 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} />
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }} // ajuste conforme a altura do BottomTab
+        contentContainerStyle={{ paddingBottom: 100 }}
       >
         <View style={styles.header}>
           <Text style={styles.headerText}>Encontre seu filme preferido!</Text>
           <Logo style={{ width: 75, height: 75 }} />
         </View>
         <View style={styles.body}>
-          <SearchBar
-            onSearch={(searchTerm) => {
-              navigation.navigate('FilteringMovieScreen', { searchTerm, generoId: null, generoLabel: null });
-            }}
-          />
-          <FilterChips
-            filters={controller.getFiltros()}
-            onSelect={(filter) => {
-              navigation.navigate('FilteringMovieScreen', { generoId: filter.id, generoLabel: filter.label });
-            }}
-          />
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate('FilteringMovieScreen')}
+          >
+            <Text style={styles.iconButtonText}>Pesquisar filme...</Text>
+            <Feather name="search" size={28} color="#FFF" />
+          </TouchableOpacity>
           <FeaturedCarousel 
             data={controller.getFilmes()} 
             navigation={navigation}
@@ -85,6 +89,16 @@ export default function HomeScreen({ navigation }) {
             generoId={6}
             generoLabel="Drama e Suspense"
           />
+          <SectionCarousel
+            title="Terror"
+            data={terrorFilmes}
+            navigation={navigation}
+            onViewAll={() => controller.verTodos('Terror')}
+            contentContainerStyle={{ paddingLeft: 0 }}
+            keyExtractor={(item) => item.id}
+            generoId={10}
+            generoLabel="Terror"
+          />
         </View>
       </ScrollView>
       <View style={styles.footer}>
@@ -98,7 +112,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 25
+    paddingTop: 5
   },
   loadingContainer: {
     justifyContent: 'center',
@@ -110,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 10,
-    marginBottom: -10,
+    marginBottom: -5,
     zIndex: 1,
   },
   headerText: {
@@ -118,6 +132,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: -15,
+  },
+  iconButton: {
+    backgroundColor: '#113342',
+    padding: 8,
+    borderRadius: 8,
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: -10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'space-between',
+    paddingRight: 20
+  },
+  iconButtonText: {
+    color: '#CCC',
+    fontSize: 16,
+    padding: 6
   },
   body: {
     flex: 1,
