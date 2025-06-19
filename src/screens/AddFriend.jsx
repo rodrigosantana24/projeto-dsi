@@ -7,18 +7,18 @@ import { useNavigation } from '@react-navigation/native';
 import HeaderBar from '../components/navi/HeaderBar';
 const amigoService = new AmigosService();
 
-const handleAdicionar = async({UserId,FriendId}) =>{
+const handleAdicionar = async({userId, friendEmail}) =>{
     try {
-        await amigoService.create({userId : UserId , friendId : FriendId})
+        await amigoService.create({userId : userId , friendEmail : friendEmail})
         Alert.alert("Amigo adicionado com sucesso!");
     } catch (error) {
         console.log("Erro ao adicionar");
         Alert.alert(error.message || "Erro ao adicionar amigo");
     } 
 }
-const handleRemover = async({UserId,FriendId}) =>{
+const handleRemover = async({userId, friendEmail}) =>{
         try {
-            await amigoService.delete({userId : UserId , friendId : FriendId})
+            await amigoService.delete({userId : userId , friendEmail : friendEmail})
             Alert.alert("Amigo removido com sucesso!");
         } catch (error) {
             Alert.alert(error.message || "Erro ao remover amigo");
@@ -37,8 +37,8 @@ export default function AddFriend(){
             <FriendForm
              onChange={(text) => setId(text)} 
              valueId={id} 
-             onSubmitAdd={()=>handleAdicionar({ UserId: userCredentials.uid, FriendId: id })}
-             onSubmitRemove={() => handleRemover({ UserId: userCredentials.uid, FriendId: id })}
+             onSubmitAdd={()=>handleAdicionar({ userId: userCredentials.uid, friendEmail: id })}
+             onSubmitRemove={() => handleRemover({ userId: userCredentials.uid,friendEmail: id })}
              ></FriendForm>
         </View>
     )
