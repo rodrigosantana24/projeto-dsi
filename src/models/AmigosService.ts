@@ -1,42 +1,50 @@
 import { getDatabase, ref, set,get, remove } from "firebase/database";
 import ICrud from "./ICrud"; // ajuste o path se necessário
+import getUserByEmail from "../services/getUserByEmail";
+
 
 interface FriendParams {
   userId: string;
-  friendId: string;
+  friendEmail: string;
 }
 
 export default class AmigosService implements ICrud<FriendParams, never, never, FriendParams> {
-  async create({ userId, friendId }: FriendParams): Promise<void> {
-       const db = getDatabase();
-
-    // Verifica se o usuário com friendId existe
-    const userRef = ref(db, `/usuarios/${friendId}`);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      throw new Error("O usuário não existe.");
-    }
-
-    const amigoRef = ref(db, `/usuarios/${userId}/amigos/${friendId}`);
-    await set(amigoRef, {
-      amigo_id: friendId
-    });
-  }
-
-  async delete({ userId, friendId }: FriendParams): Promise<void> {
+  async create({ userId, friendEmail }: FriendParams): Promise<void> {
     const db = getDatabase();
 
-    // Verifica se o usuário com friendId existe
-    const userRef = ref(db, `/usuarios/${userId}/amigos/${friendId}`);
-    const snapshot = await get(userRef);
-
-    if (!snapshot.exists()) {
-      throw new Error("O usuário não é seu amigo ou não existe.");
+    try {
+      const user = await getUserByEmail(friendEmail);
+      
+      if (!user || Object.keys(user).length === 0) {
+        throw new Error("Usuário não encontrado.");
+      }
+      const idFriend = Object.keys(user)[0];
+      const amigoRef = ref(db, `/usuarios/${userId}/amigos/${idFriend}`);
+      await set(amigoRef, {
+        amigo_id: idFriend
+      });
+    } catch (error: any) {
+      throw new Error(error.message || "Erro ao adicionar amigo.");
     }
+  }
+
+  async delete({ userId, friendEmail }: FriendParams): Promise<void> {
+    const db = getDatabase();
+
+    try {
+      const user = await getUserByEmail(friendEmail);
+      const idFriend = Object.keys(user)[0];
+      const amigoRef = ref(db, `/usuarios/${userId}/amigos/${idFriend}`);
+      const amigoSnapshot = await get(amigoRef);
+
+      if (!amigoSnapshot.exists()) {
+        throw new Error("O usuário não é seu amigo ou não existe.");
+      }
     // Remove o amigo
-    const amigoRef = ref(db, `/usuarios/${userId}/amigos/${friendId}`);
-    await remove(amigoRef);
+      await remove(amigoRef);
+    } catch (error) {
+      throw new Error(error.message || "Erro ao remover amigo.");
+    }
   }
 
   read(): Promise<any> {
