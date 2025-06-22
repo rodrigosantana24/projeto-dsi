@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, FlatList, Alert, StyleSheet, Text } from 'react-native';
-import AtorService from '../models/AtorService';
+import AtorService from '../services/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
 import Ator from '../models/Ator'; 
