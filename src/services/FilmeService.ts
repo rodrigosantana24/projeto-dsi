@@ -1,6 +1,6 @@
 import { ref, set, push, remove, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
-import Filme from './Filme';
+import Filme from '../models/Filme';
 import ICrud from './ICrud';
 
 export interface FilmeDTO {

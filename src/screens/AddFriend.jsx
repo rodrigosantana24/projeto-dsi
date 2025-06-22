@@ -1,7 +1,7 @@
 import { View, Text , StyleSheet, Alert} from 'react-native';
 import FriendForm from '../components/forms/FriendForm';
 import { UserContext } from '../Context/UserProvider';
-import AmigosService from '../models/AmigosService';
+import AmigosService from '../services/AmigosService';
 import { useContext, useState} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import HeaderBar from '../components/navi/HeaderBar';

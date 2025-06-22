@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, FlatList, Alert, StyleSheet, Button, Text } from 'react-native';
-import GeneroService from '../models/GeneroService';
+import GeneroService from '../services/GeneroService';
 import GeneroForm from '../components/genres/GeneroForm';
 import GeneroItem from '../components/genres/GeneroItem';
 import SearchBy from '../components/search/SearchBy';

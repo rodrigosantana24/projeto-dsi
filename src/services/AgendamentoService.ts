@@ -1,7 +1,7 @@
 import { ref , push, set, get, remove } from "firebase/database";
 import { database } from "../configs/firebaseConfig";
 import ICrud from "./ICrud";
-import Agendamento from "./Agendamento";
+import Agendamento from "../models/Agendamento";
 
 
 export interface AgendamentoDTO {
