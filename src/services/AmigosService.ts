@@ -1,6 +1,6 @@
 import { getDatabase, ref, set,get, remove } from "firebase/database";
 import ICrud from "./ICrud"; // ajuste o path se necessário
-import getUserByEmail from "../services/getUserByEmail";
+import getUserByEmail from "./getUserByEmail";
 
 
 interface FriendParams {

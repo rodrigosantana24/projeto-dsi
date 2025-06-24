@@ -9,7 +9,7 @@ import {
   Keyboard,
   Alert,
 } from "react-native";
-import AgendamentoService from "../models/AgendamentoService";
+import AgendamentoService from "../services/AgendamentoService";
 import Filme from "../models/Filme";
 import { UserContext } from "../Context/UserProvider";
 import { useNavigation } from "@react-navigation/native";
