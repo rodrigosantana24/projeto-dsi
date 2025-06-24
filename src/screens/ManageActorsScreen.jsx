@@ -147,7 +147,7 @@ export default class ManageActorsScreen extends React.Component {
       <View style={styles.container}>
         <HeaderBar
           title="Gerenciar Atores"
-          onBack={() => this.props.navigation.navigate('Menu')}
+          onBack={() => navigation.goBack()}
         />
         <AtorForm
           nome={nome}
