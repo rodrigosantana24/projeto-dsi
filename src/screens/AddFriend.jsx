@@ -32,7 +32,7 @@ export default function AddFriend(){
     const navigation = useNavigation();
     return (
         <View style={styles.container}>
-            <HeaderBar onBack={() => navigation.navigate("Menu")} title={"Adicionar Amigo"}></HeaderBar>
+            <HeaderBar onBack={() => navigation.goBack()} title={"Adicionar Amigo"}></HeaderBar>
 
             <FriendForm
              onChange={(text) => setId(text)} 
