@@ -24,7 +24,7 @@ export default function FriendList() {
 
   <View style={styles.container}>
 
-    <HeaderBar onBack={() => navigation.navigate("Menu")} title={"Lista de amigos"}></HeaderBar>
+    <HeaderBar onBack={() => navigation.goBack()} title={"Lista de amigos"}></HeaderBar>
     <ScrollView>
         {amigos.length === 0 ? (
           <Text style={styles.noData}>Você ainda não tem amigos adicionados.</Text>
