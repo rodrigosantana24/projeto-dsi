@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, FlatList, Alert, StyleSheet, Text } from 'react-native';
-import AtorService from '../models/AtorService';
+import AtorService from '../services/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
 import Ator from '../models/Ator'; 
@@ -147,7 +147,7 @@ export default class ManageActorsScreen extends React.Component {
       <View style={styles.container}>
         <HeaderBar
           title="Gerenciar Atores"
-          onBack={() => this.props.navigation.navigate('Menu')}
+          onBack={() => navigation.goBack()}
         />
         <AtorForm
           nome={nome}

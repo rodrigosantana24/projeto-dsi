@@ -29,7 +29,7 @@ export default function FriendList() {
 
   <View style={styles.container}>
 
-    <HeaderBar onBack={() => navigation.navigate("Menu")} title={"Lista de amigos"}></HeaderBar>
+    <HeaderBar onBack={() => navigation.goBack()} title={"Lista de amigos"}></HeaderBar>
     <SearchBar style={searchStyles.container}  onSearch={setSearchText}></SearchBar>
 
     <ScrollView>
