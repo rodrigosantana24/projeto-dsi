@@ -36,7 +36,7 @@ const MovieDetailsScreen = ({ navigation, route }) => {
     <ScrollView style={styles.container}>
         <HeaderBar
           title="Detalhes"
-          onBack={() => navigation.navigate('Home')}
+          onBack={() => navigation.goBack()}
         />
         {filme ? (
         <>
