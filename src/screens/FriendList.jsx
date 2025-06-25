@@ -1,15 +1,20 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView  } from 'react-native';
 import { UserContext } from '../Context/UserProvider';
 import useFriends from '../hooks/useFriends';
 import { TouchableOpacity, Image } from 'react-native';
 import HeaderBar from '../components/navi/HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import AddFriend from './AddFriend';
+import SearchBar from '../components/search/SearchBar';
+import getFriendsFilter from '../services/getFriendsFilter';
 
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
   const { usuario, amigos, loading } = useFriends(userCredentials.uid);
+  const [searchText, setSearchText] = useState("");
+  const friendsArray = Array.isArray(amigos) ? amigos : [];
+  const filteredFriends = getFriendsFilter(friendsArray, searchText);  
   const navigation = useNavigation();
 
   if (loading) {
@@ -25,11 +30,13 @@ export default function FriendList() {
   <View style={styles.container}>
 
     <HeaderBar onBack={() => navigation.goBack()} title={"Lista de amigos"}></HeaderBar>
+    <SearchBar style={searchStyles.container}  onSearch={setSearchText}></SearchBar>
+
     <ScrollView>
-        {amigos.length === 0 ? (
+        {filteredFriends.length === 0 ? (
           <Text style={styles.noData}>Você ainda não tem amigos adicionados.</Text>
         ) : (
-          amigos.map((amigo) => (
+          filteredFriends.map((amigo) => (
             <View key={amigo.uid} style={styles.friendBlock}>
               <Text style={styles.friendName}>{amigo.name}</Text>
               <Text style={styles.friendEmail}>{amigo.email}</Text>
@@ -158,5 +165,29 @@ const styles = StyleSheet.create({
   },
   movieInfo: {
     padding: 10,
+  },
+
+});
+
+const searchStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    paddingHorizontal: 18,
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#fff",
+    justifyContent: 'center',
+  },
+  icon: {
+    marginLeft: 10,
+    color: '#fff',
+    fontSize: 14,
   },
 });
