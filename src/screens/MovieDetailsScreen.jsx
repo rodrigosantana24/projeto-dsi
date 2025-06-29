@@ -33,7 +33,10 @@ const MovieDetailsScreen = ({ navigation, route }) => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 32 }} 
+    >
         <HeaderBar
           title="Detalhes"
           onBack={() => navigation.goBack()}
