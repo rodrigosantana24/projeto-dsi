@@ -45,9 +45,6 @@ const MovieDetailsScreen = ({ navigation, route }) => {
             <Text style={styles.title}>{filme.title}</Text>
             <View style={styles.options}>
                 <TouchableOpacity>
-                <Ionicons name="bookmark-outline" size={32} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity>
                 <Ionicons name="heart-outline" size={32} color="white" />
                 </TouchableOpacity>
             </View>
@@ -56,6 +53,9 @@ const MovieDetailsScreen = ({ navigation, route }) => {
                 <Text style={styles.metaText}>{filme.release_date}</Text>
                 <Text style={styles.metaText}>{filme.runtime} min</Text>
                 <Text style={styles.metaText}>{filme.original_language.toUpperCase()}</Text>
+                <Text style={styles.metaText}>
+                  {filme.vote_average.toFixed(2)} ★
+                </Text>
             </View>
             <View style={styles.genresContainer}>
               {getGeneros().map((genre, index) => (
