@@ -70,7 +70,7 @@ const MovieDetailsScreen = ({ navigation, route }) => {
             </View>
             <View style={styles.infoBox}>
                 <Text style={styles.infoTitle}>Elenco</Text>
-                <Text style={styles.infoText}>{filme.atores}</Text>
+                <Text style={styles.infoText}>{filme.credits}</Text>
             </View>
             <View style={styles.infoBox}>
                 <Text style={styles.infoTitle}>Orçamento</Text>
