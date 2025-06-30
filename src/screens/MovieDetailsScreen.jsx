@@ -45,10 +45,7 @@ const MovieDetailsScreen = ({ navigation, route }) => {
             <Text style={styles.title}>{filme.title}</Text>
             <View style={styles.options}>
                 <TouchableOpacity>
-                <Ionicons name="bookmark-outline" size={32} color="white" />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                <Ionicons name="heart-outline" size={32} color="white" />
+                <Ionicons name="heart-outline" size={35} color="red" />
                 </TouchableOpacity>
             </View>
             </View>
