@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import HeaderBar from '../components/navi/HeaderBar';
 import { getAuth } from 'firebase/auth';
 import { ref, get } from 'firebase/database';
 import { database } from "../configs/firebaseConfig"; 
@@ -79,7 +80,8 @@ export default function FavoriteMovieScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.headerSection}>
-        <Text style={styles.title}>Filmes favoritos</Text>
+
+        <HeaderBar onBack={() => navigation.goBack()} title={"Filmes favoritos"}></HeaderBar>
         <View style={styles.divider} />
       </View>
 
@@ -105,7 +107,7 @@ export default function FavoriteMovieScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#192936", 
+    backgroundColor: "#072330", 
     paddingTop: 50,
   },
   center: {

@@ -1,6 +1,6 @@
 import { ref, set, push, remove } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
-import Genero from './Genero';
+import Genero from '../models/Genero';
 import ICrud from './ICrud';
 
 export interface GeneroDTO {
