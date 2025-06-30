@@ -12,7 +12,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import FilmeService from '../models/FilmeService';
+import FilmeService from '../services/FilmeService';
 import AddForm from '../components/addmovies/AddForm';
 import AddList from '../components/addmovies/AddList';
 import { ref, get } from 'firebase/database';

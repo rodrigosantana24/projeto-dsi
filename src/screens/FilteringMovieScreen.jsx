@@ -34,7 +34,7 @@ export default function FilteringMovieScreen({ navigation, route }) {
     <View style={styles.container}>
         <HeaderBar
           title="Pesquisar Filmes"
-          onBack={() => navigation.navigate('Home')}
+          onBack={() => navigation.goBack()}
         />
       <View style={styles.header}>
         <SearchBar
