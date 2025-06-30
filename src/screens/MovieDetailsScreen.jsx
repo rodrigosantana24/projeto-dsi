@@ -1,11 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useMovieDetailsController } from '../controllers/useMovieDetailsController';
 import HeaderBar from '../components/navi/HeaderBar';
+import { getAuth } from 'firebase/auth';
+import { ref, get, set } from 'firebase/database';
+import { database } from '../configs/firebaseConfig';
 
-const MovieDetailsScreen = ({ navigation, route }) => {
-   const {
+export default function MovieDetailsScreen({ navigation, route }) {
+  const {
     filme,
     carregando,
     erro,
@@ -16,13 +27,57 @@ const MovieDetailsScreen = ({ navigation, route }) => {
     getDescricao
   } = useMovieDetailsController(navigation, route);
 
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [toggling, setToggling] = useState(false);
+
   useEffect(() => {
-    const carregar = async () => {
+    const init = async () => {
       await carregarFilme();
       configurarLayout();
+      await checkIfFavorite();
     };
-    carregar();
+    init();
   }, []);
+
+  const checkIfFavorite = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const favRef = ref(database, `usuarios/${user.uid}/favoritos`);
+    const snap = await get(favRef);
+    if (snap.exists()) {
+      const favs = Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val());
+      setIsFavorite(favs.includes(route.params.id));
+    }
+  };
+
+  const toggleFavorite = async () => {
+    setToggling(true);
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      console.warn('Usuário não autenticado');
+      setToggling(false);
+      return;
+    }
+
+    const favRef = ref(database, `usuarios/${user.uid}/favoritos`);
+    const snap = await get(favRef);
+    let favs = snap.exists()
+      ? Array.isArray(snap.val()) ? snap.val() : Object.values(snap.val())
+      : [];
+
+    if (isFavorite) {
+      favs = favs.filter(id => id !== route.params.id);
+    } else {
+      favs.push(route.params.id);
+    }
+
+    await set(favRef, favs);
+    setIsFavorite(!isFavorite);
+    setToggling(false);
+  };
 
   if (carregando) {
     return (
@@ -34,52 +89,63 @@ const MovieDetailsScreen = ({ navigation, route }) => {
 
   return (
     <ScrollView style={styles.container}>
-        <HeaderBar
-          title="Detalhes"
-          onBack={() => navigation.goBack()}
-        />
-        {filme ? (
+      <HeaderBar
+        title="Detalhes"
+        onBack={() => navigation.goBack()}
+      />
+
+      {filme ? (
         <>
-            <Image source={{ uri: getImagem() }} style={styles.poster} />
-            <View style={styles.titleRow}>
+          <Image source={{ uri: getImagem() }} style={styles.poster} />
+
+          <View style={styles.titleRow}>
             <Text style={styles.title}>{filme.title}</Text>
-            <View style={styles.options}>
-                <TouchableOpacity>
-                <Ionicons name="heart-outline" size={35} color="red" />
-                </TouchableOpacity>
-            </View>
-            </View>
-            <View style={styles.metaContainer}>
-                <Text style={styles.metaText}>{filme.release_date}</Text>
-                <Text style={styles.metaText}>{filme.runtime} min</Text>
-                <Text style={styles.metaText}>{filme.original_language.toUpperCase()}</Text>
-            </View>
-            <View style={styles.genresContainer}>
-              {getGeneros().map((genre, index) => (
-              <View key={index} style={styles.genreTag}>
+            <TouchableOpacity onPress={toggleFavorite} disabled={toggling}>
+              <Ionicons
+                name={isFavorite ? 'heart' : 'heart-outline'}
+                size={35}
+                color="red"
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.metaContainer}>
+            <Text style={styles.metaText}>{filme.release_date}</Text>
+            <Text style={styles.metaText}>{filme.runtime} min</Text>
+            <Text style={styles.metaText}>{filme.original_language.toUpperCase()}</Text>
+          </View>
+
+          <View style={styles.genresContainer}>
+            {getGeneros().map((genre, i) => (
+              <View key={i} style={styles.genreTag}>
                 <Text style={styles.genreText}>{genre.trim()}</Text>
               </View>
             ))}
-            </View>
-            <View style={styles.infoBox}>
-                <Text style={styles.infoTitle}>Sinopse</Text>
-                <Text style={styles.description}>{getDescricao()}</Text>
-            </View>
-            <View style={styles.infoBox}>
-                <Text style={styles.infoTitle}>Elenco</Text>
-                <Text style={styles.infoText}>{filme.atores}</Text>
-            </View>
-            <View style={styles.infoBox}>
-                <Text style={styles.infoTitle}>Orçamento</Text>
-                <Text style={styles.infoText}>${filme.budget.toLocaleString()}</Text>
-            </View>
+          </View>
+
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>Sinopse</Text>
+            <Text style={styles.description}>{getDescricao()}</Text>
+          </View>
+
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>Elenco</Text>
+            <Text style={styles.infoText}>{filme.atores}</Text>
+          </View>
+
+          <View style={styles.infoBox}>
+            <Text style={styles.infoTitle}>Orçamento</Text>
+            <Text style={styles.infoText}>
+              ${filme.budget.toLocaleString()}
+            </Text>
+          </View>
         </>
-        ) : (
-        <Text style={styles.errorText}>{controller.getErro()}</Text>
-        )}
+      ) : (
+        <Text style={styles.errorText}>{erro}</Text>
+      )}
     </ScrollView>
-    );
-};
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -96,7 +162,7 @@ const styles = StyleSheet.create({
   poster: {
     width: '100%',
     height: 400,
-    borderRadius: 8
+    borderRadius: 8,
   },
   titleRow: {
     flexDirection: 'row',
@@ -111,9 +177,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  options: {
+  metaContainer: {
     flexDirection: 'row',
-    gap: 12,
+    marginTop: 8,
+    gap: 16,
+  },
+  metaText: {
+    color: '#f4a03f',
+    fontSize: 14,
   },
   genresContainer: {
     flexDirection: 'row',
@@ -134,15 +205,6 @@ const styles = StyleSheet.create({
   },
   description: {
     color: '#FFF',
-    fontSize: 14
-  },
-  metaContainer: {
-    flexDirection: 'row',
-    marginTop: 8,
-    gap: 16,
-  },
-  metaText: {
-    color: '#f4a03f',
     fontSize: 14,
   },
   infoBox: {
@@ -167,5 +229,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default MovieDetailsScreen;
