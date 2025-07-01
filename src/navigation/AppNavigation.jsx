@@ -16,6 +16,7 @@ import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 import ActorsListScreen from '../screens/ActorsListScreen';
 import ActorFormScreen from '../screens/ActorFormScreen';
+import ScheduleFormScreen from '../screens/ScheduleFormScreen'
 
 
 
@@ -98,6 +99,11 @@ const AppNavigation = ()=> {
           component={ActorFormScreen}
           options={{headerShown: false}}
         />
+        <Stack.Screen 
+          name="ScheduleFormScreen"
+          component={ScheduleFormScreen}
+          options={{headerShown: false}}
+        /> 
       </Stack.Navigator>
     </NavigationContainer>
   );

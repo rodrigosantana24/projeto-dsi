@@ -124,6 +124,7 @@ export default class Filme {
         ref(database, 'filmes'),
         orderByChild('title'),
         startAt(termo),
+        endAt(termo + '\uf8ff'),
         limitToFirst(20)
       );
 
@@ -142,7 +143,6 @@ export default class Filme {
       return [];
     }
   }
-
 
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
     const filmesRef = ref(database, 'filmes');
