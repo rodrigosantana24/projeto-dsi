@@ -1,22 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const AtorItem = ({ ator, onEdit, onDelete }) => {
-return (
-    <View style={styles.container}>
+const AtorItem = ({ ator, onEdit }) => {
+  return (
+    <TouchableOpacity onPress={onEdit} activeOpacity={0.7}>
+      <View style={styles.container}>
         <Text style={styles.nome}>{ator.nome}</Text>
         <Text style={styles.descricao}>{ator.nacionalidade}</Text>
         <Text style={styles.descricao}>{ator.sexo}</Text>
-        <View style={styles.actions}>
-            <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={onEdit}>
-                <Text style={styles.buttonText}>Editar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={onDelete}>
-                <Text style={styles.buttonText}>Excluir</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-);
+      </View>
+    </TouchableOpacity>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -32,7 +26,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   descricao: {
-    color: '#BBB',
+    color: '#f4a03f',
     marginBottom: 4,
   },
   nativo: {

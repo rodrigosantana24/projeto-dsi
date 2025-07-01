@@ -8,13 +8,14 @@ import MenuScreen from '../screens/MenuScreen';
 import FavoriteMovieScreen from '../screens/FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
-import ManageActorsScreen from '../screens/ManageActorsScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
 import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
+import ActorsListScreen from '../screens/ActorsListScreen';
+import ActorFormScreen from '../screens/ActorFormScreen';
 
 
 
@@ -73,11 +74,6 @@ const AppNavigation = ()=> {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name= "ManageActorsScreen"
-          component={ManageActorsScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
           name='AddFriend'
           component={AddFriend}
           options={{headerShown: false}}
@@ -90,6 +86,16 @@ const AppNavigation = ()=> {
         <Stack.Screen
           name='FilteringMovieScreen'
           component={FilteringMovieScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ActorsListScreen"
+          component={ActorsListScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ActorFormScreen"
+          component={ActorFormScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

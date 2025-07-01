@@ -1,9 +1,19 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList, TouchableWithoutFeedback, Keyboard, Dimensions } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
-const AtorForm = ({ nome, nacionalidade, sexo, 
-                    onChangeNome, onChangeNacionalidade, onChangeSexo,
-                    onSubmit, editandoId, title = 'Adicionar Ator', onCancel }) => {
+const AtorForm = ({
+  nome,
+  nacionalidade,
+  sexo,
+  onChangeNome,
+  onChangeNacionalidade,
+  onChangeSexo,
+  onSubmit,
+  editandoId,
+  title = 'Adicionar Ator',
+  onCancel
+}) => {
   const sexoOptions = ['Feminino', 'Masculino'];
   const [sexoInput, setSexoInput] = React.useState(sexo || '');
   const [showOptions, setShowOptions] = React.useState(false);
@@ -19,6 +29,7 @@ const AtorForm = ({ nome, nacionalidade, sexo,
   const handleSexoChange = (text) => {
     setSexoInput(text);
     setShowOptions(true);
+    onChangeSexo(text);
   };
 
   const handleOptionSelect = (option) => {
@@ -58,6 +69,7 @@ const AtorForm = ({ nome, nacionalidade, sexo,
   const handleNacionalidadeChange = (text) => {
     setNacionalidadeInput(text);
     setShowNacionalidadeOptions(true);
+    onChangeNacionalidade(text);
   };
 
   const handleNacionalidadeOptionSelect = (option) => {
@@ -75,137 +87,247 @@ const AtorForm = ({ nome, nacionalidade, sexo,
 
   return (
     <TouchableWithoutFeedback onPress={dismissDropdowns}>
-      <View style={styles.form}>
-        <Text style={styles.formTitle}>{title}</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome do Ator"
-          placeholderTextColor="#999"
-          value={nome}
-          onChangeText={onChangeNome}
-        />
-        <View style={{ position: 'relative' }}>
-          <TextInput
-            style={styles.input}
-            placeholder="Nacionalidade"
-            placeholderTextColor="#999"
-            value={nacionalidadeInput}
-            onChangeText={handleNacionalidadeChange}
-            onFocus={() => setShowNacionalidadeOptions(true)}
-          />
-          {showNacionalidadeOptions && filteredNacionalidadeOptions.length > 0 && (
-            <View style={styles.dropdown}>
-              <FlatList
-                data={filteredNacionalidadeOptions}
-                keyExtractor={item => item}
-                style={{ maxHeight: 150 }}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleNacionalidadeOptionSelect(item)}
-                    style={styles.dropdownOption}
-                  >
-                    <Text style={styles.dropdownOptionText}>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
-            </View>
-          )}
-        </View>
-        <View style={{ position: 'relative' }}>
-          <TextInput
-            style={styles.input}
-            placeholder="Sexo"
-            placeholderTextColor="#999"
-            value={sexoInput}
-            onChangeText={handleSexoChange}
-            onFocus={() => setShowOptions(true)}
-          />
-          {showOptions && filteredOptions.length > 0 && (
-            <View style={styles.dropdown}>
-              <ScrollView style={{ maxHeight: 100 }}>
-                {filteredOptions.map(option => (
-                  <TouchableOpacity
-                    key={option}
-                    onPress={() => handleOptionSelect(option)}
-                    style={styles.dropdownOption}
-                  >
-                    <Text style={styles.dropdownOptionText}>{option}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-        </View>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (
-              sexoOptions.includes(sexoInput) &&
-              nacionalidadeOptions.includes(nacionalidadeInput)
-            ) {
-              onSubmit();
-            }
-          }}
-          disabled={
-            !sexoOptions.includes(sexoInput) ||
-            !nacionalidadeOptions.includes(nacionalidadeInput)
-          }
+      <View style={styles.fullScreenContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.buttonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
-        </TouchableOpacity>
-        {onCancel && (
-          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-            <Text style={styles.cancelButtonText}>Cancelar</Text>
+          <View style={styles.headerArea}>
+            <MaterialIcons name={editandoId ? "edit" : "person-add"} size={40} color="#f4a03f" />
+            <Text style={styles.formTitle}>{title}</Text>
+            <Text style={styles.formSubtitle}>
+              {editandoId
+                ? "Atualize as informações do ator selecionado."
+                : "Preencha os dados para cadastrar um novo ator."}
+            </Text>
+          </View>
+
+          <View style={styles.inputArea}>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome do Ator"
+              placeholderTextColor="#999"
+              value={nome}
+              onChangeText={onChangeNome}
+              maxLength={40}
+            />
+
+            <Text style={styles.label}>Nacionalidade</Text>
+            <View style={[{ position: 'relative' }, showNacionalidadeOptions ? { zIndex: 10 } : { zIndex: 1 }]}>
+              <TextInput
+                style={styles.input}
+                placeholder="Nacionalidade"
+                placeholderTextColor="#999"
+                value={nacionalidadeInput}
+                onChangeText={handleNacionalidadeChange}
+                onFocus={() => {
+                  setShowNacionalidadeOptions(true);
+                  setShowOptions(false);
+                }}
+                maxLength={30}
+              />
+              {showNacionalidadeOptions &&
+                nacionalidadeInput.length > 0 &&
+                filteredNacionalidadeOptions.length > 0 && (
+                  <View style={styles.dropdown}>
+                    <View style={{ maxHeight: 150, overflow: 'scroll' }}>
+                      {filteredNacionalidadeOptions.slice(0, 10).map(item => (
+                        <TouchableOpacity
+                          key={item}
+                          onPress={() => handleNacionalidadeOptionSelect(item)}
+                          style={styles.dropdownOption}
+                        >
+                          <Text style={styles.dropdownOptionText}>{item}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
+            </View>
+
+            <Text style={styles.label}>Sexo</Text>
+            <View style={[{ position: 'relative' }, showOptions ? { zIndex: 10 } : { zIndex: 1 }]}>
+              <TextInput
+                style={styles.input}
+                placeholder="Sexo"
+                placeholderTextColor="#999"
+                value={sexoInput}
+                onChangeText={handleSexoChange}
+                onFocus={() => {
+                  setShowOptions(true);
+                  setShowNacionalidadeOptions(false);
+                }}
+                maxLength={10}
+              />
+              {showOptions &&
+                sexoInput.length > 0 &&
+                filteredOptions.length > 0 && (
+                  <View style={styles.dropdown}>
+                    <View style={{ maxHeight: 100, overflow: 'scroll' }}>
+                      {filteredOptions.map(option => (
+                        <TouchableOpacity
+                          key={option}
+                          onPress={() => handleOptionSelect(option)}
+                          style={styles.dropdownOption}
+                        >
+                          <Text style={styles.dropdownOptionText}>{option}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.button,
+              (!sexoOptions.includes(sexoInput) ||
+                !nacionalidadeOptions.includes(nacionalidadeInput) ||
+                !nome.trim())
+                ? styles.buttonDisabled
+                : null,
+            ]}
+            onPress={() => {
+              if (
+                sexoOptions.includes(sexoInput) &&
+                nacionalidadeOptions.includes(nacionalidadeInput) &&
+                nome.trim()
+              ) {
+                onSubmit();
+              }
+            }}
+            disabled={
+              !sexoOptions.includes(sexoInput) ||
+              !nacionalidadeOptions.includes(nacionalidadeInput) ||
+              !nome.trim()
+            }
+          >
+            <MaterialIcons name={editandoId ? "save" : "check"} size={22} color="#fff" style={{ marginRight: 8 }} />
+            <Text style={styles.buttonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
           </TouchableOpacity>
-        )}
+
+          {onCancel && (
+            <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+              <MaterialIcons name="cancel" size={22} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
-  form: {
-    backgroundColor: '#113342',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 20,
-    zIndex: 20, // <-- Adicione isso
-    elevation: 20, // <-- Para Android
+  fullScreenContainer: {
+    flex: 1,
+    backgroundColor: '#072330',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    minHeight: '100%',
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingVertical: 24,
+    paddingHorizontal: 12,
+    width: width-20,
+  },
+  headerArea: {
+    alignItems: 'center',
+    marginBottom: 28,
   },
   formTitle: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 12,
+    marginTop: 8,
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  formSubtitle: {
+    color: '#f4a03f',
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: 'center',
+    maxWidth: 320,
+  },
+  inputArea: {
+    width: '100%',
+    maxWidth: 400,
+    marginBottom: 24,
+    backgroundColor: '#113342',
+    borderRadius: 12,
+    padding: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 8,
+  },
+  label: {
+    color: '#f4a03f',
+    fontWeight: 'bold',
+    marginBottom: 4,
+    marginTop: 10,
+    fontSize: 15,
+    letterSpacing: 0.5,
   },
   input: {
     borderWidth: 1,
     borderColor: '#3d5564',
-    borderRadius: 6,
-    padding: 10,
+    borderRadius: 8,
+    padding: 12,
     color: '#FFF',
-    marginBottom: 10,
+    marginBottom: 6,
+    backgroundColor: '#18394a',
+    fontSize: 16,
   },
   button: {
     backgroundColor: '#f4a03f',
-    padding: 12,
-    borderRadius: 6,
+    padding: 14,
+    borderRadius: 8,
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+    marginBottom: 8,
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: '#bfa07a',
   },
   buttonText: {
     color: '#FFF',
     fontWeight: 'bold',
+    fontSize: 17,
+    letterSpacing: 0.5,
   },
   cancelButton: {
     backgroundColor: '#dc3545',
-    padding: 12,
-    borderRadius: 6,
+    padding: 14,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 4,
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
   },
   cancelButtonText: {
     color: '#FFF',
     fontWeight: 'bold',
+    fontSize: 17,
+    letterSpacing: 0.5,
   },
   dropdown: {
     position: 'absolute',
@@ -214,8 +336,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#e6f2fa',
     borderRadius: 8,
-    zIndex: 100, // <-- Aumente aqui
-    elevation: 30, // <-- Para Android
+    zIndex: 100,
+    elevation: 30,
     borderWidth: 1,
     borderColor: '#3d5564',
     shadowColor: '#000',
