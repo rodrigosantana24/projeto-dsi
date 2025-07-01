@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import {
   View,
   Text,
@@ -12,7 +12,7 @@ import {
 import AgendamentoService from "../services/AgendamentoService";
 import Filme from "../models/Filme";
 import { UserContext } from "../Context/UserProvider";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import EditScheduleModal from "../components/modals/EditScheduleModal";
 import {  MaterialIcons } from '@expo/vector-icons';
@@ -58,28 +58,7 @@ export default function ToScheduleScreen() {
     setModalVisible(true);
   }
 
-  const buscarFilmes = async () => {
-    if (!buscaFilme.trim()) {
-      setFilmesFiltrados([]);
-      setFilmesPagina([]);
-      setPaginaAtual(0);
-      return;
-    }
-    setBuscandoFilmes(true);
-    try {
-      const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
-      setFilmesFiltrados(todos);
-      setFilmesPagina(todos.slice(0, PAGE_SIZE));
-      setPaginaAtual(1);
-    } catch (e) {
-      console.error("Erro ao buscar filmes:", e);
-      setFilmesFiltrados([]);
-      setFilmesPagina([]);
-      setPaginaAtual(0);
-    } finally {
-      setBuscandoFilmes(false);
-    }
-  };
+  
 
   async function salvarEdicao({ filmeId, data, hora }) {
   try {
@@ -260,9 +239,11 @@ export default function ToScheduleScreen() {
   }
   };
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     carregarAgendamentos();
-  }, []);
+    }, [userCredentials.uid])
+  );
 
   return (
   <View style={styles.container}>
@@ -318,75 +299,6 @@ export default function ToScheduleScreen() {
       )}
     </View>
 
-    <TouchableOpacity style={styles.button} onPress={toggleFormulario}>
-      <Text style={styles.buttonText}>{mostrarFormulario ? 'Fechar Formulário' : 'Mostrar Formulário'}</Text>
-    </TouchableOpacity>
-    {mostrarFormulario && (
-      <View style={styles.formulario}>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite o nome do filme"
-        placeholderTextColor="#a0b9d3"
-        value={buscaFilme}
-        onChangeText={setBuscaFilme}
-      />
-      <TouchableOpacity style={styles.button} onPress={buscarFilmes}>
-        <Text style={styles.buttonText}>Buscar</Text>
-      </TouchableOpacity>
-
-      {buscandoFilmes && <Text style={styles.buscandoTexto}>Buscando filmes...</Text>}
-
-      {filmesPagina.length > 0 && (
-        <FlatList
-          data={filmesPagina}
-          keyExtractor={(item) => item.id}
-          style={styles.sugestoes}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.sugestaoItem}
-              onPress={() => {
-                setNovoFilme(item.title);
-                setFilmesFiltrados([]);
-                setFilmesPagina([]);
-                setPaginaAtual(0);
-                Keyboard.dismiss();
-              }}
-            >
-              <Text style={styles.sugestaoTexto}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
-          onEndReached={carregarMaisFilmes}
-          onEndReachedThreshold={0.5}
-        />
-      )}
-
-      <TextInput
-        style={[styles.input, styles.inputDisabled]}
-        placeholder="Filme selecionado"
-        placeholderTextColor="#a0b9d3"
-        value={novoFilme}
-        editable={false}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data (DD/MM/YYYY)"
-        placeholderTextColor="#a0b9d3"
-        value={novaData}
-        onChangeText={setNovaData}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Hora (HH:mm)"
-        placeholderTextColor="#a0b9d3"
-        value={novaHora}
-        onChangeText={setNovaHora}
-      />
-      <TouchableOpacity style={[styles.button, styles.addButton]} onPress={handleAddAgendamento}>
-        <Text style={styles.buttonText}>Adicionar Agendamento</Text>
-      </TouchableOpacity>
-    </View>
-    )}
-    
 
     {loading ? (
       <Text style={styles.loadingText}>Carregando agendamentos...</Text>
@@ -397,7 +309,7 @@ export default function ToScheduleScreen() {
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎬 Filme: {item.filmeId}</Text>
+        <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
         <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
         <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
 
@@ -424,13 +336,6 @@ export default function ToScheduleScreen() {
     />
   )}
 
-    <EditScheduleModal
-      visible={modalVisible}
-      initialFilme={agendamentoEditando ? agendamentoEditando.filmeId : ""}
-      initialTime={agendamentoEditando ? agendamentoEditando.hora : ""}
-      onClose={() => setModalVisible(false)}
-      onSave={salvarEdicao}
-    />
   </View>
   );
 }
