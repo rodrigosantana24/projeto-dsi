@@ -88,7 +88,10 @@ export default function MovieDetailsScreen({ navigation, route }) {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}Add commentMore actions
+      contentContainerStyle={{ paddingBottom: 32 }} 
+      >
       <HeaderBar
         title="Detalhes"
         onBack={() => navigation.goBack()}
@@ -134,7 +137,7 @@ export default function MovieDetailsScreen({ navigation, route }) {
 
           <View style={styles.infoBox}>
             <Text style={styles.infoTitle}>Elenco</Text>
-            <Text style={styles.infoText}>{filme.atores}</Text>
+            <Text style={styles.infoText}>{filme.credits}</Text>
           </View>
 
           <View style={styles.infoBox}>
