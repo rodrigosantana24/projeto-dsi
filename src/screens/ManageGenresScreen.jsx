@@ -164,7 +164,7 @@ export default class ManageGenresScreen extends React.Component {
       <View style={styles.container}>
         <HeaderBar
           title="Gerenciar Gêneros"
-          onBack={() => navigation.goBack()}
+          onBack={() => this.props.navigation.goBack()}
         />
         <GeneroForm
           nome={nome}

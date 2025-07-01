@@ -209,22 +209,19 @@ export default function ToScheduleScreen() {
     return;
   }
 
-  // Validação da data
-  const partesData = novaData.split("/"); // DD/MM/YYYY
+  const partesData = novaData.split("/");
   if (partesData.length !== 3) {
     alert("Data inválida! Use o formato DD/MM/YYYY");
     return;
   }
 
   const [dia, mes, ano] = partesData;
-  // Criar data informada no formato ISO local, com hora zerada
   const dataInformada = new Date(`${ano}-${mes}-${dia}T00:00:00`);
   if (isNaN(dataInformada)) {
     alert("Data inválida! Use o formato DD/MM/YYYY");
     return;
   }
 
-  // Data atual com hora zerada
   const dataAtual = new Date();
   dataAtual.setHours(0, 0, 0, 0);
 
@@ -233,7 +230,7 @@ export default function ToScheduleScreen() {
     return;
   }
 
-  // Validação da hora
+  
   if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(novaHora)) {
     alert("Hora inválida! Use o formato HH:mm");
     return;
@@ -427,7 +424,7 @@ export default function ToScheduleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#071923",
+    backgroundColor: "#072330",
     paddingHorizontal: 16,
     paddingTop: 20,
   },
@@ -445,7 +442,7 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#c7defa",
+    color: "#fff",
   },
   formulario: {
     backgroundColor: "#142f43",
@@ -467,7 +464,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   button: {
-    backgroundColor: "#1a73e8",
+    backgroundColor: "#f4a03f",
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
@@ -513,12 +510,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#c7defa",
+    color: "#fff",
     marginBottom: 8,
   },
   cardText: {
     fontSize: 16,
-    color: "#a9c1e6",
+    color: "#fff",
     marginBottom: 6,
   },
   cardButtons: {
@@ -528,7 +525,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    backgroundColor: "#0d264f",
+    backgroundColor: "#1f4e6a",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
@@ -567,7 +564,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   labelFiltro: {
-    color: "#c7defa",
+    color: "#fff",
     fontWeight: "700",
     marginBottom: 8,
     fontSize: 16,
