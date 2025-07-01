@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   editButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#f4a03f',
   },
   deleteButton: {
     backgroundColor: '#dc3545',
