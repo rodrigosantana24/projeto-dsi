@@ -124,6 +124,7 @@ export default class Filme {
         ref(database, 'filmes'),
         orderByChild('title'),
         startAt(termo),
+        endAt(termo + '\uf8ff'),
         limitToFirst(20)
       );
 
