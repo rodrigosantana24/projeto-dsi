@@ -1,11 +1,22 @@
 import React from 'react';
+import 'react-native-gesture-handler';
 import AppNavigation from './navigation/AppNavigation';
 import { UserProvider } from './Context/UserProvider';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native';
 
 export default function App() {
-  return ( 
-    <UserProvider> 
-      <AppNavigation/>
-    </UserProvider>
+  return (
+    <GestureHandlerRootView style={styles.container}>
+      <UserProvider>
+        <AppNavigation />
+      </UserProvider>
+    </GestureHandlerRootView>
+  );
+}
 
-)}
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

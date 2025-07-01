@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, FlatList, Alert, StyleSheet, Text } from 'react-native';
+import { View, FlatList, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { Swipeable } from 'react-native-gesture-handler';
+import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import AtorService from '../services/AtorService';
-import AtorForm from '../components/actors/AtorForm';
 import AtorItem from '../components/actors/AtorItem';
-import Ator from '../models/Ator'; 
+import Ator from '../models/Ator';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
@@ -11,18 +12,13 @@ import SelectBy from '../components/search/SelectBy';
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
 
-export default class ManageActorsScreen extends React.Component {
+export default class ActorsListScreen extends React.Component {
   state = {
     atores: [],
-    nome: '',
-    nacionalidade: '',
-    sexo: '',
-    editandoId: null,
     filtroSexo: 'todos',
     buscaNome: '',
     atoresFiltrados: [],
-    page: 1, // novo estado
-    loadingMore: false, // novo estado
+    page: 1,
   };
 
   unsubscribeFocus = null;
@@ -50,60 +46,8 @@ export default class ManageActorsScreen extends React.Component {
       }
       this.setState({ atores, atoresFiltrados: atores });
     } catch (error) {
-      console.error('Erro ao carregar atores:', error);
       Alert.alert('Erro', 'Não foi possível carregar os atores');
     }
-  };
-  handleSave = async () => {
-    const { nome, nacionalidade, sexo, editandoId } = this.state;
-
-    if (!nome || !nacionalidade || !sexo) {
-      return Alert.alert('Erro', 'Preencha todos os campos');
-    }
-    try {
-      if (editandoId) {
-        const updated = await atorService.update({ id: editandoId, nome, nacionalidade, sexo });
-        this.setState((prev) => ({
-          atores: prev.atores.map(g => g.id === editandoId ? updated : g),
-        }));
-      } else {
-        const created = await atorService.create({ nome, nacionalidade, sexo });
-        this.setState((prev) => ({ atores: [...prev.atores, created] }));
-      }
-
-      this.setState({ nome: '', nacionalidade: '', sexo: '', editandoId: null });
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Erro', error.message);
-    }
-  };
-  startEdit = (ator) => {
-    this.setState({
-      nome: ator.nome,
-      nacionalidade: ator.nacionalidade,
-      sexo: ator.sexo,
-      editandoId: ator.id,
-    });
-  };
-  handleDelete = (id) => {
-    Alert.alert('Confirmar', 'Deseja excluir este ator?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await atorService.delete({ id });
-            this.setState((prev) => ({
-              atores: prev.atores.filter(g => g.id !== id)
-            }));
-          } catch (error) {
-            console.error(error);
-            Alert.alert('Erro', 'Falha ao excluir ator');
-          }
-        },
-      },
-    ]);
   };
 
   setFiltroSexo = async (filtroSexo) => {
@@ -129,7 +73,6 @@ export default class ManageActorsScreen extends React.Component {
     this.setState({ atoresFiltrados: filtrados, page: 1 });
   };
 
-  // Função chamada ao chegar no fim da lista
   handleEndReached = () => {
     const { page, atoresFiltrados } = this.state;
     if ((page * PAGE_SIZE) < atoresFiltrados.length) {
@@ -137,32 +80,54 @@ export default class ManageActorsScreen extends React.Component {
     }
   };
 
-  render() {
-    const { atoresFiltrados, nome, nacionalidade, sexo, editandoId, filtroSexo, buscaNome, page } = this.state;
+  handleDelete = (id) => {
+    Alert.alert('Confirmar', 'Deseja excluir este ator?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await atorService.delete({ id });
+            this.setState((prev) => ({
+              atores: prev.atores.filter(g => g.id !== id),
+              atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== id),
+            }));
+          } catch (error) {
+            Alert.alert('Erro', 'Falha ao excluir ator');
+          }
+        },
+      },
+    ]);
+  };
 
-    // Mostra apenas os itens da página atual
+  renderRightActions = (item) => (
+    <TouchableOpacity
+      style={styles.deleteButton}
+      onPress={() => this.handleDelete(item.id)}
+    >
+      <MaterialIcons name="delete" size={28} color="#fff" />
+    </TouchableOpacity>
+  );
+
+  render() {
+    const { atoresFiltrados, filtroSexo, page } = this.state;
     const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
       <View style={styles.container}>
         <HeaderBar
-          title="Gerenciar Atores"
           onBack={() => this.props.navigation.goBack()}
+          title="Atores"
+          rightComponent={
+            <TouchableOpacity
+              onPress={() => this.props.navigation.navigate('ActorFormScreen')}
+              style={{ marginRight: 10 }}
+            >
+              <MaterialIcons name="add" size={28} color="#fff" />
+            </TouchableOpacity>
+          }
         />
-        <AtorForm
-          nome={nome}
-          nacionalidade={nacionalidade}
-          sexo={sexo}
-          editandoId={editandoId}
-          title={editandoId ? 'Editar Ator' : 'Adicionar Ator'}
-          onChangeNome={(nome) => this.setState({ nome })}
-          onChangeNacionalidade={(nacionalidade) => this.setState({ nacionalidade })}
-          onChangeSexo={(sexo) => this.setState({ sexo })}
-          onSubmit={this.handleSave}
-          onCancel={editandoId ? () => this.setState({ nome: '', nacionalidade: '', sexo: '', editandoId: null }) : null}
-        />
-
-        {/* Filtros e busca */}
         <View style={styles.filterContainer}>
           <View style={styles.searchContainer}>
             <SearchBy
@@ -182,17 +147,19 @@ export default class ManageActorsScreen extends React.Component {
             />
           </View>
         </View>
-
         <Text style={styles.subheader}>Atores cadastrados</Text>
         <FlatList
           data={dataToShow}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <AtorItem
-              ator={item}
-              onEdit={() => this.startEdit(item)}
-              onDelete={() => this.handleDelete(item.id)}
-            />
+            <Swipeable renderRightActions={() => this.renderRightActions(item)}>
+              <AtorItem
+                ator={item}
+                onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
+                // Não mostra botão de excluir, pois agora é por swipe
+                hideDelete
+              />
+            </Swipeable>
           )}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
@@ -232,5 +199,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     marginTop: -4,
     marginLeft: 4,
+  },
+  deleteButton: {
+    backgroundColor: '#c00',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 60,
+    height: '100%',
   },
 });
