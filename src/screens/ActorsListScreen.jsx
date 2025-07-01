@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, FlatList, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
+// Remova o import de Swipeable
+import { SwipeListView } from 'react-native-swipe-list-view'; // Importe SwipeListView
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import AtorService from '../services/AtorService';
 import AtorItem from '../components/actors/AtorItem';
@@ -31,11 +32,13 @@ export default class ActorsListScreen extends React.Component {
       });
     }
   }
+
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
       this.unsubscribeFocus();
     }
   }
+
   loadAtores = async () => {
     try {
       let atores = [];
@@ -101,17 +104,8 @@ export default class ActorsListScreen extends React.Component {
     ]);
   };
 
-  renderRightActions = (item) => (
-    <TouchableOpacity
-      style={styles.deleteButton}
-      onPress={() => this.handleDelete(item.id)}
-    >
-      <MaterialIcons name="delete" size={28} color="#fff" />
-    </TouchableOpacity>
-  );
-
   render() {
-    const { atoresFiltrados, filtroSexo, page } = this.state;
+    const { atoresFiltrados, page } = this.state;
     const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
@@ -148,19 +142,30 @@ export default class ActorsListScreen extends React.Component {
           </View>
         </View>
         <Text style={styles.subheader}>Atores cadastrados</Text>
-        <FlatList
+
+        <SwipeListView
           data={dataToShow}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <Swipeable renderRightActions={() => this.renderRightActions(item)}>
-              <AtorItem
-                ator={item}
-                onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
-                // Não mostra botão de excluir, pois agora é por swipe
-                hideDelete
-              />
-            </Swipeable>
+            <AtorItem
+              ator={item}
+              onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
+             
+              hideDelete={true}
+            />
           )}
+          renderHiddenItem={({ item }) => (
+            <View style={styles.hiddenContainer}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => this.handleDelete(item.id)}
+              >
+                <MaterialIcons name="delete" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+          rightOpenValue={-75} 
+          disableRightSwipe={false} 
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -200,11 +205,23 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginLeft: 4,
   },
+
+  hiddenContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end', 
+    alignItems: 'center',
+    backgroundColor: '#072330', 
+    paddingRight: 10,
+   
+    paddingVertical: 4, 
+  },
   deleteButton: {
     backgroundColor: '#c00',
     justifyContent: 'center',
     alignItems: 'center',
     width: 60,
-    height: '100%',
+    height: '90%', 
+    borderRadius: 5, 
   },
 });
