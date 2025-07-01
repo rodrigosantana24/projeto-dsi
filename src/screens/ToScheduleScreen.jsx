@@ -15,6 +15,8 @@ import { UserContext } from "../Context/UserProvider";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import EditScheduleModal from "../components/modals/EditScheduleModal";
+import {  MaterialIcons } from '@expo/vector-icons';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const PAGE_SIZE = 20;
 
@@ -269,6 +271,9 @@ export default function ToScheduleScreen() {
         <Ionicons name="arrow-back" size={28} color="#c7defa" />
       </TouchableOpacity>
       <Text style={styles.titulo}>Seus agendamentos</Text>
+      <TouchableOpacity style={styles.backButton}>
+        <MaterialIcons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
 
     <View style={styles.filtroContainer}>
@@ -386,29 +391,38 @@ export default function ToScheduleScreen() {
     {loading ? (
       <Text style={styles.loadingText}>Carregando agendamentos...</Text>
     ) : (
-      <FlatList
-        data={agendamentosFiltrados}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>🎬 Filme: {item.filmeId}</Text>
-            <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-            <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
+      
+  <SwipeListView
+    data={agendamentosFiltrados}
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>🎬 Filme: {item.filmeId}</Text>
+        <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+        <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
 
-            <View style={styles.cardButtons}>
-              <TouchableOpacity style={styles.editButton} onPress={() => abrirModalEdicao(item)}>
-                <Text style={styles.editButtonText}>Editar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.delButton} onPress={() => excluirAgendamento(item.id)}>
-                <Text style={styles.editButtonText}>Excluir</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-        contentContainerStyle={{ paddingBottom: 60 }}
-      />
+        <View style={styles.cardButtons}>
+          <TouchableOpacity style={styles.editButton} onPress={() => abrirModalEdicao(item)}>
+            <Text style={styles.editButtonText}>Editar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     )}
-
+    renderHiddenItem={({ item }) => (
+      <View style={styles.hiddenContainer}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => excluirAgendamento(item.id)}
+        >
+          <MaterialIcons name="delete" size={28} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    )}
+    rightOpenValue={-75}
+    disableRightSwipe
+    contentContainerStyle={{ paddingBottom: 60 }}
+    />
+  )}
 
     <EditScheduleModal
       visible={modalVisible}
@@ -502,25 +516,25 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#1e2f47",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-    elevation: 3,
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 12,
+    overflow: 'hidden',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
     color: "#fff",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   cardText: {
     fontSize: 16,
     color: "#fff",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   cardButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     marginTop: 12,
   },
   editButton: {
@@ -594,5 +608,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     fontSize: 16,
+  },
+  hiddenContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingRight: 10,
+    backgroundColor: 'transparent', // não deixa vazar o vermelho
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    width: 75,
+    height: '85%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
 });
