@@ -271,7 +271,7 @@ export default function ToScheduleScreen() {
         <Ionicons name="arrow-back" size={28} color="#c7defa" />
       </TouchableOpacity>
       <Text style={styles.titulo}>Seus agendamentos</Text>
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}>
         <MaterialIcons name="add" size={28} color="#fff" />
       </TouchableOpacity>
     </View>
@@ -402,7 +402,7 @@ export default function ToScheduleScreen() {
         <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
 
         <View style={styles.cardButtons}>
-          <TouchableOpacity style={styles.editButton} onPress={() => abrirModalEdicao(item)}>
+          <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})}>
             <Text style={styles.editButtonText}>Editar</Text>
           </TouchableOpacity>
         </View>
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent', // não deixa vazar o vermelho
   },
   deleteButton: {
-    backgroundColor: 'red',
+    backgroundColor: '#c00',
     width: 75,
     height: '85%',
     justifyContent: 'center',
