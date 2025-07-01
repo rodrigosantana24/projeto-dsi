@@ -116,30 +116,6 @@ export default class Filme {
   static async getFilmesFirebaseFiltrados(termo) {
     if (!termo || termo.trim() === '') return [];
 
-    const termoLower = termo.toLowerCase();
-
-    try {
-      const filmesQuery = query(ref(database, 'filmes'), orderByChild('title'), startAt(termoLower), endAt(termoLower + '\uf8ff' ), limitToFirst(20))
-      const snapshot = await get(filmesQuery);
-
-      if (!snapshot.exists()) return [];
-
-      const data = snapshot.val();
-      const filmes = Object.entries(data).map(
-        ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
-      );
-
-
-      return filmes;
-    } catch (error) {
-      console.error('Erro ao buscar filmes filtrados:', error);
-      return [];
-    }
-  }
-
-  static async getFilmesFirebaseFiltrados(termo) {
-    if (!termo || termo.trim() === '') return [];
-
     try {
       const filmesQuery = query(
         ref(database, 'filmes'),
@@ -163,9 +139,6 @@ export default class Filme {
       return [];
     }
   }
-
-
-
 
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
     const filmesRef = ref(database, 'filmes');
