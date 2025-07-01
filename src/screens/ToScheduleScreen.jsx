@@ -69,8 +69,8 @@ export default function ToScheduleScreen() {
       setFilmesFiltrados(todos);
       setFilmesPagina(todos.slice(0, PAGE_SIZE));
       setPaginaAtual(1);
-    } catch (error) {
-      console.error("Erro ao buscar filmes:", error);
+    } catch (e) {
+      console.error("Erro ao buscar filmes:", e);
       setFilmesFiltrados([]);
       setFilmesPagina([]);
       setPaginaAtual(0);
