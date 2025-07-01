@@ -1,55 +1,55 @@
-import { View, Text , StyleSheet} from 'react-native';
+import { View, Text , StyleSheet, Alert} from 'react-native';
 import FriendForm from '../components/forms/FriendForm';
 import { UserContext } from '../Context/UserProvider';
-import AmigosService from '../models/AmigosService';
+import AmigosService from '../services/AmigosService';
 import { useContext, useState} from 'react';
-
+import { useNavigation } from '@react-navigation/native';
+import HeaderBar from '../components/navi/HeaderBar';
 const amigoService = new AmigosService();
 
-const handleAdicionar = async({UserId,FriendId}) =>{
+const handleAdicionar = async({userId, friendEmail}) =>{
     try {
-        amigoService.create({userId : UserId , friendId : FriendId})
-        console.log("TUDO OK create");
-        
+        await amigoService.create({userId : userId , friendEmail : friendEmail})
+        Alert.alert("Amigo adicionado com sucesso!");
     } catch (error) {
         console.log("Erro ao adicionar");
-        
+        Alert.alert(error.message || "Erro ao adicionar amigo");
     } 
 }
-const handleRemover = async({UserId,FriendId}) =>{
+const handleRemover = async({userId, friendEmail}) =>{
         try {
-            amigoService.delete({userId : UserId , friendId : FriendId})
-            console.log("removido");
-            
+            await amigoService.delete({userId : userId , friendEmail : friendEmail})
+            Alert.alert("Amigo removido com sucesso!");
         } catch (error) {
-            console.log("ERRO AO REMOVER");
-        } 
+            Alert.alert(error.message || "Erro ao remover amigo");
+        }
     }
 
 
 export default function AddFriend(){
     const {userCredentials} = useContext(UserContext)
     const [id,setId] = useState("");
-
+    const navigation = useNavigation();
     return (
         <View style={styles.container}>
+            <HeaderBar onBack={() => navigation.goBack()} title={"Adicionar Amigo"}></HeaderBar>
+
             <FriendForm
              onChange={(text) => setId(text)} 
              valueId={id} 
-             onSubmitAdd={()=>handleAdicionar({ UserId: userCredentials.uid, FriendId: id })}
-             onSubmitRemove={() => handleRemover({ UserId: userCredentials.uid, FriendId: id })}
+             onSubmitAdd={()=>handleAdicionar({ userId: userCredentials.uid, friendEmail: id })}
+             onSubmitRemove={() => handleRemover({ userId: userCredentials.uid,friendEmail: id })}
              ></FriendForm>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-  container: {
+container: {
     flex: 1,
     padding: 16,
-    paddingTop: 60,
-    backgroundColor: '#192936',
-    alignItems: "center",
+    paddingTop: 25,
+    backgroundColor: '#072330',
   },
   subheader: {
     fontSize: 16,

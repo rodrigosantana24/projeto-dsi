@@ -29,20 +29,20 @@ export default function FilteringSectionCarousel({
             <View style={styles.itemRow}>
               <MovieCard
                 id={item.id}
-                title={item.titulo || item.title}
+                title={item.title || " "}
                 image={{ uri: item.imagem || (item.getImageUrl && item.getImageUrl()) }}
                 onPress={(id) => navigation.navigate('MovieDetailsScreen', { id })}
               />
               <View style={styles.infoContainer}>
-                <Text style={styles.movieName}>{item.titulo || item.title}</Text>
+                <Text style={styles.movieName}>{item.title || "0" }</Text>
                 {item.release_date && (
-                  <Text style={styles.movieInfo}>Lançamento: {item.release_date}</Text>
+                  <Text style={styles.movieInfo}>Lançamento: {item.release_date  || "0" }</Text>
                 )}
                 {item.runtime && (
-                  <Text style={styles.movieInfo}>Duração: {item.runtime} min</Text>
+                  <Text style={styles.movieInfo}>Duração: {item.runtime  || "0" } min</Text>
                 )}
                 {item.vote_average && (
-                  <Text style={styles.movieInfo}>Nota: {item.vote_average}</Text>
+                  <Text style={styles.movieInfo}>Nota: {item.vote_average  || "0" }</Text>
                 )}
               </View>
             </View>
@@ -58,7 +58,7 @@ export default function FilteringSectionCarousel({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 14,
+    marginTop: 5,
     flex: 1,
   },
   header: {
@@ -78,7 +78,6 @@ const styles = StyleSheet.create({
   },
   carouselBackground: {
     borderRadius: 12,
-    padding: 8,
     flex: 1,
   },
   itemRow: {

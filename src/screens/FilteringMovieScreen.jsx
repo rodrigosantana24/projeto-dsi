@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Logo } from '../components/logo/Logo';
 import SearchBar from '../components/search/SearchBar';
 import BottomTab from '../components/navi/BottomTab';
 import HomeController from '../controllers/HomeController';
-import FilteringSectionCarousel from '../components/carousels/FilteringSectionCarousel'; // importação adicionada
+import FilteringSectionCarousel from '../components/carousels/FilteringSectionCarousel';
+import HeaderBar from '../components/navi/HeaderBar';
+import FilterChips from '../components/chips/FilterChips';
 
 export default function FilteringMovieScreen({ navigation, route }) {
   const [controller] = useState(new HomeController(navigation));
   const [carregando, setCarregando] = useState(true);
   const [filmes, setFilmes] = useState([]);
-  const generoId = route?.params?.generoId ?? null;
+  const generoId = route?.params?.generoId ?? 0;
   const generoLabel = route?.params?.generoLabel ?? 'Filmes';
   const searchTerm = route?.params?.searchTerm ?? null;
 
@@ -31,20 +32,28 @@ export default function FilteringMovieScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+        <HeaderBar
+          title="Pesquisar Filmes"
+          onBack={() => navigation.goBack()}
+        />
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backArrow}>{'←'}</Text>
-        </TouchableOpacity>
-        <View style={{ flex: 1, alignItems: 'center' }}>
-          <SearchBar
-            style={{ width: '100%' }}
-            onSearch={(searchTerm) => {
-              navigation.setParams({ searchTerm, generoId: null, generoLabel: null });
+        <SearchBar
+          style={{ width: '100%' }}
+          onSearch={(searchTerm) => {
+            navigation.navigate('FilteringMovieScreen', {
+              searchTerm,
+              generoId: null,
+              generoLabel: 'Resultados',
+            });
+          }}
+        />
+          <FilterChips
+            filters={controller.getFiltros()}
+            onSelect={(filter) => {
+              navigation.navigate('FilteringMovieScreen', { generoId: filter.id, generoLabel: filter.label });
             }}
           />
-        </View>
       </View>
-      <Text style={styles.sectionTitle}>{generoLabel}</Text>
       {carregando ? (
         <ActivityIndicator size="large" color="#FFF" style={{ marginTop: 30 }} />
       ) : (
@@ -52,7 +61,6 @@ export default function FilteringMovieScreen({ navigation, route }) {
           title={null}
           data={filmes}
           navigation={navigation}
-          contentContainerStyle={{ paddingLeft: 4, paddingRight: 16 }}
         />
       )}
       <View style={styles.footer}>
@@ -65,27 +73,17 @@ export default function FilteringMovieScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
+    paddingTop: 25,
     backgroundColor: '#072330',
-    paddingTop: 30,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center', // alinhamento centralizado
-    paddingHorizontal: 20,
     marginBottom: 10,
   },
   backArrow: {
     color: '#FFF',
     fontSize: 28,
     marginRight: 10,
-  },
-  sectionTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    paddingHorizontal: 20,
-    marginBottom: 10,
   },
   footer: {
     position: 'absolute',

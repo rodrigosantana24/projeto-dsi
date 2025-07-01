@@ -1,11 +1,21 @@
-import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import React, { useState, useContext, useEffect } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView  } from 'react-native';
 import { UserContext } from '../Context/UserProvider';
 import useFriends from '../hooks/useFriends';
 import { TouchableOpacity, Image } from 'react-native';
+import HeaderBar from '../components/navi/HeaderBar';
+import { useNavigation } from '@react-navigation/native';
+import AddFriend from './AddFriend';
+import SearchBar from '../components/search/SearchBar';
+import getFriendsFilter from '../services/getFriendsFilter';
+
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
   const { usuario, amigos, loading } = useFriends(userCredentials.uid);
+  const [searchText, setSearchText] = useState("");
+  const friendsArray = Array.isArray(amigos) ? amigos : [];
+  const filteredFriends = getFriendsFilter(friendsArray, searchText);  
+  const navigation = useNavigation();
 
   if (loading) {
     return (
@@ -16,62 +26,68 @@ export default function FriendList() {
   }
 
  return (
-  <ScrollView contentContainerStyle={styles.container}>
-    <Text style={styles.username}>Olá, {usuario?.name}</Text>
-    <ScrollView>
-      {amigos.length === 0 ? (
-        <Text style={styles.noData}>Você ainda não tem amigos adicionados.</Text>
-      ) : (
-        amigos.map((amigo) => (
-          <View key={amigo.uid} style={styles.friendBlock}>
-            <Text style={styles.friendName}>{amigo.name}</Text>
-            <Text style={styles.friendEmail}>{amigo.email}</Text>
 
-            <Text style={styles.subtitle}>Filmes Favoritos:</Text>
-            
-            {amigo.favoritos.length === 0 ? (
-              <Text style={styles.noData}>Nenhum favorito.</Text>
-            ) : (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moviesContainer}>
-                {amigo.favoritos.map((filme) => (
-                  <View key={filme.id} style={styles.movieCard}>
-                    <Text style={styles.title_movie}>{filme.title}</Text>
-                    <Image
-                      source={{ uri: filme.poster_path 
-                          ? "https://image.tmdb.org/t/p/original"+filme.poster_path 
-                          : "https://via.placeholder.com/150x225?text=No+Poster" }}
-                        style={styles.movieImage}
-                        resizeMode="cover"
-                        onError={(e) => console.log("Erro ao carregar imagem:", e.nativeEvent.error)}
-                    />
-                    <Text style={styles.filmeAno}>⭐ {filme.vote_average}/10</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            )}
-          </View>
-        ))
-      )}
+  <View style={styles.container}>
+
+    <HeaderBar onBack={() => navigation.goBack()} title={"Lista de amigos"}></HeaderBar>
+    <SearchBar style={searchStyles.container}  onSearch={setSearchText}></SearchBar>
+
+    <ScrollView>
+        {filteredFriends.length === 0 ? (
+          <Text style={styles.noData}>Você ainda não tem amigos adicionados.</Text>
+        ) : (
+          filteredFriends.map((amigo) => (
+            <View key={amigo.uid} style={styles.friendBlock}>
+              <Text style={styles.friendName}>{amigo.name}</Text>
+              <Text style={styles.friendEmail}>{amigo.email}</Text>
+
+              <Text style={styles.subtitle}>Filmes Favoritos:</Text>
+              
+              {amigo.favoritos.length === 0 ? (
+                <Text style={styles.noData}>Nenhum favorito.</Text>
+              ) : (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.moviesContainer}>
+                  {amigo.favoritos.map((filme) => (
+                    <View key={filme.id} style={styles.movieCard}>
+                      <Text style={styles.title_movie}>{filme.title}</Text>
+                      <Image
+                        source={{ uri: filme.poster_path 
+                            ? "https://image.tmdb.org/t/p/original"+filme.poster_path 
+                            : "https://via.placeholder.com/150x225?text=No+Poster" }}
+                          style={styles.movieImage}
+                          resizeMode="cover"
+                          onError={(e) => console.log("Erro ao carregar imagem:", e.nativeEvent.error)}
+                      />
+                      <Text style={styles.filmeAno}>⭐ {filme.vote_average}/10</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              )}
+            </View>
+          ))
+        )}
+      
     </ScrollView>
-  </ScrollView>
+  </View>
 );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#192936',
-    paddingTop: 60,
-    paddingHorizontal: 10,
+    padding: 16,
+    paddingTop: 25,
+    backgroundColor: '#072330',
   },
   username: {
     marginTop: 10,
     color: 'white',
-    fontSize: 29,
+    fontSize: 15,
+    textAlign: 'center',
     fontWeight: 'bold',
     marginBottom: 20,
   },
   friendBlock: {
-    marginBottom: 25,
+    marginBottom: 20,
     padding: 15,
     backgroundColor: '#223344',
     borderRadius: 10,
@@ -149,5 +165,29 @@ const styles = StyleSheet.create({
   },
   movieInfo: {
     padding: 10,
+  },
+
+});
+
+const searchStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    paddingHorizontal: 18,
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: "#fff",
+    justifyContent: 'center',
+  },
+  icon: {
+    marginLeft: 10,
+    color: '#fff',
+    fontSize: 14,
   },
 });

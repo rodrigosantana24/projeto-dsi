@@ -6,7 +6,10 @@ export default function SearchBar({ onSearch, style }) {
     const [text, setText] = React.useState('');
 
     const handleSubmit = () => {
-        if (onSearch) onSearch(text);
+      const trimmed = text.trim();
+      if (onSearch && trimmed.length > 0) {
+        onSearch(trimmed);
+      }
     };
 
     return (
@@ -33,12 +36,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 4,
-    paddingHorizontal: 15,
-    height: 40,
+    paddingHorizontal: 18
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 16,
     color: "#fff",
     justifyContent: 'center',
   },

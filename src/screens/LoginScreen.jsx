@@ -6,11 +6,14 @@ import { PasswordTextInput } from '../components/inputs/PasswordTextInput';
 import { useLogin } from '../hooks/useLogin';
 import { useState } from 'react';
 import { LoginTextInput } from '../components/inputs/LoginTextInput';
+import { StatusBar } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
+
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState(); 
   const {isLoading,error,data,handleLogin} = useLogin(navigation)
-
+  NavigationBar.setVisibilityAsync('hidden');
 
   const login = ()=>{
     handleLogin(email,password)
@@ -18,6 +21,7 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} />
       <Logo />
       <Text style={styles.title}>RuralFlix</Text>
       <LoginTextInput

@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import MapaUsuario from "../components/map/mapaUsuario";
 
 export default function CineScreen() {
-    const navigation = useNavigation();
     
     return (
         <View style={styles.container}>

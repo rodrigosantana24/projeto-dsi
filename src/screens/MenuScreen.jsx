@@ -8,10 +8,12 @@ import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
 import ManageActorsScreen from './ManageActorsScreen';
+import ToScheduleScreen from './ToScheduleScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 const ProfileScreen = () => {
@@ -69,11 +71,19 @@ const ProfileScreen = () => {
                 navigation.navigate(ManageActorsScreen);
               }}
             />
+            <ProfileButton
+              icon={<AntDesign name="calendar" size={30} color={'white'}/>}
+              text="Agendar" showArrow={true} 
+              onPress={() => {
+                navigation.navigate('ToScheduleScreen')
+              }}
+            />
             <ProfileButton 
               icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
               text="Sair" showArrow={false} 
               />
             </View>
+            
         </ScrollView>
         <View style={styles.footer}>
               <BottomTab/>
