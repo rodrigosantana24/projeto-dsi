@@ -19,7 +19,8 @@ export default class Filme {
     production_companies = '',
     release_date = '',
     vote_average = 0,
-    vote_count = 0
+    vote_count = 0,
+    credits = '' // <-- Adicionado credits
   ) {
     this.id = id;
     this.title = title;
@@ -38,6 +39,7 @@ export default class Filme {
     this.release_date = release_date;
     this.vote_average = vote_average;
     this.vote_count = vote_count;
+    this.credits = credits; // <-- Adicionado credits
   }
 
   getImageUrl() {
@@ -86,7 +88,8 @@ export default class Filme {
       data.production_companies || '',
       data.release_date || '',
       data.vote_average || 0,
-      data.vote_count || 0
+      data.vote_count || 0,
+      data.credits || '' // <-- Adicionado credits
     );
   }
 
