@@ -9,15 +9,11 @@ import {
   Alert,
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
-import Filme from "../models/Filme";
 import { UserContext } from "../Context/UserProvider";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import EditScheduleModal from "../components/modals/EditScheduleModal";
 import {  MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
-const PAGE_SIZE = 20;
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
@@ -27,7 +23,6 @@ export default function ToScheduleScreen() {
   const [novoFilme, setNovoFilme] = useState('');
   const [novaData, setNovaData] = useState('');
   const [novaHora, setNovaHora] = useState('');
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [filtro, setFiltro] = useState("nenhum"); 
   const [valorFiltro, setValorFiltro] = useState('');
 

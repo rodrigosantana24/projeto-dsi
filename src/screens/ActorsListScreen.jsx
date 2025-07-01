@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, FlatList, Alert, StyleSheet, Text, TouchableOpacity } from 'react-native';
-// Remova o import de Swipeable
-import { SwipeListView } from 'react-native-swipe-list-view'; // Importe SwipeListView
+import { SwipeListView } from 'react-native-swipe-list-view'; 
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import AtorService from '../services/AtorService';
 import AtorItem from '../components/actors/AtorItem';
