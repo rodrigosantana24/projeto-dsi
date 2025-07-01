@@ -25,16 +25,9 @@ export default function ToScheduleScreen() {
   const { userCredentials } = useContext(UserContext);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [buscaFilme, setBuscaFilme] = useState('');
-  const [filmesFiltrados, setFilmesFiltrados] = useState([]);
-  const [filmesPagina, setFilmesPagina] = useState([]);
-  const [buscandoFilmes, setBuscandoFilmes] = useState(false);
-  const [paginaAtual, setPaginaAtual] = useState(0);
   const [novoFilme, setNovoFilme] = useState('');
   const [novaData, setNovaData] = useState('');
   const [novaHora, setNovaHora] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [agendamentoEditando, setAgendamentoEditando] = useState(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [filtro, setFiltro] = useState("nenhum"); 
   const [valorFiltro, setValorFiltro] = useState('');
@@ -53,54 +46,6 @@ export default function ToScheduleScreen() {
     }
   };
 
-  function abrirModalEdicao(agendamento) {
-    setAgendamentoEditando(agendamento);
-    setModalVisible(true);
-  }
-
-  
-
-  async function salvarEdicao({ filmeId, data, hora }) {
-  try {
-    const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = data.match(regexData);
-    if (!match) {
-      alert("Data inválida! Use o formato DD/MM/YYYY");
-      return;
-    }
-    const [_, diaStr, mesStr, anoStr] = match;
-    const dia = parseInt(diaStr, 10);
-    const mes = parseInt(mesStr, 10);
-    const ano = parseInt(anoStr, 10);
-    const dataObj = new Date(ano, mes - 1, dia);
-    if (
-      dataObj.getDate() !== dia ||
-      dataObj.getMonth() !== mes - 1 ||
-      dataObj.getFullYear() !== ano
-    ) {
-      alert("Data inválida! Essa data não existe.");
-      return;
-    }
-    const dataISO = `${ano}-${mesStr.padStart(2, "0")}-${diaStr.padStart(2, "0")}`;
-    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(hora)) {
-      alert("Hora inválida! Use o formato HH:mm");
-      return;
-    }
-    await service.update({
-      id: agendamentoEditando.id,
-      userId: agendamentoEditando.userId,
-      filmeId,
-      data: dataISO,
-      hora,
-    });
-    setModalVisible(false);
-    setAgendamentoEditando(null);
-    await carregarAgendamentos();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
   async function excluirAgendamento(id) {
     try {
       await service.delete({ userId: userCredentials.uid, id });
@@ -111,15 +56,6 @@ export default function ToScheduleScreen() {
     }
   }
 
-  const carregarMaisFilmes = () => {
-    if (buscandoFilmes) return;
-    const inicio = paginaAtual * PAGE_SIZE;
-    const fim = inicio + PAGE_SIZE;
-    const maisFilmes = filmesFiltrados.slice(inicio, fim);
-    if (maisFilmes.length === 0) return;
-    setFilmesPagina((prev) => [...prev, ...maisFilmes]);
-    setPaginaAtual(paginaAtual + 1);
-  };
 
   function converterDataParaISO(dataBR) {
     const partes = dataBR.split("/");
@@ -177,12 +113,7 @@ export default function ToScheduleScreen() {
   return agendamentos;
 }
 
-
   const agendamentosFiltrados = filtrarAgendamentos();
-
-  const toggleFormulario = () => {
-    setMostrarFormulario(!mostrarFormulario);
-  }
 
   const handleAddAgendamento = async () => {
   if (!novoFilme || !novaData || !novaHora) {
@@ -363,13 +294,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
   },
-  formulario: {
-    backgroundColor: "#142f43",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    elevation: 5,
-  },
   input: {
     backgroundColor: "#1f4e6a",
     color: "#e0e0e0",
@@ -379,9 +303,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
   },
-  inputDisabled: {
-    opacity: 0.7,
-  },
   button: {
     backgroundColor: "#f4a03f",
     paddingVertical: 14,
@@ -389,34 +310,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  addButton: {
-    marginTop: 8,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "700",
-    fontSize: 16,
-  },
-  buscandoTexto: {
-    color: "#a0b9d3",
-    fontStyle: "italic",
-    marginBottom: 12,
-    marginLeft: 6,
-  },
-  sugestoes: {
-    maxHeight: 160,
-    backgroundColor: "#11314f",
-    borderRadius: 10,
-    marginVertical: 10,
-  },
-  sugestaoItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomColor: "#1a73e8",
-    borderBottomWidth: 1,
-  },
-  sugestaoTexto: {
-    color: "#cce4f7",
     fontSize: 16,
   },
   card: {
@@ -450,14 +346,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: 6,
   },
-  delButton: {
-    flex: 1,
-    backgroundColor: "#dc3545",
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-    marginLeft: 6,
-  },
   editButtonText: {
     color: "#fff",
     fontWeight: "700",
@@ -468,13 +356,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     marginVertical: 20,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
   },
   filtroContainer: {
     marginBottom: 20,
@@ -519,7 +400,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'center',
     paddingRight: 10,
-    backgroundColor: 'transparent', // não deixa vazar o vermelho
+    backgroundColor: 'transparent', 
   },
   deleteButton: {
     backgroundColor: '#c00',
