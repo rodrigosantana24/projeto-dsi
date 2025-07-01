@@ -6,7 +6,7 @@ import BottomTab from '../components/navi/BottomTab'
 import { useNavigation, useRoute } from '@react-navigation/native';
 import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
-import ManageGenresScreen from '../screens/ManageGenresScreen';
+import GenresListScreen from './GenresListScreen';
 import ActorsListScreen from './ActorsListScreen';
 import ToScheduleScreen from './ToScheduleScreen';
 import { UserContext } from '../Context/UserProvider';
@@ -61,7 +61,7 @@ const ProfileScreen = () => {
               icon={<AntDesign name="plus" size={30} color={"white"}/>} 
               text="Gerenciar Gêneros" 
               onPress={() => {
-                navigation.navigate(ManageGenresScreen);
+                navigation.navigate(GenresListScreen);
               }}
             />
             <ProfileButton 
