@@ -25,13 +25,10 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const carregarDados = async () => {
       await controller.carregarFilmes();
-      // Busca filmes com primary_genre_id = 0 para "Ação e Aventura"
       const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreIdLimited(0);
       setAcaoAventuraFilmes(filmesAcaoAventura);
-      // Busca filmes com primary_genre_id = 6 para "Drama e Suspense"
       const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreIdLimited(6);
       setDramaSuspenseFilmes(filmesDramaSuspense);
-      // Busca filmes com primary_genre_id = 10 para "Terror"
       const terrorFilmes = await controller.getFilmesByPrimaryGenreIdLimited(10);
       setFilmesterrorFilmes(terrorFilmes);
       setCarregando(false);

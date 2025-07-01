@@ -180,7 +180,7 @@ export default class ManageGenresScreen extends React.Component {
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar generos..."
-              onSearch={this.handleBuscaNome}
+              onSearch={this.handleSearch}
             />
           </View>
           <View style={styles.selectContainer}>
