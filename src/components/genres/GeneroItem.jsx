@@ -1,24 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-const GeneroItem = ({ genero, onEdit, onDelete }) => {
+const GeneroItem = ({ genero, onEdit }) => {
+  const isNativo = genero.nativo === true || genero.nativo === 'n';
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.nome}>{genero.nome}</Text>
-      <Text style={styles.descricao}>{genero.descricao}</Text>
-      {genero.nativo ? (
-        <Text style={styles.nativo}>Gênero nativo</Text>
-      ) : (
-        <View style={styles.actions}>
-          <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={onEdit}>
-            <Text style={styles.buttonText}>Editar</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={onDelete}>
-            <Text style={styles.buttonText}>Excluir</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
+    <TouchableOpacity onPress={onEdit} activeOpacity={0.7}>
+      <View style={styles.container}>
+        <Text style={styles.nome}>{genero.nome}</Text>
+        <Text style={styles.descricao}>{genero.descricao}</Text>
+        {isNativo && <Text style={styles.nativo}>Gênero nativo</Text>}
+      </View>
+    </TouchableOpacity>
   );
 };
 
@@ -28,6 +21,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 8,
     borderRadius: 8,
+    minHeight: 80
   },
   nome: {
     fontSize: 16,
@@ -35,11 +29,10 @@ const styles = StyleSheet.create({
     color: '#FFF',
   },
   descricao: {
-    color: '#BBB',
+    color: '#f4a03f',
     marginBottom: 4,
   },
   nativo: {
-    marginTop: 8,
     fontStyle: 'italic',
     color: '#FFD700',
   },
