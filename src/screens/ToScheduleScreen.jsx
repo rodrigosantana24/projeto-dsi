@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    backgroundColor: "#0d264f",
+    backgroundColor: "#1f4e6a",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
