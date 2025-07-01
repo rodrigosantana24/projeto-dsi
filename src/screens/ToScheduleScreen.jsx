@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   View,
   Text,
-  FlatList,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -10,30 +9,20 @@ import {
   Alert,
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
-import Filme from "../models/Filme";
 import { UserContext } from "../Context/UserProvider";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import EditScheduleModal from "../components/modals/EditScheduleModal";
-
-const PAGE_SIZE = 20;
+import {  MaterialIcons } from '@expo/vector-icons';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
   const { userCredentials } = useContext(UserContext);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [buscaFilme, setBuscaFilme] = useState('');
-  const [filmesFiltrados, setFilmesFiltrados] = useState([]);
-  const [filmesPagina, setFilmesPagina] = useState([]);
-  const [buscandoFilmes, setBuscandoFilmes] = useState(false);
-  const [paginaAtual, setPaginaAtual] = useState(0);
   const [novoFilme, setNovoFilme] = useState('');
   const [novaData, setNovaData] = useState('');
   const [novaHora, setNovaHora] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [agendamentoEditando, setAgendamentoEditando] = useState(null);
-  const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [filtro, setFiltro] = useState("nenhum"); 
   const [valorFiltro, setValorFiltro] = useState('');
 
@@ -51,75 +40,6 @@ export default function ToScheduleScreen() {
     }
   };
 
-  function abrirModalEdicao(agendamento) {
-    setAgendamentoEditando(agendamento);
-    setModalVisible(true);
-  }
-
-  const buscarFilmes = async () => {
-    if (!buscaFilme.trim()) {
-      setFilmesFiltrados([]);
-      setFilmesPagina([]);
-      setPaginaAtual(0);
-      return;
-    }
-    setBuscandoFilmes(true);
-    try {
-      const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
-      setFilmesFiltrados(todos);
-      setFilmesPagina(todos.slice(0, PAGE_SIZE));
-      setPaginaAtual(1);
-    } catch (error) {
-      console.error("Erro ao buscar filmes:", error);
-      setFilmesFiltrados([]);
-      setFilmesPagina([]);
-      setPaginaAtual(0);
-    } finally {
-      setBuscandoFilmes(false);
-    }
-  };
-
-  async function salvarEdicao({ filmeId, data, hora }) {
-  try {
-    const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-    const match = data.match(regexData);
-    if (!match) {
-      alert("Data inválida! Use o formato DD/MM/YYYY");
-      return;
-    }
-    const [_, diaStr, mesStr, anoStr] = match;
-    const dia = parseInt(diaStr, 10);
-    const mes = parseInt(mesStr, 10);
-    const ano = parseInt(anoStr, 10);
-    const dataObj = new Date(ano, mes - 1, dia);
-    if (
-      dataObj.getDate() !== dia ||
-      dataObj.getMonth() !== mes - 1 ||
-      dataObj.getFullYear() !== ano
-    ) {
-      alert("Data inválida! Essa data não existe.");
-      return;
-    }
-    const dataISO = `${ano}-${mesStr.padStart(2, "0")}-${diaStr.padStart(2, "0")}`;
-    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(hora)) {
-      alert("Hora inválida! Use o formato HH:mm");
-      return;
-    }
-    await service.update({
-      id: agendamentoEditando.id,
-      userId: agendamentoEditando.userId,
-      filmeId,
-      data: dataISO,
-      hora,
-    });
-    setModalVisible(false);
-    setAgendamentoEditando(null);
-    await carregarAgendamentos();
-  } catch (error) {
-    console.error(error);
-  }
-}
-
   async function excluirAgendamento(id) {
     try {
       await service.delete({ userId: userCredentials.uid, id });
@@ -130,15 +50,6 @@ export default function ToScheduleScreen() {
     }
   }
 
-  const carregarMaisFilmes = () => {
-    if (buscandoFilmes) return;
-    const inicio = paginaAtual * PAGE_SIZE;
-    const fim = inicio + PAGE_SIZE;
-    const maisFilmes = filmesFiltrados.slice(inicio, fim);
-    if (maisFilmes.length === 0) return;
-    setFilmesPagina((prev) => [...prev, ...maisFilmes]);
-    setPaginaAtual(paginaAtual + 1);
-  };
 
   function converterDataParaISO(dataBR) {
     const partes = dataBR.split("/");
@@ -196,12 +107,7 @@ export default function ToScheduleScreen() {
   return agendamentos;
 }
 
-
   const agendamentosFiltrados = filtrarAgendamentos();
-
-  const toggleFormulario = () => {
-    setMostrarFormulario(!mostrarFormulario);
-  }
 
   const handleAddAgendamento = async () => {
   if (!novoFilme || !novaData || !novaHora) {
@@ -258,9 +164,11 @@ export default function ToScheduleScreen() {
   }
   };
 
-  useEffect(() => {
+  useFocusEffect(
+    useCallback(() => {
     carregarAgendamentos();
-  }, []);
+    }, [userCredentials.uid])
+  );
 
   return (
   <View style={styles.container}>
@@ -269,6 +177,9 @@ export default function ToScheduleScreen() {
         <Ionicons name="arrow-back" size={28} color="#c7defa" />
       </TouchableOpacity>
       <Text style={styles.titulo}>Seus agendamentos</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}>
+        <MaterialIcons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
 
     <View style={styles.filtroContainer}>
@@ -313,110 +224,43 @@ export default function ToScheduleScreen() {
       )}
     </View>
 
-    <TouchableOpacity style={styles.button} onPress={toggleFormulario}>
-      <Text style={styles.buttonText}>{mostrarFormulario ? 'Fechar Formulário' : 'Mostrar Formulário'}</Text>
-    </TouchableOpacity>
-    {mostrarFormulario && (
-      <View style={styles.formulario}>
-      <TextInput
-        style={styles.input}
-        placeholder="Digite o nome do filme"
-        placeholderTextColor="#a0b9d3"
-        value={buscaFilme}
-        onChangeText={setBuscaFilme}
-      />
-      <TouchableOpacity style={styles.button} onPress={buscarFilmes}>
-        <Text style={styles.buttonText}>Buscar</Text>
-      </TouchableOpacity>
-
-      {buscandoFilmes && <Text style={styles.buscandoTexto}>Buscando filmes...</Text>}
-
-      {filmesPagina.length > 0 && (
-        <FlatList
-          data={filmesPagina}
-          keyExtractor={(item) => item.id}
-          style={styles.sugestoes}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.sugestaoItem}
-              onPress={() => {
-                setNovoFilme(item.title);
-                setFilmesFiltrados([]);
-                setFilmesPagina([]);
-                setPaginaAtual(0);
-                Keyboard.dismiss();
-              }}
-            >
-              <Text style={styles.sugestaoTexto}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
-          onEndReached={carregarMaisFilmes}
-          onEndReachedThreshold={0.5}
-        />
-      )}
-
-      <TextInput
-        style={[styles.input, styles.inputDisabled]}
-        placeholder="Filme selecionado"
-        placeholderTextColor="#a0b9d3"
-        value={novoFilme}
-        editable={false}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data (DD/MM/YYYY)"
-        placeholderTextColor="#a0b9d3"
-        value={novaData}
-        onChangeText={setNovaData}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Hora (HH:mm)"
-        placeholderTextColor="#a0b9d3"
-        value={novaHora}
-        onChangeText={setNovaHora}
-      />
-      <TouchableOpacity style={[styles.button, styles.addButton]} onPress={handleAddAgendamento}>
-        <Text style={styles.buttonText}>Adicionar Agendamento</Text>
-      </TouchableOpacity>
-    </View>
-    )}
-    
 
     {loading ? (
       <Text style={styles.loadingText}>Carregando agendamentos...</Text>
     ) : (
-      <FlatList
-        data={agendamentosFiltrados}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>🎬 Filme: {item.filmeId}</Text>
-            <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-            <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
+      
+  <SwipeListView
+    data={agendamentosFiltrados}
+    keyExtractor={(item) => item.id}
+    renderItem={({ item }) => (
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
+        <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+        <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
 
-            <View style={styles.cardButtons}>
-              <TouchableOpacity style={styles.editButton} onPress={() => abrirModalEdicao(item)}>
-                <Text style={styles.editButtonText}>Editar</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.delButton} onPress={() => excluirAgendamento(item.id)}>
-                <Text style={styles.editButtonText}>Excluir</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-        contentContainerStyle={{ paddingBottom: 60 }}
-      />
+        <View style={styles.cardButtons}>
+          <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})}>
+            <Text style={styles.editButtonText}>Editar</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     )}
-
-
-    <EditScheduleModal
-      visible={modalVisible}
-      initialFilme={agendamentoEditando ? agendamentoEditando.filmeId : ""}
-      initialTime={agendamentoEditando ? agendamentoEditando.hora : ""}
-      onClose={() => setModalVisible(false)}
-      onSave={salvarEdicao}
+    renderHiddenItem={({ item }) => (
+      <View style={styles.hiddenContainer}>
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={() => excluirAgendamento(item.id)}
+        >
+          <MaterialIcons name="delete" size={28} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    )}
+    rightOpenValue={-75}
+    disableRightSwipe
+    contentContainerStyle={{ paddingBottom: 60 }}
     />
+  )}
+
   </View>
   );
 }
@@ -444,13 +288,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "#fff",
   },
-  formulario: {
-    backgroundColor: "#142f43",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 24,
-    elevation: 5,
-  },
   input: {
     backgroundColor: "#1f4e6a",
     color: "#e0e0e0",
@@ -460,9 +297,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 12,
   },
-  inputDisabled: {
-    opacity: 0.7,
-  },
   button: {
     backgroundColor: "#f4a03f",
     paddingVertical: 14,
@@ -470,74 +304,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  addButton: {
-    marginTop: 8,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
   },
-  buscandoTexto: {
-    color: "#a0b9d3",
-    fontStyle: "italic",
-    marginBottom: 12,
-    marginLeft: 6,
-  },
-  sugestoes: {
-    maxHeight: 160,
-    backgroundColor: "#11314f",
-    borderRadius: 10,
-    marginVertical: 10,
-  },
-  sugestaoItem: {
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomColor: "#1a73e8",
-    borderBottomWidth: 1,
-  },
-  sugestaoTexto: {
-    color: "#cce4f7",
-    fontSize: 16,
-  },
   card: {
     backgroundColor: "#1e2f47",
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-    elevation: 3,
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 12,
+    overflow: 'hidden',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
     color: "#fff",
-    marginBottom: 8,
+    marginBottom: 4,
   },
   cardText: {
     fontSize: 16,
     color: "#fff",
-    marginBottom: 6,
+    marginBottom: 4,
   },
   cardButtons: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     marginTop: 12,
   },
   editButton: {
     flex: 1,
-    backgroundColor: "#1f4e6a",
+    backgroundColor: "#f4a03f",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",
     marginRight: 6,
-  },
-  delButton: {
-    flex: 1,
-    backgroundColor: "#dc3545",
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-    marginLeft: 6,
   },
   editButtonText: {
     color: "#fff",
@@ -549,13 +350,6 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "center",
     marginVertical: 20,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1,
   },
   filtroContainer: {
     marginBottom: 20,
@@ -594,5 +388,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     fontSize: 16,
+  },
+  hiddenContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingRight: 10,
+    backgroundColor: 'transparent', 
+  },
+  deleteButton: {
+    backgroundColor: '#c00',
+    width: 75,
+    height: '85%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
 });
