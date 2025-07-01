@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import ManageGenresScreen from '../screens/ManageGenresScreen';
-import ManageActorsScreen from './ManageActorsScreen';
+import ActorsListScreen from './ActorsListScreen';
 import ToScheduleScreen from './ToScheduleScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
@@ -68,7 +68,7 @@ const ProfileScreen = () => {
               icon={<AntDesign name="user" size={30} color={"white"}/>} 
               text="Gerenciar Atores" 
               onPress={() => {
-                navigation.navigate(ManageActorsScreen);
+                navigation.navigate(ActorsListScreen);
               }}
             />
             <ProfileButton
