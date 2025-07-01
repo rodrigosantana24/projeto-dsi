@@ -143,7 +143,10 @@ export default class Filme {
     }
   }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 930f9fa2d300690da9a5cd279a4180d171427ade
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
     const filmesRef = ref(database, 'filmes');
     const filmesQuery = query(
