@@ -99,10 +99,11 @@ const AppNavigation = ()=> {
           component={ActorFormScreen}
           options={{headerShown: false}}
         />
-        {/* <Stack.Screen 
-          name="SheduleFormScreen"
+        <Stack.Screen 
+          name="ScheduleFormScreen"
           component={ScheduleFormScreen}
-          options={{headerShown: false}}/> */}
+          options={{headerShown: false}}
+        /> 
       </Stack.Navigator>
     </NavigationContainer>
   );
