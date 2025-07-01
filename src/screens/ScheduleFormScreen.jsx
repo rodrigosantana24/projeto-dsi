@@ -23,12 +23,22 @@ export default function ScheduleFormScreen({ route, navigation }) {
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [buscandoFilmes, setBuscandoFilmes] = useState(false);
 
+  const userId = agendamento?.userId || route.params?.userId || null;
+  const service = new AgendamentoService();
+
+  if (!userId) {
+    alert("Usuário não identificado.");
+    return null;
+  }
+
   const [filmeSelecionado, setFilmeSelecionado] = useState(
-    agendamento ? { id: agendamento.filmeId, title: agendamento.filmeTitulo } : { id: "", title: "" }
+    agendamento ? agendamento.filmeId : ""
   );
+
   const [data, setData] = useState(
     agendamento ? formatarData(agendamento.data) : ""
   );
+
   const [hora, setHora] = useState(agendamento?.hora || "");
 
   useEffect(() => {
@@ -65,7 +75,7 @@ export default function ScheduleFormScreen({ route, navigation }) {
   };
 
   const selecionarFilme = (filme) => {
-    setFilmeSelecionado({ id: filme.id, title: filme.title });
+    setFilmeSelecionado(filme.title);
     setBuscaFilme("");
     setFilmesFiltrados([]);
     setFilmesPagina([]);
@@ -73,7 +83,7 @@ export default function ScheduleFormScreen({ route, navigation }) {
   };
 
   const salvar = async () => {
-    if (!filmeSelecionado.id || !data || !hora) {
+    if (!filmeSelecionado || !data || !hora) {
       alert("Preencha todos os campos");
       return;
     }
@@ -108,21 +118,22 @@ export default function ScheduleFormScreen({ route, navigation }) {
 
     try {
       if (isEdit) {
-        await AgendamentoService.update({
+        await service.update({
           id: agendamento.id,
           userId: agendamento.userId,
-          filmeId: filmeSelecionado.id,
+          filmeId: filmeSelecionado,
           data: dataISO,
           hora,
         });
       } else {
-        await AgendamentoService.create({
-          userId: route.params.userId, // ou pegue do contexto
-          filmeId: filmeSelecionado.id,
+        await service.create({
+          userId,
+          filmeId: filmeSelecionado,
           data: dataISO,
           hora,
         });
       }
+
       alert("Agendamento salvo com sucesso!");
       navigation.goBack();
     } catch (error) {
@@ -172,7 +183,7 @@ export default function ScheduleFormScreen({ route, navigation }) {
         style={styles.input}
         placeholder="Filme selecionado"
         placeholderTextColor="#a0b9d3"
-        value={filmeSelecionado.title}
+        value={filmeSelecionado}
         editable={false}
       />
       <TextInput
