@@ -1,8 +1,7 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import {
   View,
   Text,
-  FlatList,
   TextInput,
   StyleSheet,
   TouchableOpacity,
@@ -340,7 +339,7 @@ const styles = StyleSheet.create({
   },
   editButton: {
     flex: 1,
-    backgroundColor: "#1f4e6a",
+    backgroundColor: "#f4a03f",
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: "center",

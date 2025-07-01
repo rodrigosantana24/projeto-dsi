@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Alert } from 'react-native';
+import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native';
 import AgendamentoService from '../services/AgendamentoService';
 import AgendamentoForm from '../components/schedule/AgendamentoForm';
+import { Ionicons } from "@expo/vector-icons";
 
 const ScheduleFormScreen = ({ route, navigation }) => {
   const agendamento = route.params?.agendamento || null;
@@ -54,9 +55,9 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     try {
       if (isEdit) {
         await service.update({
-          id: agendamento.id,           
+          id: agendamento.id,
           userId: agendamento.userId,
-          filmeId: filmeSelecionado.title,  
+          filmeId: filmeSelecionado.title,
           data: dataISO,
           hora,
         });
@@ -77,7 +78,15 @@ const ScheduleFormScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={28} color="#c7defa" />
+        </TouchableOpacity>
+        <Text style={styles.titulo}>
+          {isEdit ? "Editar Agendamento" : "Novo Agendamento"}
+        </Text>
+      </View>
       <AgendamentoForm
         filmeSelecionado={filmeSelecionado}
         onChangeFilmeSelecionado={setFilmeSelecionado}
@@ -92,5 +101,30 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#072330",
+    paddingHorizontal: 16,
+    paddingTop: 5,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start", 
+    gap: 12,
+    marginBottom: 5,
+    marginTop: 20,
+  },
+  backButton: {
+    padding: 8,
+  },
+  titulo: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#fff",
+  },
+});
 
 export default ScheduleFormScreen;
