@@ -68,11 +68,11 @@ export default class HomeController {
   }
 
   async getFilmesByPrimaryGenreId(genreId, limit = 100) {
-    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);r
   }
 
   async searchFilmesByName(searchTerm) {
-    const filmes = await Filme.getAllFilmesFromFirebase();
+    const filmes = await Filme.getFilmesFromFirebase(2000, false);
     if (!searchTerm) return filmes;
     const lower = searchTerm.toLowerCase();
     return filmes.filter(f =>
