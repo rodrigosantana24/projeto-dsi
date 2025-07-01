@@ -13,6 +13,7 @@ import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 
 const ProfileScreen = () => {
@@ -71,7 +72,7 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton
-              icon={<AntDesign name="setting" size={30} color={'white'}/>}
+              icon={<AntDesign name="calendar" size={30} color={'white'}/>}
               text="Agendar" showArrow={true} 
               onPress={() => {
                 navigation.navigate('ToScheduleScreen')

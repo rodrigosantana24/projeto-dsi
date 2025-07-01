@@ -1,4 +1,4 @@
-import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo } from 'firebase/database';
+import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo, startAt, endAt } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Filme {
@@ -122,58 +122,52 @@ export default class Filme {
     const termoLower = termo.toLowerCase();
 
     try {
-      const filmesRef = ref(database, 'filmes');
-      const snapshot = await get(filmesRef);
+      const filmesQuery = query(ref(database, 'filmes'), orderByChild('title'), startAt(termoLower), endAt(termoLower + '\uf8ff' ), limitToFirst(20))
+      const snapshot = await get(filmesQuery);
 
       if (!snapshot.exists()) return [];
 
       const data = snapshot.val();
-      const todosFilmes = Object.entries(data).map(
+      const filmes = Object.entries(data).map(
         ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
       );
 
-      const filtrados = todosFilmes.filter(filme =>
-        filme.title.toLowerCase().startsWith(termoLower)
-      );
 
-      return filtrados;
+      return filmes;
     } catch (error) {
       console.error('Erro ao buscar filmes filtrados:', error);
       return [];
     }
   }
 
-  static async getAllFilmesFromFirebase(useCache = true) {
-    if (useCache && this.cache) return this.cache;
+  static async getFilmesFirebaseFiltrados(termo) {
+    if (!termo || termo.trim() === '') return [];
 
     try {
-      const filmesRef = ref(database, 'filmes');
-      const filmesQuery = query(filmesRef, orderByKey(), limitToFirst(1000));
+      const filmesQuery = query(
+        ref(database, 'filmes'),
+        orderByChild('title'),
+        startAt(termo),
+        limitToFirst(20)
+      );
+
       const snapshot = await get(filmesQuery);
 
       if (!snapshot.exists()) return [];
 
       const data = snapshot.val();
+      const filmes = Object.entries(data).map(
+        ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
+      );
 
-      const filmes = Object.entries(data)
-      .filter(([id, filmeData]) => {
-        // ✅ Mantém apenas objetos válidos que possuem a chave "id"
-        return (
-          typeof filmeData === 'object' &&
-          filmeData !== null &&
-          'id' in filmeData && !isNaN(Number(filmeData.id))
-        );
-      })
-      .map(([id, filmeData]) => Filme.fromFirebase(id, filmeData))
-      .filter(filme => filme && filme.isValid()); // só instâncias válidas
-
-      if (useCache) this.cache = filmes;
       return filmes;
     } catch (error) {
-      console.error('Erro ao buscar todos os filmes:', error);
+      console.error('Erro ao buscar filmes filtrados:', error);
       return [];
     }
   }
+
+
 
 
   static async getFilmesByPrimaryGenreId(genreId, limit = 20) {
