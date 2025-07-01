@@ -2,13 +2,16 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
-const HeaderBar = ({ title, onBack }) => {
+const HeaderBar = ({ title, onBack, rightComponent }) => {
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={onBack} style={styles.backButton}>
-        <Icon name="arrow-left" size={28} color="#EFEFEF" />
-      </TouchableOpacity>
+      {onBack && (
+        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+          <Icon name="arrow-left" size={28} color="#EFEFEF" />
+        </TouchableOpacity>
+      )}
       <Text style={styles.title}>{title}</Text>
+      {rightComponent && <View style={styles.right}>{rightComponent}</View>}
     </View>
   );
 };
@@ -19,16 +22,21 @@ const styles = StyleSheet.create({
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    paddingHorizontal: 10,
+    justifyContent: 'space-between',
   },
   backButton: {
-    marginRight: 10,
+    paddingRight: 10,
   },
   title: {
+    flex: 1,
     fontSize: 24,
     color: '#FFF',
     fontWeight: 'bold',
-    marginBottom: 2
+    textAlign: 'center',
+  },
+  right: {
+    paddingLeft: 10,
   },
 });
 
