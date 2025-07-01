@@ -1,6 +1,6 @@
 import { ref, set, push, remove } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
-import Ator from './Ator';
+import Ator from '../models/Ator';
 import ICrud from './ICrud';
 
 export interface AtorDTO {

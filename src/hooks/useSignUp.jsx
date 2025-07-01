@@ -9,6 +9,7 @@ import { getFirebaseErrorMessage } from '../errors/getFirebaseErrorMessage';
 
 export function useSignUp(navigation) { // Recebe navigation como parâmetro
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(null); 
   const [error, setError] = useState(null);
 
   const handleSignUp = async (name, email, password, confirmPassword) => {
@@ -29,23 +30,12 @@ export function useSignUp(navigation) { // Recebe navigation como parâmetro
         name
       })
 
-
-      // Exibe o Alert de sucesso e redireciona após o usuário pressionar "OK"
-      Alert.alert(
-        'Sucesso',
-        'Cadastro realizado com sucesso!',
-        [
-          {
-            text: 'OK',
-            onPress: () => navigation.navigate('Login'), // Redireciona ao pressionar "OK"
-          },
-        ]
-      );
+      setSuccess('Cadastro realizado com sucesso!');
+      setTimeout(() => {navigation.navigate('Login');}, 2000); 
 
     } catch (err) {
       const messageError = getFirebaseErrorMessage(err)
-      setError(messageError);
-      Alert.alert('Erro', 'Erro ao realizar o cadastro. Tente novamente!');
+      setError(messageError || 'Erro ao realizar o cadastro. Tente novamente!');
       throw err;
     } finally {
       setIsLoading(false);
@@ -74,5 +64,5 @@ export function useSignUp(navigation) { // Recebe navigation como parâmetro
     return true;
   };
 
-  return { isLoading, error, handleSignUp };
+  return { isLoading, error, success, handleSignUp };
 }

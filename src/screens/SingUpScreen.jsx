@@ -13,7 +13,7 @@ export default function SingUpScreen({ navigation }) {
   const [email, setEmail]           = useState('');
   const [password, setPassword]           = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { isLoading, error, handleSignUp }  = useSignUp(navigation);
+  const { isLoading, error, success, handleSignUp }  = useSignUp(navigation);
 
   const singUp = () => {
     handleSignUp(name, email, password, confirmPassword)
@@ -54,6 +54,12 @@ export default function SingUpScreen({ navigation }) {
         onPress={singUp}
       />
 
+      {success && (
+        <View style={styles.successContainer}>
+          <Text style={styles.successText}>{success}</Text>
+        </View>
+      )}
+
       {error && (
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>{error}</Text>
@@ -77,11 +83,21 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '700', marginBottom: 10, color: '#fff' },
   footerText: { marginTop: 10, fontSize: 14, color: '#fff' },
   cadastro: { color: '#f4a03f', fontWeight: 'bold', fontSize: 16 },
+  successText: { color: '#1abc9c', fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
   errorText: { color: '#D32F2F', fontSize: 16, fontWeight: 'bold', textAlign: 'center' },
   errorContainer: {
     backgroundColor: 'rgba(0, 0, 0, 0.237)',
     borderWidth: 1,
     borderColor: '#F44336',
+    borderRadius: 4,
+    padding: 10,
+    marginTop: 10,
+    width: '100%',
+  },
+  successContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.237)',
+    borderWidth: 1,
+    borderColor: '#1abc9c',
     borderRadius: 4,
     padding: 10,
     marginTop: 10,
