@@ -100,6 +100,7 @@ export default function MovieDetailsScreen({ navigation, route }) {
 
           <View style={styles.titleRow}>
             <Text style={styles.title}>{filme.title}</Text>
+
             <TouchableOpacity onPress={toggleFavorite} disabled={toggling}>
               <Ionicons
                 name={isFavorite ? 'heart' : 'heart-outline'}
@@ -113,6 +114,9 @@ export default function MovieDetailsScreen({ navigation, route }) {
             <Text style={styles.metaText}>{filme.release_date}</Text>
             <Text style={styles.metaText}>{filme.runtime} min</Text>
             <Text style={styles.metaText}>{filme.original_language.toUpperCase()}</Text>
+            <Text style={styles.metaText}>
+                  {filme.vote_average.toFixed(2)} ★
+                </Text>
           </View>
 
           <View style={styles.genresContainer}>
