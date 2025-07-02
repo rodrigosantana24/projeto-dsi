@@ -18,6 +18,7 @@ import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 import ActorsListScreen from '../screens/ActorsListScreen';
 import ActorFormScreen from '../screens/ActorFormScreen';
 import ScheduleFormScreen from '../screens/ScheduleFormScreen'
+import MovieFormScreen from '../screens/AddMovieFormScreen';
 
 
 
@@ -108,6 +109,11 @@ const AppNavigation = ()=> {
         <Stack.Screen 
           name="ScheduleFormScreen"
           component={ScheduleFormScreen}
+          options={{headerShown: false}}
+        /> 
+        <Stack.Screen 
+          name="MovieFormScreen"
+          component={MovieFormScreen}
           options={{headerShown: false}}
         /> 
       </Stack.Navigator>
