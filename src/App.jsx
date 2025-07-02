@@ -4,6 +4,7 @@ import AppNavigation from './navigation/AppNavigation';
 import { UserProvider } from './Context/UserProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 export default function App() {
   return (
