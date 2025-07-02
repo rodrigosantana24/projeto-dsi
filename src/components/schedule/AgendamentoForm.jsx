@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dropdownOptionText: {
-    color: '#f4a03f',  
+    color: '#FFFFFF',  
     fontWeight: 'bold',
     fontSize: 16,
   },

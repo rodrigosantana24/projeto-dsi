@@ -112,14 +112,6 @@ export default class ActorsListScreen extends React.Component {
         <HeaderBar
           onBack={() => this.props.navigation.goBack()}
           title="Atores"
-          rightComponent={
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('ActorFormScreen')}
-              style={{ marginRight: 10 }}
-            >
-              <MaterialIcons name="add" size={28} color="#fff" />
-            </TouchableOpacity>
-          }
         />
         <View style={styles.filterContainer}>
           <View style={styles.searchContainer}>
@@ -149,7 +141,6 @@ export default class ActorsListScreen extends React.Component {
             <AtorItem
               ator={item}
               onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
-             
               hideDelete={true}
             />
           )}
@@ -163,8 +154,8 @@ export default class ActorsListScreen extends React.Component {
               </TouchableOpacity>
             </View>
           )}
-          rightOpenValue={-75} 
-          disableRightSwipe={false} 
+          rightOpenValue={-75}
+          disableRightSwipe={false}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -173,6 +164,14 @@ export default class ActorsListScreen extends React.Component {
               : null
           }
         />
+
+        {/* FAB - Botão flutuante */}
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() => this.props.navigation.navigate('ActorFormScreen')}
+        >
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -222,5 +221,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: '90%', 
     borderRadius: 5, 
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
   },
 });
