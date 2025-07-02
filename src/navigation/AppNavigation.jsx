@@ -7,7 +7,8 @@ import ToScheduleScreen from '../screens/ToScheduleScreen';
 import MenuScreen from '../screens/MenuScreen';
 import FavoriteMovieScreen from '../screens/FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
-import ManageGenresScreen from '../screens/ManageGenresScreen';
+import GenresListScreen from '../screens/GenresListScreen';
+import GenresFormScreen from '../screens/GenresFormScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FriendList from '../screens/FriendList';
@@ -60,8 +61,13 @@ const AppNavigation = ()=> {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="ManageGenresScreen" 
-          component={ManageGenresScreen}
+          name="GenresListScreen" 
+          component={GenresListScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="GenresFormScreen" 
+          component={GenresFormScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
