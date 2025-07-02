@@ -55,12 +55,8 @@ export default function HomeScreen({ navigation }) {
           <Logo style={{ width: 75, height: 75 }} />
         </View>
         <View style={styles.body}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => navigation.navigate('FilteringMovieScreen')}
-          >
-            <Text style={styles.iconButtonText}>Pesquisar filme...</Text>
-            <Feather name="search" size={28} color="#FFF" />
+          <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('FilteringMovieScreen')} activeOpacity={1}>
+            <SearchBar style={{ pointerEvents: 'none' }} />
           </TouchableOpacity>
           <FeaturedCarousel 
             data={controller.getFilmes()} 
@@ -130,23 +126,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: -15,
   },
-  iconButton: {
-    backgroundColor: '#113342',
-    padding: 8,
-    borderRadius: 8,
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: -10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent:'space-between',
-    paddingRight: 20
-  },
-  iconButtonText: {
-    color: '#CCC',
-    fontSize: 16,
-    padding: 6
+  search: {
+    marginVertical: 4
   },
   body: {
     flex: 1,
