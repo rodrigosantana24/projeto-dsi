@@ -15,29 +15,9 @@ const AtorForm = ({
   onCancel
 }) => {
   const sexoOptions = ['Feminino', 'Masculino'];
-  const [sexoInput, setSexoInput] = React.useState(sexo || '');
   const [showOptions, setShowOptions] = React.useState(false);
 
-  React.useEffect(() => {
-    setSexoInput(sexo || '');
-  }, [sexo]);
-
-  const filteredOptions = sexoOptions.filter(opt =>
-    opt.toLowerCase().includes(sexoInput.toLowerCase())
-  );
-
-  const handleSexoChange = (text) => {
-    setSexoInput(text);
-    setShowOptions(true);
-    onChangeSexo(text);
-  };
-
-  const handleOptionSelect = (option) => {
-    setSexoInput(option);
-    setShowOptions(false);
-    onChangeSexo(option);
-  };
-
+  // Nacionalidade
   const nacionalidadeOptions = [
     "Antiguano", "Argentino", "Bahamense", "Barbadiano", "Barbadense", "Belizenho", "Boliviano", "Brasileiro",
     "Chileno", "Colombiano", "Costarriquenho", "Cubano", "Dominicano", "Equatoriano", "Salvadorenho", "Granadino",
@@ -46,7 +26,7 @@ const AtorForm = ({
     "Santa-lucense", "Surinamês", "Trindadense", "Uruguaio", "Venezuelano", "Alemão", "Austríaco", "Belga",
     "Croata", "Dinamarquês", "Eslovaco", "Esloveno", "Espanhol", "Francês", "Grego", "Húngaro", "Irlandês",
     "Italiano", "Noruego", "Holandês", "Polonês", "Português", "Britânico", "Inglês", "Galês", "Escocês",
-    "Romeno", "Russo", "Sérvio", "Sueco", "Suíço", "Turco", "Ucraniano", "Americano", "Canadense", "Angolano",
+    "Romeno", "Russo", "Sérvio", "Sueco", "Suíço", "Turco", "Ucraniano", "Norte-americano", "Canadense", "Angolano",
     "Moçambicano", "Sul-africano", "Zimbabuense", "Argélia", "Comorense", "Egípcio", "Líbio", "Marroquino",
     "Ganés", "Queniano", "Ruandês", "Ugandense", "Bechuano", "Marfinense", "Camaronense", "Nigeriano", "Somali",
     "Australiano", "Neozelandês", "Afegão", "Saudita", "Armeno", "Bangladesh", "Chinês", "Norte-coreano", "Coreano",
@@ -54,7 +34,6 @@ const AtorForm = ({
     "Omanense", "Paquistanês", "Palestino", "Qatarense", "Sírio", "Cingalês", "Tailandês", "Timorense", "Maubere",
     "Árabe", "Emiratense", "Vietnamita", "Iemenita"
   ];
-
   const [nacionalidadeInput, setNacionalidadeInput] = React.useState(nacionalidade || '');
   const [showNacionalidadeOptions, setShowNacionalidadeOptions] = React.useState(false);
 
@@ -89,9 +68,9 @@ const AtorForm = ({
     <TouchableWithoutFeedback onPress={dismissDropdowns}>
       <View style={styles.fullScreenContainer}>
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
           <View style={styles.headerArea}>
             <MaterialIcons name={editandoId ? "edit" : "person-add"} size={40} color="#f4a03f" />
             <Text style={styles.formTitle}>{title}</Text>
@@ -103,21 +82,23 @@ const AtorForm = ({
           </View>
 
           <View style={styles.inputArea}>
+            {/* Nome */}
             <Text style={styles.label}>Nome</Text>
             <TextInput
               style={styles.input}
-              placeholder="Nome do Ator"
+              placeholder="Tom Cruise"
               placeholderTextColor="#999"
               value={nome}
               onChangeText={onChangeNome}
               maxLength={40}
             />
 
+            {/* Nacionalidade */}
             <Text style={styles.label}>Nacionalidade</Text>
-            <View style={[{ position: 'relative' }, showNacionalidadeOptions ? { zIndex: 10 } : { zIndex: 1 }]}>
+            <View style={{ position: 'relative', zIndex: showNacionalidadeOptions ? 20 : 1 }}>
               <TextInput
                 style={styles.input}
-                placeholder="Nacionalidade"
+                placeholder="Norte-americano"
                 placeholderTextColor="#999"
                 value={nacionalidadeInput}
                 onChangeText={handleNacionalidadeChange}
@@ -131,12 +112,12 @@ const AtorForm = ({
                 nacionalidadeInput.length > 0 &&
                 filteredNacionalidadeOptions.length > 0 && (
                   <View style={styles.dropdown}>
-                    <View style={{ maxHeight: 150, overflow: 'scroll' }}>
-                      {filteredNacionalidadeOptions.slice(0, 10).map(item => (
+                    <View style={{ maxHeight: 180 }}>
+                      {filteredNacionalidadeOptions.map(item => (
                         <TouchableOpacity
                           key={item}
-                          onPress={() => handleNacionalidadeOptionSelect(item)}
                           style={styles.dropdownOption}
+                          onPress={() => handleNacionalidadeOptionSelect(item)}
                         >
                           <Text style={styles.dropdownOptionText}>{item}</Text>
                         </TouchableOpacity>
@@ -146,44 +127,50 @@ const AtorForm = ({
                 )}
             </View>
 
+            {/* Sexo */}
             <Text style={styles.label}>Sexo</Text>
-            <View style={[{ position: 'relative' }, showOptions ? { zIndex: 10 } : { zIndex: 1 }]}>
-              <TextInput
-                style={styles.input}
-                placeholder="Sexo"
-                placeholderTextColor="#999"
-                value={sexoInput}
-                onChangeText={handleSexoChange}
-                onFocus={() => {
-                  setShowOptions(true);
+            <View style={{ position: 'relative', zIndex: showOptions ? 20 : 1 }}>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => {
+                  setShowOptions(!showOptions);
                   setShowNacionalidadeOptions(false);
                 }}
-                maxLength={10}
-              />
-              {showOptions &&
-                sexoInput.length > 0 &&
-                filteredOptions.length > 0 && (
-                  <View style={styles.dropdown}>
-                    <View style={{ maxHeight: 100, overflow: 'scroll' }}>
-                      {filteredOptions.map(option => (
-                        <TouchableOpacity
-                          key={option}
-                          onPress={() => handleOptionSelect(option)}
-                          style={styles.dropdownOption}
-                        >
-                          <Text style={styles.dropdownOptionText}>{option}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                )}
+              >
+                <View pointerEvents="none">
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Selecione"
+                    placeholderTextColor="#999"
+                    value={sexo}
+                    editable={false}
+                  />
+                </View>
+              </TouchableOpacity>
+              {showOptions && (
+                <View style={styles.dropdown}>
+                  {sexoOptions.map(option => (
+                    <TouchableOpacity
+                      key={option}
+                      onPress={() => {
+                        setShowOptions(false);
+                        onChangeSexo(option);
+                      }}
+                      style={styles.dropdownOption}
+                    >
+                      <Text style={styles.dropdownOptionText}>{option}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
           </View>
 
+          {/* ...botões... */}
           <TouchableOpacity
             style={[
               styles.button,
-              (!sexoOptions.includes(sexoInput) ||
+              (!sexoOptions.includes(sexo) ||
                 !nacionalidadeOptions.includes(nacionalidadeInput) ||
                 !nome.trim())
                 ? styles.buttonDisabled
@@ -191,7 +178,7 @@ const AtorForm = ({
             ]}
             onPress={() => {
               if (
-                sexoOptions.includes(sexoInput) &&
+                sexoOptions.includes(sexo) &&
                 nacionalidadeOptions.includes(nacionalidadeInput) &&
                 nome.trim()
               ) {
@@ -199,7 +186,7 @@ const AtorForm = ({
               }
             }}
             disabled={
-              !sexoOptions.includes(sexoInput) ||
+              !sexoOptions.includes(sexo) ||
               !nacionalidadeOptions.includes(nacionalidadeInput) ||
               !nome.trim()
             }
@@ -237,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 24,
     paddingHorizontal: 12,
-    width: width-20,
+    width: width-30,
   },
   headerArea: {
     alignItems: 'center',
@@ -259,6 +246,7 @@ const styles = StyleSheet.create({
     maxWidth: 320,
   },
   inputArea: {
+    zIndex: 10,
     width: '100%',
     maxWidth: 400,
     marginBottom: 24,
@@ -272,7 +260,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   label: {
-    color: '#f4a03f',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     marginBottom: 4,
     marginTop: 10,
@@ -290,6 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
+    zIndex: 1,
     backgroundColor: '#f4a03f',
     padding: 14,
     borderRadius: 8,
@@ -312,6 +301,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   cancelButton: {
+    zIndex: 1,
     backgroundColor: '#dc3545',
     padding: 14,
     borderRadius: 8,
@@ -336,7 +326,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: '#e6f2fa',
     borderRadius: 8,
-    zIndex: 100,
+    zIndex: 9999, // aumente aqui
     elevation: 30,
     borderWidth: 1,
     borderColor: '#3d5564',
@@ -346,17 +336,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   dropdownOption: {
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#cce0ee',
-    backgroundColor: '#d6eaff',
-    borderRadius: 6,
-    margin: 4,
-    alignItems: 'center',
+    borderBottomColor: '#3d5564', 
+    backgroundColor: '#397391',   
+    justifyContent: 'center',
   },
   dropdownOptionText: {
-    color: '#113342',
+    color: '#FFFFFF',  
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
