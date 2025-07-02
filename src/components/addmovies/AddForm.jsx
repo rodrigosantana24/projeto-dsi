@@ -1,134 +1,167 @@
-import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Modal, SafeAreaView, FlatList } from 'react-native';
+import React from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
-const AddForm = ({ title, poster_path, genero, atores, generosList, atoresList, editandoId, onChange, onSave }) => {
-  const [isGeneroModalVisible, setGeneroModalVisible] = useState(false);
-  const [isAtoresModalVisible, setAtoresModalVisible] = useState(false);
-
-  const handleSelectGenero = g => {
-    onChange('genero', g);
-    setGeneroModalVisible(false);
-  };
-
-  const handleToggleAtor = a => {
-    const arr = atores ? atores.split(',').map(x => x.trim()) : [];
-    const newArr = arr.includes(a) ? arr.filter(x => x !== a) : [...arr, a];
-    onChange('atores', newArr.join(', '));
-  };
-
-  const selectedAtoresArray = atores ? atores.split(',').map(x => x.trim()).filter(Boolean) : [];
-
+const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCancel, onOpenModal }) => {
   return (
-    <View style={styles.form}>
-      <TextInput style={styles.input} placeholder="Título" placeholderTextColor="#888" value={title} onChangeText={t => onChange('title', t)} />
-      <TextInput style={styles.input} placeholder="URL do Poster" placeholderTextColor="#888" value={poster_path} onChangeText={t => onChange('poster_path', t)} />
-      
-      <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.selectButton} onPress={() => setGeneroModalVisible(true)}>
-            <Text style={styles.selectButtonText} numberOfLines={1}>{genero || 'Gênero'}</Text>
+    <View style={styles.scrollContent}>
+      <View style={styles.headerArea}>
+        <Icon name="film" size={40} color="#f4a03f" />
+        <Text style={styles.formTitle}>Dados do Filme</Text>
+        <Text style={styles.formSubtitle}>
+          Preencha as informações para cadastrar um novo filme.
+        </Text>
+      </View>
+      <View style={styles.inputArea}>
+        <Text style={styles.label}>Título do Filme</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ex: O Poderoso Chefão"
+          placeholderTextColor="#999"
+          value={title}
+          onChangeText={(text) => onChange('title', text)}
+        />
+        <Text style={styles.label}>URL do Poster</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="https://.../poster.jpg"
+          placeholderTextColor="#999"
+          value={poster_path}
+          onChangeText={(text) => onChange('poster_path', text)}
+        />
+
+        <Text style={styles.label}>Gêneros</Text>
+        <TouchableOpacity style={styles.selectButton} onPress={() => onOpenModal('generos')}>
+          <Text style={styles.selectButtonText} numberOfLines={1}>
+            {generos.length > 0 ? generos.join(', ') : 'Clique para selecionar'}
+          </Text>
+          <Icon name="tag" size={20} color="#f4a03f" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.selectButton} onPress={() => setAtoresModalVisible(true)}>
-            <Text style={styles.selectButtonText} numberOfLines={1}>{atores || 'Atores'}</Text>
+        <Text style={styles.label}>Atores Principais</Text>
+        <TouchableOpacity style={styles.selectButton} onPress={() => onOpenModal('atores')}>
+          <Text style={styles.selectButtonText} numberOfLines={1}>
+            {atores.length > 0 ? atores.join(', ') : 'Clique para selecionar'}
+          </Text>
+          <Icon name="users" size={20} color="#f4a03f" />
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={onSave}>
-        <Text style={styles.saveButtonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
-      </TouchableOpacity>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={isGeneroModalVisible}
-        onRequestClose={() => setGeneroModalVisible(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Selecione o Gênero</Text>
-            <TouchableOpacity onPress={() => setGeneroModalVisible(false)}>
-              <Icon name="x" size={30} color="#FFF" />
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={generosList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.modalOption} onPress={() => handleSelectGenero(item)}>
-                <Text style={styles.modalOptionText}>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </SafeAreaView>
-      </Modal>
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={isAtoresModalVisible}
-        onRequestClose={() => setAtoresModalVisible(false)}
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Selecione os Atores</Text>
-            <TouchableOpacity onPress={() => setAtoresModalVisible(false)}>
-              <Text style={styles.modalDoneText}>Concluir</Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={atoresList}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => {
-              const isSelected = selectedAtoresArray.includes(item);
-              return (
-                <TouchableOpacity style={[styles.modalOption, isSelected && styles.modalOptionSelected]} onPress={() => handleToggleAtor(item)}>
-                  <Text style={styles.modalOptionText}>{item}</Text>
-                  {isSelected && <Icon name="check" size={24} color="#00BFA5" />}
-                </TouchableOpacity>
-              );
-            }}
-          />
-        </SafeAreaView>
-      </Modal>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+          <Icon name="x" size={20} color="#FFF" style={{ marginRight: 8 }} />
+          <Text style={styles.buttonText}>Cancelar</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
+           <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
+          <Text style={styles.buttonText}>Salvar</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  form: { marginBottom: 16 },
-  input: { backgroundColor: '#1C3F4F', color: '#FFF', padding: 12, borderRadius: 8, marginBottom: 12, borderWidth: 1, borderColor: '#2a5a75' },
-  
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+  scrollContent: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  headerArea: {
+    alignItems: 'center',
+    marginBottom: 28,
+  },
+  formTitle: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginTop: 8,
+    marginBottom: 4,
+    letterSpacing: 1,
+  },
+  formSubtitle: {
+    color: '#f4a03f',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  inputArea: {
+    width: '100%',
+    backgroundColor: '#113342', 
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 10,
+  },
+  label: {
+    color: '#f4a03f', 
+    fontWeight: 'bold',
+    marginBottom: 6,
+    fontSize: 15,
+    letterSpacing: 0.5,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#3d5564',
+    borderRadius: 8,
+    padding: 12,
+    color: '#FFF',
+    marginBottom: 16,
+    backgroundColor: '#18394a', 
+    fontSize: 16,
+    height: 50,
   },
   selectButton: {
-    flex: 1, 
-    backgroundColor: '#1C3F4F',
     borderWidth: 1,
-    borderColor: '#2a5a75',
+    borderColor: '#3d5564',
     borderRadius: 8,
-    padding: 15,
+    padding: 12,
+    marginBottom: 16,
+    backgroundColor: '#18394a',
+    height: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 4, 
   },
   selectButtonText: {
     color: '#FFF',
     fontSize: 16,
+    flex: 1,
+    marginRight: 10,
   },
-  
-  saveButton: { backgroundColor: '#00BFA5', padding: 15, borderRadius: 8, alignItems: 'center', marginTop: 8 },
-  saveButtonText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
-
-  modalContainer: { flex: 1, backgroundColor: '#071A24' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: '#1C3F4F' },
-  modalTitle: { color: '#FFF', fontSize: 22, fontWeight: 'bold' },
-  modalDoneText: { color: '#00BFA5', fontSize: 16, fontWeight: 'bold' },
-  modalOption: { padding: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#1C3F4F' },
-  modalOptionSelected: { backgroundColor: '#102A38' },
-  modalOptionText: { color: '#FFF', fontSize: 18 },
+  buttonContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: '#dc3545',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 1,
+    marginRight: 8,
+  },
+  saveButton: {
+    backgroundColor: '#f4a03f',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flex: 1,
+    marginLeft: 8,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+    letterSpacing: 0.5,
+  },
 });
 
 export default AddForm;
