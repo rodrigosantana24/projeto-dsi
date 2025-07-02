@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
@@ -14,10 +14,28 @@ import FriendList from './FriendList';
 import AddFriend from '../screens/AddFriend';
 import FilteringMovieScreen from '../screens/FilteringMovieScreen';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-
+import { signOut } from 'firebase/auth';
+import { auth } from '../configs/firebaseConfig';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
+  const { setUserCredentials } = useContext(UserContext);
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setUserCredentials(null);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }]
+      });
+    } catch (error) {
+      Alert.alert('Erro ao sair', 'Não foi possível sair da conta.');
+      console.error(error);
+    }
+  };
+
   const {userCredentials} = useContext(UserContext)
   return ( 
       <View style={styles.container}>
@@ -26,7 +44,7 @@ const ProfileScreen = () => {
             <FontAwesome name="user-circle-o" size={50} color="white"/>
         </View>
         <ScrollView
-          contentContainerStyle={{ paddingBottom: 100 }} // ajuste conforme a altura do BottomTab
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           <View style={styles.content}>
             <ProfileButton 
@@ -80,14 +98,51 @@ const ProfileScreen = () => {
             />
             <ProfileButton 
               icon={<MaterialIcons name="power-settings-new" size={30} color="white"/>} 
-              text="Sair" showArrow={false} 
-              />
+              text="Sair" 
+              showArrow={false} 
+              onPress={() => setShowLogoutModal(true)}
+            />
             </View>
             
         </ScrollView>
         <View style={styles.footer}>
               <BottomTab/>
         </View>
+
+        {showLogoutModal && (
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Deseja realmente sair?</Text>
+              <Text style={styles.modalMessage}>Você será desconectado da sua conta.</Text>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: '#f4a03f' }]} 
+                  onPress={() => setShowLogoutModal(false)}
+                >
+                  <Text style={styles.modalButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={[styles.modalButton, { backgroundColor: '#dc3545' }]} 
+                  onPress={async () => {
+                    try {
+                      await signOut(auth);
+                      setUserCredentials(null);
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Login' }],
+                      });
+                    } catch (error) {
+                      Alert.alert('Erro ao sair', 'Não foi possível sair da conta.');
+                      console.error(error);
+                    }
+                  }}
+                >
+                  <Text style={styles.modalButtonText}>Sair</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
   );
 };
@@ -128,6 +183,50 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
   },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalContainer: {
+    width: '85%',
+    backgroundColor: '#192936',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    color: '#ccc',
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalButton: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+
 });
 
 export default ProfileScreen;
