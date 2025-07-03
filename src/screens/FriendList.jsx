@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView  } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { UserContext } from '../Context/UserProvider';
 import useFriends from '../hooks/useFriends';
 import { TouchableOpacity, Image } from 'react-native';
@@ -8,6 +9,8 @@ import { useNavigation } from '@react-navigation/native';
 import AddFriend from './AddFriend';
 import SearchBar from '../components/search/SearchBar';
 import getFriendsFilter from '../services/getFriendsFilter';
+import AddButton from '../components/buttons/AddButton';
+import SearchGeneric from '../components/search/SearchGeneric';
 
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
@@ -30,7 +33,11 @@ export default function FriendList() {
   <View style={styles.container}>
 
     <HeaderBar onBack={() => navigation.goBack()} title={"Lista de amigos"}></HeaderBar>
-    <SearchBar style={searchStyles.container}  onSearch={setSearchText}></SearchBar>
+    <SearchGeneric
+      value={searchText}
+      placeholder="Pesquisar ..."
+      onSearch={setSearchText}
+    />
 
     <ScrollView>
         {filteredFriends.length === 0 ? (
@@ -68,6 +75,7 @@ export default function FriendList() {
         )}
       
     </ScrollView>
+    <AddButton onPress={() => navigation.navigate('AddFriend')}></AddButton>
   </View>
 );
 }
@@ -78,29 +86,21 @@ const styles = StyleSheet.create({
     paddingTop: 25,
     backgroundColor: '#072330',
   },
-  username: {
-    marginTop: 10,
-    color: 'white',
-    fontSize: 15,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
   friendBlock: {
     marginBottom: 20,
     padding: 15,
-    backgroundColor: '#223344',
-    borderRadius: 10,
+    backgroundColor: '#113342',
+    borderRadius: 8,
   },
   friendName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white',
+    color:"#FFF",
     marginBottom: 5,
   },
   friendEmail: {
     fontSize: 14,
-    color: '#aabbcc',
+    color: '#f4a03f',
     marginBottom: 15,
   },
   subtitle: {
@@ -166,7 +166,6 @@ const styles = StyleSheet.create({
   movieInfo: {
     padding: 10,
   },
-
 });
 
 const searchStyles = StyleSheet.create({

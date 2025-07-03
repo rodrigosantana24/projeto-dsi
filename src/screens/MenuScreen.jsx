@@ -62,13 +62,6 @@ const ProfileScreen = () => {
               }}
             />
             <ProfileButton 
-              icon= {<Ionicons name="person-add" size={30} color={"white"}/>} 
-              text="Adicionar Amigo" 
-              onPress={() => {
-                navigation.navigate(AddFriend);
-              }}
-            />
-            <ProfileButton 
               icon={<AntDesign name="videocamera" size={30} color={"white"}/>} 
               text="Gerenciar Filmes" 
               onPress={() => {
