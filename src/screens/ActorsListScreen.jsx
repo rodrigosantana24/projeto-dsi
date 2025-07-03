@@ -113,7 +113,7 @@ export default class ActorsListScreen extends React.Component {
             }));
             Toast.show({
               type: 'error',
-              text1: 'Ator excluído com sucesso!',
+              text1: 'Ator excluído',
             });
           } catch (error) {
             Alert.alert('Erro', 'Falha ao excluir ator');
