@@ -150,7 +150,7 @@ const AtorForm = ({
                 filteredNacionalidadeOptions.length > 0 && (
                   <View style={styles.dropdown}>
                     <View style={{ maxHeight: 180 }}>
-                      {filteredNacionalidadeOptions.map(item => (
+                      {filteredNacionalidadeOptions.slice(0, 5).map(item => (
                         <TouchableOpacity
                           key={item}
                           style={styles.dropdownOption}
@@ -161,7 +161,7 @@ const AtorForm = ({
                       ))}
                     </View>
                   </View>
-                )}
+              )}
             </View>
 
             {/* Sexo */}
