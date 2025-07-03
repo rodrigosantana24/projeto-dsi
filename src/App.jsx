@@ -5,7 +5,7 @@ import { UserProvider } from './Context/UserProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-import CustomToast from './components/Toast/CustomToast';
+import CustomToast from './components/toast/CustomToast';
 
 export default function App() {
   return (
