@@ -33,12 +33,12 @@ export default class ActorFormScreen extends React.Component {
     try {
       if (editandoId) {
         await atorService.update({ id: editandoId, nome, nacionalidade, sexo });
-        navigation.navigate('ActorsListScreen', {
+        navigation.replace('ActorsListScreen', {
           toast: { type: 'success', msg: 'Ator atualizado' }
         });
       } else {
         await atorService.create({ nome, nacionalidade, sexo });
-        navigation.navigate('ActorsListScreen', {
+        navigation.replace('ActorsListScreen', {
           toast: { type: 'success', msg: 'Ator criado' }
         });
       }
