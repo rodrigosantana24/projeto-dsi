@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import AtorService from '../services/AtorService';
 import AtorForm from '../components/actors/AtorForm';
 import HeaderBar from '../components/navi/HeaderBar';
+import Toast from 'react-native-toast-message';
 
 const atorService = new AtorService();
 
@@ -20,17 +21,27 @@ export default class ActorFormScreen extends React.Component {
 
   handleSave = async () => {
     const { nome, nacionalidade, sexo, editandoId } = this.state;
+    const { navigation } = this.props;
 
     if (!nome || !nacionalidade || !sexo) {
-      return Alert.alert('Erro', 'Preencha todos os campos');
+      Toast.show({
+        type: 'error',
+        text1: 'Preencha todos os campos',
+      });
+      return;
     }
     try {
       if (editandoId) {
         await atorService.update({ id: editandoId, nome, nacionalidade, sexo });
+        navigation.navigate('ActorsListScreen', {
+          toast: { type: 'success', msg: 'Ator atualizado com sucesso!' }
+        });
       } else {
         await atorService.create({ nome, nacionalidade, sexo });
+        navigation.navigate('ActorsListScreen', {
+          toast: { type: 'success', msg: 'Ator criado com sucesso!' }
+        });
       }
-      this.props.navigation.goBack();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }

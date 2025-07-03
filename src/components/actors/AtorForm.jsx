@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, FlatList, TouchableWithoutFeedback, Keyboard, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 
 const AtorForm = ({
   nome,
@@ -36,6 +37,9 @@ const AtorForm = ({
   ];
   const [nacionalidadeInput, setNacionalidadeInput] = React.useState(nacionalidade || '');
   const [showNacionalidadeOptions, setShowNacionalidadeOptions] = React.useState(false);
+  const [nomeError, setNomeError] = React.useState(false);
+  const [nacionalidadeError, setNacionalidadeError] = React.useState(false);
+  const [sexoError, setSexoError] = React.useState(false);
 
   React.useEffect(() => {
     setNacionalidadeInput(nacionalidade || '');
@@ -57,6 +61,35 @@ const AtorForm = ({
     onChangeNacionalidade(option);
   };
 
+  const validateAndSubmit = () => {
+    let hasError = false;
+    setNomeError(false);
+    setNacionalidadeError(false);
+    setSexoError(false);
+
+    if (!nome.trim()) {
+      setNomeError(true);
+      hasError = true;
+    }
+    if (!nacionalidadeOptions.includes(nacionalidadeInput)) {
+      setNacionalidadeError(true);
+      hasError = true;
+    }
+    if (!sexoOptions.includes(sexo)) {
+      setSexoError(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Preencha todos os campos',
+      });
+      return;
+    }
+    onSubmit();
+  };
+
   // Função para esconder dropdowns ao clicar fora
   const dismissDropdowns = () => {
     setShowOptions(false);
@@ -68,9 +101,9 @@ const AtorForm = ({
     <TouchableWithoutFeedback onPress={dismissDropdowns}>
       <View style={styles.fullScreenContainer}>
         <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
           <View style={styles.headerArea}>
             <MaterialIcons name={editandoId ? "edit" : "person-add"} size={40} color="#f4a03f" />
             <Text style={styles.formTitle}>{title}</Text>
@@ -85,11 +118,14 @@ const AtorForm = ({
             {/* Nome */}
             <Text style={styles.label}>Nome</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, nomeError && styles.inputError]}
               placeholder="Tom Cruise"
               placeholderTextColor="#999"
               value={nome}
-              onChangeText={onChangeNome}
+              onChangeText={text => {
+                setNomeError(false);
+                onChangeNome(text);
+              }}
               maxLength={40}
             />
 
@@ -97,7 +133,7 @@ const AtorForm = ({
             <Text style={styles.label}>Nacionalidade</Text>
             <View style={{ position: 'relative', zIndex: showNacionalidadeOptions ? 20 : 1 }}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, nacionalidadeError && styles.inputError]}
                 placeholder="Norte-americano"
                 placeholderTextColor="#999"
                 value={nacionalidadeInput}
@@ -105,6 +141,7 @@ const AtorForm = ({
                 onFocus={() => {
                   setShowNacionalidadeOptions(true);
                   setShowOptions(false);
+                  setNacionalidadeError(false);
                 }}
                 maxLength={30}
               />
@@ -135,11 +172,12 @@ const AtorForm = ({
                 onPress={() => {
                   setShowOptions(!showOptions);
                   setShowNacionalidadeOptions(false);
+                  setSexoError(false);
                 }}
               >
                 <View pointerEvents="none">
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, sexoError && styles.inputError]}
                     placeholder="Selecione"
                     placeholderTextColor="#999"
                     value={sexo}
@@ -166,30 +204,13 @@ const AtorForm = ({
             </View>
           </View>
 
-          {/* ...botões... */}
+          {/* Botão de salvar */}
           <TouchableOpacity
             style={[
               styles.button,
-              (!sexoOptions.includes(sexo) ||
-                !nacionalidadeOptions.includes(nacionalidadeInput) ||
-                !nome.trim())
-                ? styles.buttonDisabled
-                : null,
+              // Remova a lógica de desabilitar cor
             ]}
-            onPress={() => {
-              if (
-                sexoOptions.includes(sexo) &&
-                nacionalidadeOptions.includes(nacionalidadeInput) &&
-                nome.trim()
-              ) {
-                onSubmit();
-              }
-            }}
-            disabled={
-              !sexoOptions.includes(sexo) ||
-              !nacionalidadeOptions.includes(nacionalidadeInput) ||
-              !nome.trim()
-            }
+            onPress={validateAndSubmit}
           >
             <MaterialIcons name={editandoId ? "save" : "check"} size={22} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
@@ -276,6 +297,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     backgroundColor: '#18394a',
     fontSize: 16,
+  },
+  inputError: {
+    borderColor: '#dc3545',
+    backgroundColor: '#2a1a1a',
   },
   button: {
     zIndex: 1,
