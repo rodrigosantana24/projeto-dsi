@@ -5,6 +5,7 @@ import { UserProvider } from './Context/UserProvider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
+import CustomToast from './components/Toast/CustomToast';
 
 export default function App() {
   return (
@@ -12,7 +13,11 @@ export default function App() {
       <UserProvider>
         <AppNavigation />
       </UserProvider>
-      <Toast /> {}
+      <Toast  config={{
+          success: (props) => <CustomToast {...props} type="success" />,
+          error: (props) => <CustomToast {...props} type="error" />,
+        }}
+        />
     </GestureHandlerRootView>
   );
 }
