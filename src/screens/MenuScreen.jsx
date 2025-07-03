@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   username: {
     marginTop: 10,
     color: 'white',
-    fontSize: 25,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   menuContainer: {
