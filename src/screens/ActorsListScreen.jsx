@@ -16,7 +16,7 @@ const PAGE_SIZE = 20;
 export default class ActorsListScreen extends React.Component {
   state = {
     atores: [],
-    filtroSexo: 'todos',
+    filtroSexo: 'Sexo',
     buscaNome: '',
     atoresFiltrados: [],
     page: 1,
@@ -28,8 +28,14 @@ export default class ActorsListScreen extends React.Component {
     await this.loadAtores();
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
-        this.loadAtores();
-        this.checkToastParam();
+        // Limpa filtros e busca ao voltar para a tela
+        this.setState(
+          { filtroSexo: 'Sexo', buscaNome: '', page: 1 },
+          () => {
+            this.applyFilters();
+            this.checkToastParam();
+          }
+        );
       });
     }
     this.checkToastParam();
@@ -42,7 +48,6 @@ export default class ActorsListScreen extends React.Component {
         type: toastParam.type,
         text1: toastParam.msg,
       });
-      // Limpa o param para não mostrar de novo
       this.props.navigation.setParams({ toast: undefined });
     }
   };
@@ -55,34 +60,30 @@ export default class ActorsListScreen extends React.Component {
 
   loadAtores = async () => {
     try {
-      let atores = [];
-      if (this.state.filtroSexo === 'todos') {
-        atores = await atorService.read({ useCache: false });
-      } else {
-        atores = await Ator.getAtoresBySexoFromFirebase(this.state.filtroSexo, false);
-      }
-      this.setState({ atores, atoresFiltrados: atores });
+      const atores = await atorService.read({ useCache: false });
+      this.setState({ atores }, this.applyFilters);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os atores');
     }
   };
 
-  setFiltroSexo = async (filtroSexo) => {
-    await this.setState({ filtroSexo, buscaNome: '', page: 1 });
-    await this.loadAtores();
+  setFiltroSexo = (filtroSexo) => {
+    this.setState({ filtroSexo, page: 1 }, this.applyFilters);
   };
 
   handleBuscaNome = (buscaNome) => {
-    this.setState({ buscaNome }, this.applyFilters);
+    this.setState({ buscaNome, page: 1 }, this.applyFilters);
   };
 
   applyFilters = () => {
     const { atores, buscaNome, filtroSexo } = this.state;
     let filtrados = atores;
 
-    if (filtroSexo !== 'todos') {
+    // Aplica filtro de sexo se não for "Sexo"
+    if (filtroSexo !== 'Sexo') {
       filtrados = filtrados.filter(a => a.sexo === filtroSexo);
     }
+    // Aplica filtro de nome se não estiver vazio
     if (buscaNome.trim()) {
       const termo = buscaNome.trim().toLowerCase();
       filtrados = filtrados.filter(a => a.nome.toLowerCase().includes(termo));
@@ -142,7 +143,7 @@ export default class ActorsListScreen extends React.Component {
   };
 
   render() {
-    const { atoresFiltrados, page } = this.state;
+    const { atoresFiltrados, page, filtroSexo, buscaNome } = this.state;
     const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
@@ -155,17 +156,19 @@ export default class ActorsListScreen extends React.Component {
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar atores..."
+              value={buscaNome}
               onSearch={this.handleBuscaNome}
             />
           </View>
           <View style={styles.selectContainer}>
             <SelectBy
               options={[
-                { label: 'Todos', value: 'todos' },
+                { label: 'Sexo', value: 'Sexo' },
                 { label: 'Masculino', value: 'Masculino' },
                 { label: 'Feminino', value: 'Feminino' },
               ]}
-              initialValue="todos"
+              initialValue="Sexo"
+              value={filtroSexo}
               onSelect={this.setFiltroSexo}
             />
           </View>
