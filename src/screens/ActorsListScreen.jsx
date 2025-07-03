@@ -8,6 +8,7 @@ import Ator from '../models/Ator';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
+import Toast from 'react-native-toast-message';
 
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
@@ -15,7 +16,7 @@ const PAGE_SIZE = 20;
 export default class ActorsListScreen extends React.Component {
   state = {
     atores: [],
-    filtroSexo: 'todos',
+    filtroSexo: 'Sexo',
     buscaNome: '',
     atoresFiltrados: [],
     page: 1,
@@ -27,10 +28,29 @@ export default class ActorsListScreen extends React.Component {
     await this.loadAtores();
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
-        this.loadAtores();
+        // Limpa filtros e busca ao voltar para a tela
+        this.setState(
+          { filtroSexo: 'Sexo', buscaNome: '', page: 1 },
+          () => {
+            this.applyFilters();
+            this.checkToastParam();
+          }
+        );
       });
     }
+    this.checkToastParam();
   }
+
+  checkToastParam = () => {
+    const toastParam = this.props.route?.params?.toast;
+    if (toastParam) {
+      Toast.show({
+        type: toastParam.type,
+        text1: toastParam.msg,
+      });
+      this.props.navigation.setParams({ toast: undefined });
+    }
+  };
 
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
@@ -40,34 +60,30 @@ export default class ActorsListScreen extends React.Component {
 
   loadAtores = async () => {
     try {
-      let atores = [];
-      if (this.state.filtroSexo === 'todos') {
-        atores = await atorService.read({ useCache: false });
-      } else {
-        atores = await Ator.getAtoresBySexoFromFirebase(this.state.filtroSexo, false);
-      }
-      this.setState({ atores, atoresFiltrados: atores });
+      const atores = await atorService.read({ useCache: false });
+      this.setState({ atores }, this.applyFilters);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível carregar os atores');
     }
   };
 
-  setFiltroSexo = async (filtroSexo) => {
-    await this.setState({ filtroSexo, buscaNome: '', page: 1 });
-    await this.loadAtores();
+  setFiltroSexo = (filtroSexo) => {
+    this.setState({ filtroSexo, page: 1 }, this.applyFilters);
   };
 
   handleBuscaNome = (buscaNome) => {
-    this.setState({ buscaNome }, this.applyFilters);
+    this.setState({ buscaNome, page: 1 }, this.applyFilters);
   };
 
   applyFilters = () => {
     const { atores, buscaNome, filtroSexo } = this.state;
     let filtrados = atores;
 
-    if (filtroSexo !== 'todos') {
+    // Aplica filtro de sexo se não for "Sexo"
+    if (filtroSexo !== 'Sexo') {
       filtrados = filtrados.filter(a => a.sexo === filtroSexo);
     }
+    // Aplica filtro de nome se não estiver vazio
     if (buscaNome.trim()) {
       const termo = buscaNome.trim().toLowerCase();
       filtrados = filtrados.filter(a => a.nome.toLowerCase().includes(termo));
@@ -82,7 +98,7 @@ export default class ActorsListScreen extends React.Component {
     }
   };
 
-  handleDelete = (id) => {
+  handleDelete = async (id) => {
     Alert.alert('Confirmar', 'Deseja excluir este ator?', [
       { text: 'Cancelar', style: 'cancel' },
       {
@@ -95,6 +111,10 @@ export default class ActorsListScreen extends React.Component {
               atores: prev.atores.filter(g => g.id !== id),
               atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== id),
             }));
+            Toast.show({
+              type: 'error',
+              text1: 'Ator excluído com sucesso!',
+            });
           } catch (error) {
             Alert.alert('Erro', 'Falha ao excluir ator');
           }
@@ -103,8 +123,27 @@ export default class ActorsListScreen extends React.Component {
     ]);
   };
 
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.atoresFiltrados.find(a => a.id.toString() === rowKey);
+    if (item) {
+      this.handleDelete(item.id);
+      // Fecha o swipe imediatamente
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
+  };
+
+  showToast = (msg, type) => {
+    Toast.show({
+      type: type === 'success' ? 'success' : 'error',
+      text1: msg,
+    });
+    this.loadAtores();
+  };
+
   render() {
-    const { atoresFiltrados, page } = this.state;
+    const { atoresFiltrados, page, filtroSexo, buscaNome } = this.state;
     const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
@@ -117,17 +156,19 @@ export default class ActorsListScreen extends React.Component {
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar atores..."
+              value={buscaNome}
               onSearch={this.handleBuscaNome}
             />
           </View>
           <View style={styles.selectContainer}>
             <SelectBy
               options={[
-                { label: 'Todos', value: 'todos' },
+                { label: 'Sexo', value: 'Sexo' },
                 { label: 'Masculino', value: 'Masculino' },
                 { label: 'Feminino', value: 'Feminino' },
               ]}
-              initialValue="todos"
+              initialValue="Sexo"
+              value={filtroSexo}
               onSelect={this.setFiltroSexo}
             />
           </View>
@@ -140,7 +181,9 @@ export default class ActorsListScreen extends React.Component {
           renderItem={({ item }) => (
             <AtorItem
               ator={item}
-              onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
+              onEdit={() =>
+                this.props.navigation.navigate('ActorFormScreen', { ator: item })
+              }
               hideDelete={true}
             />
           )}
@@ -158,6 +201,7 @@ export default class ActorsListScreen extends React.Component {
           disableRightSwipe={false}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
+          onRowOpen={this.handleRowOpen}
           ListFooterComponent={
             (page * PAGE_SIZE) < atoresFiltrados.length
               ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
@@ -168,7 +212,9 @@ export default class ActorsListScreen extends React.Component {
         {/* FAB - Botão flutuante */}
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => this.props.navigation.navigate('ActorFormScreen')}
+          onPress={() =>
+            this.props.navigation.navigate('ActorFormScreen')
+          }
         >
           <MaterialIcons name="add" size={32} color="#fff" />
         </TouchableOpacity>
