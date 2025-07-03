@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Keyboard,
   Alert,
+  Pressable,
+  Animated
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
@@ -231,17 +233,13 @@ export default function ToScheduleScreen() {
     data={agendamentosFiltrados}
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
-        <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-        <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
-
-        <View style={styles.cardButtons}>
-          <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})}>
-            <Text style={styles.editButtonText}>Editar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <Pressable onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})} style={({ pressed }) => [
+        styles.card, { transform: [{ scale: pressed ? 1.02 : 1 }] },
+    ]}>
+          <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
+          <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+          <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
+        </Pressable>
     )}
     renderHiddenItem={({ item }) => (
       <View style={styles.hiddenContainer}>
@@ -255,6 +253,7 @@ export default function ToScheduleScreen() {
     )}
     rightOpenValue={-75}
     disableRightSwipe
+    swipeToOpenPercent={100}
     contentContainerStyle={{ paddingBottom: 60 }}
     />
   )}
@@ -391,16 +390,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingRight: 10,
-    backgroundColor: 'transparent', 
+    paddingRight: 10,    
   },
   deleteButton: {
     backgroundColor: '#c00',
     width: 75,
-    height: '85%',
+    height: '80%',
     justifyContent: 'center',
     alignItems: 'center',
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
   },
+  pressed: {
+
+  }
 });
