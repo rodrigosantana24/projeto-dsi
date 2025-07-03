@@ -9,6 +9,7 @@ import { TextInput } from '../components/inputs/TextInput';
 import { FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React, { useEffect } from 'react';
 import getFriendFilter from '../services/getFriendsFilter';
+import SearchGeneric from '../components/search/SearchGeneric';
 const amigoService = new AmigosService();
 
 const handleAdicionar = async({userId, friendEmail}) =>{
@@ -104,11 +105,10 @@ export default function AddFriend() {
     return (
         <View style={styles.container}>
             <HeaderBar onBack={() => navigation.goBack()} title={"Adicionar Amigo"} />
-            <TextInput
-                placeholder="Pesquisar por Email"
+            <SearchGeneric
+                placeholder="Pesquisar..."
                 value={search}
-                onChangeText={setSearch}
-                style={styles.searchBar}
+                onSearch={setSearch}
             />
             {loading ? (
                 <ActivityIndicator size="large" color="#FFF" style={{ marginTop: 30 }} />
@@ -148,8 +148,8 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#0e3a4d',
-    borderRadius: 12,
+    backgroundColor: '#113342',
+    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   },
 
   email: {
-    color: '#b0c4de',
+    color: '#f4a03f',
     fontSize: 14,
     marginBottom: 12,
   },

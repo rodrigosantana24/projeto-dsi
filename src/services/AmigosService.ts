@@ -1,5 +1,5 @@
 import { getDatabase, ref, set,get, remove,update, limitToFirst, query ,orderByChild, startAt , endAt } from "firebase/database";
-import ICrud from "./ICrud"; // ajuste o path se necessário
+import ICrud from "./ICrud";
 import getUserByEmail from "./getUserByEmail";
 
 
@@ -9,7 +9,6 @@ interface FriendParams {
   nickName?: string; 
   friendId?: string;
   name?: string;
-  // opcional, caso queira atualizar o apelido do amigo
 }
 
 interface FriendReadParams {
@@ -63,7 +62,7 @@ async read({ friendEmail }: FriendReadParams = {}): Promise<any> {
   let usuariosQuery;
 
   if (friendEmail && friendEmail.trim() !== "") {
-    // Busca por prefixo de e-mail (ex: "joao" retorna "joao@gmail.com")
+    
     usuariosQuery = query(
       usuariosRef,
       orderByChild('email'),
@@ -71,7 +70,6 @@ async read({ friendEmail }: FriendReadParams = {}): Promise<any> {
       endAt(friendEmail + "\uf8ff")
     );
   } else {
-    // Retorna os 20 primeiros usuários por ordem de cadastro
     usuariosQuery = query(
       usuariosRef,
       limitToFirst(20)
