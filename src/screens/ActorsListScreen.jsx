@@ -8,6 +8,7 @@ import Ator from '../models/Ator';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
+import Toast from 'react-native-toast-message';
 
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
@@ -28,9 +29,23 @@ export default class ActorsListScreen extends React.Component {
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
         this.loadAtores();
+        this.checkToastParam();
       });
     }
+    this.checkToastParam();
   }
+
+  checkToastParam = () => {
+    const toastParam = this.props.route?.params?.toast;
+    if (toastParam) {
+      Toast.show({
+        type: toastParam.type,
+        text1: toastParam.msg,
+      });
+      // Limpa o param para não mostrar de novo
+      this.props.navigation.setParams({ toast: undefined });
+    }
+  };
 
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
@@ -82,7 +97,7 @@ export default class ActorsListScreen extends React.Component {
     }
   };
 
-  handleDelete = (id) => {
+  handleDelete = async (id) => {
     Alert.alert('Confirmar', 'Deseja excluir este ator?', [
       { text: 'Cancelar', style: 'cancel' },
       {
@@ -95,12 +110,35 @@ export default class ActorsListScreen extends React.Component {
               atores: prev.atores.filter(g => g.id !== id),
               atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== id),
             }));
+            Toast.show({
+              type: 'error',
+              text1: 'Ator excluído com sucesso!',
+            });
           } catch (error) {
             Alert.alert('Erro', 'Falha ao excluir ator');
           }
         },
       },
     ]);
+  };
+
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.atoresFiltrados.find(a => a.id.toString() === rowKey);
+    if (item) {
+      this.handleDelete(item.id);
+      // Fecha o swipe imediatamente
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
+  };
+
+  showToast = (msg, type) => {
+    Toast.show({
+      type: type === 'success' ? 'success' : 'error',
+      text1: msg,
+    });
+    this.loadAtores();
   };
 
   render() {
@@ -140,7 +178,9 @@ export default class ActorsListScreen extends React.Component {
           renderItem={({ item }) => (
             <AtorItem
               ator={item}
-              onEdit={() => this.props.navigation.navigate('ActorFormScreen', { ator: item })}
+              onEdit={() =>
+                this.props.navigation.navigate('ActorFormScreen', { ator: item })
+              }
               hideDelete={true}
             />
           )}
@@ -158,6 +198,7 @@ export default class ActorsListScreen extends React.Component {
           disableRightSwipe={false}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
+          onRowOpen={this.handleRowOpen}
           ListFooterComponent={
             (page * PAGE_SIZE) < atoresFiltrados.length
               ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
@@ -168,7 +209,9 @@ export default class ActorsListScreen extends React.Component {
         {/* FAB - Botão flutuante */}
         <TouchableOpacity
           style={styles.fab}
-          onPress={() => this.props.navigation.navigate('ActorFormScreen')}
+          onPress={() =>
+            this.props.navigation.navigate('ActorFormScreen')
+          }
         >
           <MaterialIcons name="add" size={32} color="#fff" />
         </TouchableOpacity>

@@ -12,6 +12,7 @@ export default function App() {
       <UserProvider>
         <AppNavigation />
       </UserProvider>
+      <Toast /> {}
     </GestureHandlerRootView>
   );
 }
