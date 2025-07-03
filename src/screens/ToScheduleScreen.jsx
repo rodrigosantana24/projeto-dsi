@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Keyboard,
   Alert,
+  Pressable,
+  Animated
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
@@ -14,6 +16,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import {  MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import AddButton from "../components/buttons/AddButton";
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
@@ -177,9 +180,6 @@ export default function ToScheduleScreen() {
         <Ionicons name="arrow-back" size={28} color="#c7defa" />
       </TouchableOpacity>
       <Text style={styles.titulo}>Seus agendamentos</Text>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}>
-        <MaterialIcons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
     </View>
 
     <View style={styles.filtroContainer}>
@@ -233,17 +233,13 @@ export default function ToScheduleScreen() {
     data={agendamentosFiltrados}
     keyExtractor={(item) => item.id}
     renderItem={({ item }) => (
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
-        <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-        <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
-
-        <View style={styles.cardButtons}>
-          <TouchableOpacity style={styles.editButton} onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})}>
-            <Text style={styles.editButtonText}>Editar</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+        <Pressable onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})} style={({ pressed }) => [
+        styles.card, { transform: [{ scale: pressed ? 1.02 : 1 }] },
+    ]}>
+          <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
+          <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+          <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
+        </Pressable>
     )}
     renderHiddenItem={({ item }) => (
       <View style={styles.hiddenContainer}>
@@ -257,10 +253,11 @@ export default function ToScheduleScreen() {
     )}
     rightOpenValue={-75}
     disableRightSwipe
+    swipeToOpenPercent={100}
     contentContainerStyle={{ paddingBottom: 60 }}
     />
   )}
-
+    <AddButton onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}></AddButton>
   </View>
   );
 }
@@ -310,7 +307,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    backgroundColor: "#1e2f47",
+    backgroundColor: "#113342",
     padding: 16,
     borderRadius: 10,
     marginBottom: 12,
@@ -353,7 +350,7 @@ const styles = StyleSheet.create({
   },
   filtroContainer: {
     marginBottom: 20,
-    backgroundColor: "#142f43",
+    backgroundColor: "#113342",
     padding: 12,
     borderRadius: 10,
   },
@@ -375,10 +372,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   filtroBotaoSelecionado: {
-    backgroundColor: "#1a73e8",
+    backgroundColor: "#f4a03f",
   },
   textoFiltro: {
-    color: "#c7defa",
+    color: "#fff",
     fontWeight: "700",
   },
   inputFiltro: {
@@ -393,16 +390,18 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingRight: 10,
-    backgroundColor: 'transparent', 
+    paddingRight: 10,    
   },
   deleteButton: {
     backgroundColor: '#c00',
     width: 75,
-    height: '85%',
+    height: '80%',
     justifyContent: 'center',
     alignItems: 'center',
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
   },
+  pressed: {
+
+  }
 });
