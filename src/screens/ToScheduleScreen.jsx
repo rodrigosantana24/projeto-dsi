@@ -14,6 +14,7 @@ import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import {  MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import AddButton from "../components/buttons/AddButton";
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
@@ -177,9 +178,6 @@ export default function ToScheduleScreen() {
         <Ionicons name="arrow-back" size={28} color="#c7defa" />
       </TouchableOpacity>
       <Text style={styles.titulo}>Seus agendamentos</Text>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}>
-        <MaterialIcons name="add" size={28} color="#fff" />
-      </TouchableOpacity>
     </View>
 
     <View style={styles.filtroContainer}>
@@ -260,7 +258,7 @@ export default function ToScheduleScreen() {
     contentContainerStyle={{ paddingBottom: 60 }}
     />
   )}
-
+    <AddButton onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}></AddButton>
   </View>
   );
 }
@@ -310,7 +308,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    backgroundColor: "#1e2f47",
+    backgroundColor: "#113342",
     padding: 16,
     borderRadius: 10,
     marginBottom: 12,
@@ -353,7 +351,7 @@ const styles = StyleSheet.create({
   },
   filtroContainer: {
     marginBottom: 20,
-    backgroundColor: "#142f43",
+    backgroundColor: "#113342",
     padding: 12,
     borderRadius: 10,
   },
@@ -375,10 +373,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   filtroBotaoSelecionado: {
-    backgroundColor: "#1a73e8",
+    backgroundColor: "#f4a03f",
   },
   textoFiltro: {
-    color: "#c7defa",
+    color: "#fff",
     fontWeight: "700",
   },
   inputFiltro: {
