@@ -46,16 +46,15 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
           <Icon name="users" size={20} color="#f4a03f" />
         </TouchableOpacity>
       </View>
-
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Icon name="x" size={20} color="#FFF" style={{ marginRight: 8 }} />
-          <Text style={styles.buttonText}>Cancelar</Text>
-        </TouchableOpacity>
-        
         <TouchableOpacity style={styles.saveButton} onPress={onSave}>
            <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Salvar</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
+          <Icon name="x" size={20} color="#FFF" style={{ marginRight: 8 }} />
+          <Text style={styles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -131,20 +130,12 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 10,
   },
+  // --- ALTERAÇÃO AQUI ---
+  // Estilos dos botões e do container atualizados.
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column', // Alterado para 'column'
     marginTop: 20,
     width: '100%',
-  },
-  cancelButton: {
-    backgroundColor: '#dc3545',
-    padding: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    flex: 1,
-    marginRight: 8,
   },
   saveButton: {
     backgroundColor: '#f4a03f',
@@ -153,8 +144,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    flex: 1,
-    marginLeft: 8,
+    width: '100%',
+    marginBottom: 12, 
+  },
+  cancelButton: {
+    backgroundColor: '#dc3545',
+    padding: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
   },
   buttonText: {
     color: '#FFF',
