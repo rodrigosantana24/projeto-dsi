@@ -27,7 +27,7 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
         type: 'error',
         text1: 'Por favor, preencha todos os campos.',
         text2: `Por favor, preencha o campo "${fieldName}".`,
-        position: 'top', // Aqui colocamos o toast no topo
+        position: 'top', 
       });
 
       return;
