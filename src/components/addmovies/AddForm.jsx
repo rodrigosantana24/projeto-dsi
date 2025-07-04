@@ -1,8 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import Toast from 'react-native-toast-message'; 
 
 const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCancel, onOpenModal }) => {
+  const [errors, setErrors] = useState({});
+
+  const handleSave = () => {
+    const newErrors = {};
+
+    if (!title.trim()) newErrors.title = true;
+    if (!poster_path.trim()) newErrors.poster_path = true;
+    if (generos.length === 0) newErrors.generos = true;
+    if (atores.length === 0) newErrors.atores = true;
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      let fieldName = '';
+      if (newErrors.title) fieldName = 'Título do Filme';
+      else if (newErrors.poster_path) fieldName = 'URL do Poster';
+      else if (newErrors.generos) fieldName = 'Gêneros';
+      else if (newErrors.atores) fieldName = 'Atores Principais';
+
+      Toast.show({
+        type: 'error',
+        text1: 'Por favor, preencha todos os campos.',
+        text2: `Por favor, preencha o campo "${fieldName}".`,
+        position: 'top', // Aqui colocamos o toast no topo
+      });
+
+      return;
+    }
+
+    onSave();
+  };
+
   return (
     <View style={styles.scrollContent}>
       <View style={styles.headerArea}>
@@ -12,26 +45,46 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
           Preencha as informações para cadastrar um novo filme.
         </Text>
       </View>
+
       <View style={styles.inputArea}>
         <Text style={styles.label}>Título do Filme</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.title && styles.inputError]}
           placeholder="Ex: O Poderoso Chefão"
           placeholderTextColor="#999"
           value={title}
-          onChangeText={(text) => onChange('title', text)}
+          onChangeText={(text) => {
+            onChange('title', text);
+            if (errors.title) {
+              setErrors((prev) => ({ ...prev, title: false }));
+            }
+          }}
         />
+
         <Text style={styles.label}>URL do Poster</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.poster_path && styles.inputError]}
           placeholder="https://.../poster.jpg"
           placeholderTextColor="#999"
           value={poster_path}
-          onChangeText={(text) => onChange('poster_path', text)}
+          onChangeText={(text) => {
+            onChange('poster_path', text);
+            if (errors.poster_path) {
+              setErrors((prev) => ({ ...prev, poster_path: false }));
+            }
+          }}
         />
 
         <Text style={styles.label}>Gêneros</Text>
-        <TouchableOpacity style={styles.selectButton} onPress={() => onOpenModal('generos')}>
+        <TouchableOpacity 
+          style={[styles.selectButton, errors.generos && styles.selectButtonError]} 
+          onPress={() => {
+            onOpenModal('generos');
+            if (errors.generos) {
+              setErrors((prev) => ({ ...prev, generos: false }));
+            }
+          }}
+        >
           <Text style={styles.selectButtonText} numberOfLines={1}>
             {generos.length > 0 ? generos.join(', ') : 'Clique para selecionar'}
           </Text>
@@ -39,16 +92,25 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
         </TouchableOpacity>
 
         <Text style={styles.label}>Atores Principais</Text>
-        <TouchableOpacity style={styles.selectButton} onPress={() => onOpenModal('atores')}>
+        <TouchableOpacity 
+          style={[styles.selectButton, errors.atores && styles.selectButtonError]} 
+          onPress={() => {
+            onOpenModal('atores');
+            if (errors.atores) {
+              setErrors((prev) => ({ ...prev, atores: false }));
+            }
+          }}
+        >
           <Text style={styles.selectButtonText} numberOfLines={1}>
             {atores.length > 0 ? atores.join(', ') : 'Clique para selecionar'}
           </Text>
           <Icon name="users" size={20} color="#f4a03f" />
         </TouchableOpacity>
       </View>
+
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
-           <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Salvar</Text>
         </TouchableOpacity>
         
@@ -112,6 +174,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     height: 50,
   },
+  inputError: {
+    borderColor: '#dc3545', 
+    borderWidth: 1.5,
+  },
   selectButton: {
     borderWidth: 1,
     borderColor: '#3d5564',
@@ -124,16 +190,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  selectButtonError: {
+    borderColor: '#dc3545',
+    borderWidth: 1.5,
+  },
   selectButtonText: {
     color: '#FFF',
     fontSize: 16,
     flex: 1,
     marginRight: 10,
   },
-  // --- ALTERAÇÃO AQUI ---
-  // Estilos dos botões e do container atualizados.
   buttonContainer: {
-    flexDirection: 'column', // Alterado para 'column'
+    flexDirection: 'column',
     marginTop: 20,
     width: '100%',
   },
