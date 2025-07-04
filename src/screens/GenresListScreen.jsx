@@ -123,6 +123,19 @@ export default class GenresListScreen extends React.Component {
     ]);
   };
 
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.filteredGeneros.find(g => g.id.toString() === rowKey);
+
+    if (item && !item.nativo) {
+      this.handleDelete(item.id);
+
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
+  };
+
+
   render() {
     const { filteredGeneros, page } = this.state;
     const dataToShow = filteredGeneros.slice(0, page * PAGE_SIZE);
@@ -165,7 +178,16 @@ export default class GenresListScreen extends React.Component {
               genero={item}
               onEdit={() => {
                 if (!item.nativo) {
-                  this.props.navigation.navigate('GenresFormScreen', { genero: item });
+                  this.props.navigation.navigate('GenresFormScreen', {
+                    genero: item,
+                    onSave: (mensagem) => {
+                      Toast.show({
+                        type: 'success',
+                        text1: mensagem,
+                      });
+                      this.loadGeneros();
+                    }
+                  });
                 }
               }}
             />
@@ -184,6 +206,7 @@ export default class GenresListScreen extends React.Component {
           }
           rightOpenValue={-75}
           disableRightSwipe={false}
+          onRowOpen={this.handleRowOpen}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -195,7 +218,15 @@ export default class GenresListScreen extends React.Component {
         <TouchableOpacity
           style={styles.fab}
           onPress={() =>
-            this.props.navigation.navigate('GenresFormScreen')
+            this.props.navigation.navigate('GenresFormScreen', {
+              onSave: (mensagem) => {
+                Toast.show({
+                  type: 'success',
+                  text1: mensagem,
+                });
+                this.loadGeneros(); // atualiza a lista
+              }
+            })
           }
         >
           <MaterialIcons name="add" size={32} color="#fff" />

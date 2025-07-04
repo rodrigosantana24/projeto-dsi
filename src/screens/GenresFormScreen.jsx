@@ -20,20 +20,16 @@ export default class GeneroFormScreen extends React.Component {
 
   handleSave = async () => {
     const { nome, descricao, editandoId } = this.state;
-    const { navigation } = this.props;
+    const { navigation, route } = this.props;
 
     try {
       if (editandoId) {
         await generoService.update({ id: editandoId, nome, descricao });
-        Toast.show({
-          type: 'success',
-          text1: 'Gênero atualizado',
-        });
+        route.params?.onSave?.('Gênero atualizado');
       } else {
         await generoService.create({ nome, descricao });
-        navigation.replace('GenresListScreen', {
-          toast: { type: 'success', msg: 'Gênero criado' },
-        });
+        route.params?.onSave?.('Gênero criado');
+        navigation.goBack();
       }
     } catch (error) {
       Alert.alert('Erro', error.message);
