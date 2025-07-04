@@ -17,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {  MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AddButton from "../components/buttons/AddButton";
+import Toast from "react-native-toast-message";
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
@@ -46,10 +47,19 @@ export default function ToScheduleScreen() {
   async function excluirAgendamento(id) {
     try {
       await service.delete({ userId: userCredentials.uid, id });
-      Alert.alert("Agendamento excluído");
+      Toast.show({
+        type: 'success',
+        text1: 'Agendamento excluído com sucesso!',
+        visibilityTime: 3000,
+      });
       setAgendamentos((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao excluir agendamento',
+        visibilityTime: 4000,
+      });
     }
   }
 
@@ -115,6 +125,11 @@ export default function ToScheduleScreen() {
   const handleAddAgendamento = async () => {
   if (!novoFilme || !novaData || !novaHora) {
     alert("Preencha todos os campos");
+    Toast.show({
+      type: 'success',
+      text1: 'Preencha todos os campos',
+      visibilityTime: 3000,
+    })
     return;
   }
 
