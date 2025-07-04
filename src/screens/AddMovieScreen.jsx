@@ -9,6 +9,7 @@ import {
   SafeAreaView
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { MaterialIcons } from '@expo/vector-icons';
 import FilmeService from '../services/FilmeService';
 import AddList from '../components/addmovies/AddList';
 import { SwipeListView } from 'react-native-swipe-list-view'; 
@@ -133,7 +134,7 @@ export default class AddMovieScreen extends React.Component {
           </TouchableOpacity>
           <Text style={styles.header}>Gerenciar Filmes</Text>
           <TouchableOpacity onPress={this.navigateToAdd} style={styles.headerButton}>
-            <Icon name="plus" size={24} color="#EFEFEF" />
+            <MaterialIcons name="add" size={32} color="#fff" />
           </TouchableOpacity>
         </View>
 
@@ -168,7 +169,24 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1C3F4F',
   },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-  headerButton: { padding: 5 },
+  
+  headerButton: { 
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
+  },
   filtersContainer: {
     paddingVertical: 10,
   },
