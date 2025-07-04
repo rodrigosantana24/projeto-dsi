@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   SafeAreaView
 } from 'react-native';
+import HeaderBar from '../components/navi/HeaderBar';
 import Icon from 'react-native-vector-icons/Feather';
 import { MaterialIcons } from '@expo/vector-icons';
 import FilmeService from '../services/FilmeService';
 import AddList from '../components/addmovies/AddList';
-import { SwipeListView } from 'react-native-swipe-list-view'; 
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const filmeService = new FilmeService();
+
 export default class AddMovieScreen extends React.Component {
   state = {
     filmes: [],
@@ -86,7 +88,7 @@ export default class AddMovieScreen extends React.Component {
   };
 
   renderItem = (data) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.rowFront}
       activeOpacity={0.9}
       onPress={() => this.navigateToEdit(data.item)}
@@ -128,39 +130,41 @@ export default class AddMovieScreen extends React.Component {
     const { filmes } = this.state;
     return (
       <SafeAreaView style={styles.container}>
+        {/* O HeaderBar agora fica sozinho no seu container */}
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={styles.headerButton}>
-            <Icon name="arrow-left" size={24} color="#EFEFEF" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Gerenciar Filmes</Text>
-          <TouchableOpacity onPress={this.navigateToAdd} style={styles.headerButton}>
-            <MaterialIcons name="add" size={32} color="#fff" />
-          </TouchableOpacity>
+          <HeaderBar
+            onBack={() => this.props.navigation.goBack()}
+            title="Gerenciar Filmes" // O título já estava sendo definido aqui
+          />
         </View>
 
         <SwipeListView
           data={filmes}
           renderItem={this.renderItem}
           renderHiddenItem={this.renderHiddenItem}
-          rightOpenValue={-75} 
+          rightOpenValue={-75}
           keyExtractor={f => f.id.toString()}
           ListHeaderComponent={this.renderListHeader}
           contentContainerStyle={styles.scrollContainer}
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
         />
+
+        {/* O BOTÃO FOI MOVIDO DAQUI... */}
+        {/* ...PARA CÁ, no final do componente, para que ele flutue sobre a lista. */}
+        <TouchableOpacity onPress={this.navigateToAdd} style={styles.addButton}>
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#071A24' },
-  scrollContainer: { paddingHorizontal: 20 },
+  container: { flex: 1, backgroundColor: '#072330' },
+  scrollContainer: { paddingHorizontal: 20, paddingBottom: 100 }, // Adicionado paddingBottom
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    // Estilos simplificados pois agora só contém o HeaderBar
     backgroundColor: '#0E2935',
     paddingTop: 60,
     paddingHorizontal: 20,
@@ -169,11 +173,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1C3F4F',
   },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-  
-  headerButton: { 
-    position: 'absolute',
-    right: 24,
-    bottom: 32,
+
+  // ESTILO RENOMEADO E AJUSTADO
+  // De 'headerButton' para 'addButton' para melhor semântica
+  // Posição ajustada para o canto inferior direito da tela
+  addButton: {
+    position: 'absolute', // Posição absoluta em relação ao container pai (SafeAreaView)
+    right: 24,           // 24 pixels da direita
+    bottom: 32,          // 32 pixels de baixo
     backgroundColor: '#f4a03f',
     width: 60,
     height: 60,
@@ -185,7 +192,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 100,
+    zIndex: 100, 
   },
   filtersContainer: {
     paddingVertical: 10,
@@ -205,11 +212,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   rowFront: {
-    backgroundColor: '#071A24', 
+    backgroundColor: '#071A24',
   },
   rowBack: {
     alignItems: 'center',
-    backgroundColor: '#D9534F', 
+    backgroundColor: '#D9534F',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
