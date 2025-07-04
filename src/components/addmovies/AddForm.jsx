@@ -1,12 +1,14 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
-import Toast from 'react-native-toast-message'; 
+import Toast from 'react-native-toast-message';
 
-const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCancel, onOpenModal }) => {
+// --- Componente de formulário para adicionar/editar filmes ---
+const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onSave, onCancel, onOpenModal }) => {
   const [errors, setErrors] = useState({});
 
-  const handleSave = () => {
+  // Função para validar e salvar os dados
+  const handleSave = async () => {
     const newErrors = {};
 
     if (!title.trim()) newErrors.title = true;
@@ -25,15 +27,33 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
 
       Toast.show({
         type: 'error',
-        text1: 'Por favor, preencha todos os campos.',
+        text1: 'Por favor, preencha todos os campos',
         text2: `Por favor, preencha o campo "${fieldName}".`,
-        position: 'top', 
+        position: 'top',
       });
-
       return;
     }
 
-    onSave();
+    try {
+      await onSave();
+
+      Toast.show({
+        type: 'success',
+        text1: isEditing ? 'Editado!' : 'Filme salvo com sucesso!',
+        text2: isEditing ? 'Filme editado com sucesso.' : 'Filme adicionado com sucesso.',
+        position: 'top',
+        visibilityTime: 2000,
+        topOffset: 50,
+      });
+    } catch (error) {
+      console.error('Erro ao salvar o filme:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Não foi possível salvar o filme. Tente novamente.',
+        position: 'top',
+      });
+    }
   };
 
   return (
@@ -42,7 +62,7 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
         <Icon name="film" size={40} color="#f4a03f" />
         <Text style={styles.formTitle}>Dados do Filme</Text>
         <Text style={styles.formSubtitle}>
-          Preencha as informações para cadastrar um novo filme.
+          {isEditing ? 'Altere as informações do filme.' : 'Preencha as informações para cadastrar um novo filme.'}
         </Text>
       </View>
 
@@ -55,9 +75,7 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
           value={title}
           onChangeText={(text) => {
             onChange('title', text);
-            if (errors.title) {
-              setErrors((prev) => ({ ...prev, title: false }));
-            }
+            if (errors.title) setErrors((prev) => ({ ...prev, title: false }));
           }}
         />
 
@@ -69,20 +87,16 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
           value={poster_path}
           onChangeText={(text) => {
             onChange('poster_path', text);
-            if (errors.poster_path) {
-              setErrors((prev) => ({ ...prev, poster_path: false }));
-            }
+            if (errors.poster_path) setErrors((prev) => ({ ...prev, poster_path: false }));
           }}
         />
 
         <Text style={styles.label}>Gêneros</Text>
-        <TouchableOpacity 
-          style={[styles.selectButton, errors.generos && styles.selectButtonError]} 
+        <TouchableOpacity
+          style={[styles.selectButton, errors.generos && styles.selectButtonError]}
           onPress={() => {
             onOpenModal('generos');
-            if (errors.generos) {
-              setErrors((prev) => ({ ...prev, generos: false }));
-            }
+            if (errors.generos) setErrors((prev) => ({ ...prev, generos: false }));
           }}
         >
           <Text style={styles.selectButtonText} numberOfLines={1}>
@@ -92,13 +106,11 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
         </TouchableOpacity>
 
         <Text style={styles.label}>Atores Principais</Text>
-        <TouchableOpacity 
-          style={[styles.selectButton, errors.atores && styles.selectButtonError]} 
+        <TouchableOpacity
+          style={[styles.selectButton, errors.atores && styles.selectButtonError]}
           onPress={() => {
             onOpenModal('atores');
-            if (errors.atores) {
-              setErrors((prev) => ({ ...prev, atores: false }));
-            }
+            if (errors.atores) setErrors((prev) => ({ ...prev, atores: false }));
           }}
         >
           <Text style={styles.selectButtonText} numberOfLines={1}>
@@ -113,7 +125,7 @@ const AddForm = ({ title, poster_path, generos, atores, onChange, onSave, onCanc
           <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Salvar</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
           <Icon name="x" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Cancelar</Text>
@@ -147,7 +159,7 @@ const styles = StyleSheet.create({
   },
   inputArea: {
     width: '100%',
-    backgroundColor: '#113342', 
+    backgroundColor: '#113342',
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -157,7 +169,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   label: {
-    color: '#f4a03f', 
+    color: '#f4a03f',
     fontWeight: 'bold',
     marginBottom: 6,
     fontSize: 15,
@@ -170,12 +182,12 @@ const styles = StyleSheet.create({
     padding: 12,
     color: '#FFF',
     marginBottom: 16,
-    backgroundColor: '#18394a', 
+    backgroundColor: '#18394a',
     fontSize: 16,
     height: 50,
   },
   inputError: {
-    borderColor: '#dc3545', 
+    borderColor: '#dc3545',
     borderWidth: 1.5,
   },
   selectButton: {
@@ -213,7 +225,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
-    marginBottom: 12, 
+    marginBottom: 12,
   },
   cancelButton: {
     backgroundColor: '#dc3545',
