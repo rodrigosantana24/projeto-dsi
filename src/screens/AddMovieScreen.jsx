@@ -62,20 +62,35 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ searchQuery: query }, this.applyFilters);
   };
 
-  handleDelete = id => {
+  // --- MODIFICAÇÃO 1: Ajuste na função handleDelete ---
+  // A função agora aceita `rowMap` para poder fechar a linha programaticamente.
+  handleDelete = (id, rowMap) => {
+    const closeRow = () => {
+      if (rowMap && rowMap[id]) {
+        rowMap[id].closeRow();
+      }
+    };
+
     Alert.alert('Confirmar Exclusão', 'Deseja realmente excluir este filme?', [
-      { text: 'Cancelar', style: 'cancel' },
       {
-        text: 'Excluir', style: 'destructive', onPress: async () => {
+        text: 'Cancelar',
+        style: 'cancel',
+        onPress: () => closeRow(), // Fecha a linha se o usuário cancelar
+      },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          closeRow(); // Garante que a linha se feche antes da operação
           try {
             await filmeService.delete({ id });
-            this.loadFilmes();
+            this.loadFilmes(); // Recarrega a lista após a exclusão
           } catch (e) {
             console.error(e);
             Alert.alert('Erro', 'Falha ao excluir o filme.');
           }
-        }
-      }
+        },
+      },
     ]);
   };
 
@@ -97,11 +112,12 @@ export default class AddMovieScreen extends React.Component {
     </TouchableOpacity>
   );
 
+  // O item oculto ainda é útil para dar feedback visual ao usuário durante o arraste.
   renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => this.handleDelete(data.item.id)}
+        onPress={() => this.handleDelete(data.item.id, rowMap)}
       >
         <Icon name="trash-2" size={24} color="#FFF" />
       </TouchableOpacity>
@@ -130,14 +146,14 @@ export default class AddMovieScreen extends React.Component {
     const { filmes } = this.state;
     return (
       <SafeAreaView style={styles.container}>
-        {/* O HeaderBar agora fica sozinho no seu container */}
         <View style={styles.headerContainer}>
           <HeaderBar
             onBack={() => this.props.navigation.goBack()}
-            title="Gerenciar Filmes" // O título já estava sendo definido aqui
+            title="Gerenciar Filmes"
           />
         </View>
 
+        {/* --- MODIFICAÇÃO 2: Novas propriedades na SwipeListView --- */}
         <SwipeListView
           data={filmes}
           renderItem={this.renderItem}
@@ -148,10 +164,15 @@ export default class AddMovieScreen extends React.Component {
           contentContainerStyle={styles.scrollContainer}
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
+          // Prop para desabilitar o arraste para a direita
+          disableRightSwipe={true}
+          // Prop que é chamada quando a linha é totalmente arrastada e "aberta"
+          onRowOpen={(rowKey, rowMap) => {
+            // Chama a função de exclusão assim que a animação de abrir termina
+            this.handleDelete(rowKey, rowMap);
+          }}
         />
 
-        {/* O BOTÃO FOI MOVIDO DAQUI... */}
-        {/* ...PARA CÁ, no final do componente, para que ele flutue sobre a lista. */}
         <TouchableOpacity onPress={this.navigateToAdd} style={styles.addButton}>
           <MaterialIcons name="add" size={32} color="#fff" />
         </TouchableOpacity>
@@ -160,11 +181,11 @@ export default class AddMovieScreen extends React.Component {
   }
 }
 
+// Os estilos permanecem os mesmos da refatoração anterior
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#072330' },
-  scrollContainer: { paddingHorizontal: 20, paddingBottom: 100 }, // Adicionado paddingBottom
+  scrollContainer: { paddingHorizontal: 20, paddingBottom: 100 },
   headerContainer: {
-    // Estilos simplificados pois agora só contém o HeaderBar
     backgroundColor: '#0E2935',
     paddingTop: 60,
     paddingHorizontal: 20,
@@ -173,14 +194,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#1C3F4F',
   },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-
-  // ESTILO RENOMEADO E AJUSTADO
-  // De 'headerButton' para 'addButton' para melhor semântica
-  // Posição ajustada para o canto inferior direito da tela
   addButton: {
-    position: 'absolute', // Posição absoluta em relação ao container pai (SafeAreaView)
-    right: 24,           // 24 pixels da direita
-    bottom: 32,          // 32 pixels de baixo
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
     backgroundColor: '#f4a03f',
     width: 60,
     height: 60,
@@ -192,7 +209,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    zIndex: 100, 
+    zIndex: 100,
   },
   filtersContainer: {
     paddingVertical: 10,
