@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   Alert,
   StyleSheet,
   TextInput,
@@ -16,7 +15,6 @@ import AddList from '../components/addmovies/AddList';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
 const filmeService = new FilmeService();
-
 export default class AddMovieScreen extends React.Component {
   state = {
     filmes: [],
@@ -62,29 +60,26 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ searchQuery: query }, this.applyFilters);
   };
 
-  // --- MODIFICAÇÃO 1: Ajuste na função handleDelete ---
-  // A função agora aceita `rowMap` para poder fechar a linha programaticamente.
   handleDelete = (id, rowMap) => {
     const closeRow = () => {
       if (rowMap && rowMap[id]) {
         rowMap[id].closeRow();
       }
     };
-
     Alert.alert('Confirmar Exclusão', 'Deseja realmente excluir este filme?', [
       {
         text: 'Cancelar',
         style: 'cancel',
-        onPress: () => closeRow(), // Fecha a linha se o usuário cancelar
+        onPress: () => closeRow(),
       },
       {
         text: 'Excluir',
         style: 'destructive',
         onPress: async () => {
-          closeRow(); // Garante que a linha se feche antes da operação
+          closeRow();
           try {
             await filmeService.delete({ id });
-            this.loadFilmes(); // Recarrega a lista após a exclusão
+            this.loadFilmes();
           } catch (e) {
             console.error(e);
             Alert.alert('Erro', 'Falha ao excluir o filme.');
@@ -112,7 +107,6 @@ export default class AddMovieScreen extends React.Component {
     </TouchableOpacity>
   );
 
-  // O item oculto ainda é útil para dar feedback visual ao usuário durante o arraste.
   renderHiddenItem = (data, rowMap) => (
     <View style={styles.rowBack}>
       <TouchableOpacity
@@ -153,7 +147,6 @@ export default class AddMovieScreen extends React.Component {
           />
         </View>
 
-        {/* --- MODIFICAÇÃO 2: Novas propriedades na SwipeListView --- */}
         <SwipeListView
           data={filmes}
           renderItem={this.renderItem}
@@ -164,11 +157,8 @@ export default class AddMovieScreen extends React.Component {
           contentContainerStyle={styles.scrollContainer}
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
-          // Prop para desabilitar o arraste para a direita
           disableRightSwipe={true}
-          // Prop que é chamada quando a linha é totalmente arrastada e "aberta"
           onRowOpen={(rowKey, rowMap) => {
-            // Chama a função de exclusão assim que a animação de abrir termina
             this.handleDelete(rowKey, rowMap);
           }}
         />
@@ -181,17 +171,16 @@ export default class AddMovieScreen extends React.Component {
   }
 }
 
-// Os estilos permanecem os mesmos da refatoração anterior
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#072330' },
   scrollContainer: { paddingHorizontal: 20, paddingBottom: 100 },
   headerContainer: {
-    backgroundColor: '#0E2935',
-    paddingTop: 60,
+    backgroundColor: '#072330',
+    paddingTop: 40,
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
+    borderBottomColor: '#072330',
   },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
   addButton: {
@@ -229,7 +218,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   rowFront: {
-    backgroundColor: '#071A24',
+    backgroundColor: '#072330',
   },
   rowBack: {
     alignItems: 'center',

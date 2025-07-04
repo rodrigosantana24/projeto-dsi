@@ -9,16 +9,16 @@ import {
   ScrollView,
   Modal,
   FlatList,
-  TouchableWithoutFeedback, 
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeaderBar from '../components/navi/HeaderBar';
 import FilmeService from '../services/FilmeService';
 import AddForm from '../components/addmovies/AddForm';
 import { ref, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 const filmeService = new FilmeService();
-
 export default class MovieFormScreen extends React.Component {
   state = {
     title: '',
@@ -122,13 +122,12 @@ export default class MovieFormScreen extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={this.handleCancel} style={styles.headerButton}>
-            <Icon name="arrow-left" size={24} color="#EFEFEF" />
-          </TouchableOpacity>
-          <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Adicionar Filme'}</Text>
-          <View style={styles.headerButton} />
+          <HeaderBar
+            onBack={() => this.props.navigation.goBack()}
+            title={editandoId ? 'Editar Filme' : 'Adicionar Filme'}
+          />
         </View>
-        
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AddForm
             {...this.state}
@@ -140,8 +139,8 @@ export default class MovieFormScreen extends React.Component {
         </ScrollView>
 
         <Modal
-          animationType="fade" 
-          transparent={true} 
+          animationType="fade"
+          transparent={true}
           visible={isModalVisible}
           onRequestClose={() => this.setState({ isModalVisible: false })}
         >
@@ -182,38 +181,35 @@ export default class MovieFormScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#071A24' },
+  container: { flex: 1, backgroundColor: '#072330' },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
-    paddingTop: 40,
+    paddingTop: 1, 
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#0E2935',
-    paddingTop: 60,
+    backgroundColor: '#072330',
+    paddingTop: 40,
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
+    borderBottomColor: '#072330',
   },
   headerButton: { width: 30 },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-  
+
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     backgroundColor: '#1C3F4F',
     width: '90%',
-    maxHeight: '70%', 
+    maxHeight: '70%',
     borderRadius: 15,
     padding: 20,
     shadowColor: "#000",
