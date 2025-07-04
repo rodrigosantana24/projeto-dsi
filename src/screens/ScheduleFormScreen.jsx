@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import AgendamentoService from '../services/AgendamentoService';
 import AgendamentoForm from '../components/schedule/AgendamentoForm';
 import { Ionicons } from "@expo/vector-icons";
@@ -12,7 +12,11 @@ const ScheduleFormScreen = ({ route, navigation }) => {
   const userId = agendamento?.userId || route.params?.userId;
 
   if (!userId) {
-    Alert.alert('Erro', 'Usuário não identificado.');
+    Toast.show({
+            type: 'error',
+            text1: 'Usuário não identificado',
+            visibilityTime: 3000,
+          })
     navigation.goBack();
     return null;
   }
@@ -36,7 +40,11 @@ const ScheduleFormScreen = ({ route, navigation }) => {
 
   const salvar = async () => {
     if (!filmeSelecionado.title || !data || !hora) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+      Toast.show({
+            type: 'error',
+            text1: 'Preencha todos os campos',
+            visibilityTime: 3000,
+          })
       return;
     }
 
