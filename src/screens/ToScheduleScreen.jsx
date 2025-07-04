@@ -5,10 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Keyboard,
-  Alert,
   Pressable,
-  Animated
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
