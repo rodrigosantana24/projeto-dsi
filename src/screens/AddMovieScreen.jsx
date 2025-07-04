@@ -3,11 +3,11 @@ import {
   View,
   Alert,
   StyleSheet,
+  TextInput,
   TouchableOpacity,
   SafeAreaView
 } from 'react-native';
 import HeaderBar from '../components/navi/HeaderBar';
-import SearchBy from '../components/search/SearchBy'; 
 import Icon from 'react-native-vector-icons/Feather';
 import { MaterialIcons } from '@expo/vector-icons';
 import FilmeService from '../services/FilmeService';
@@ -119,12 +119,18 @@ export default class AddMovieScreen extends React.Component {
   );
 
   renderListHeader = () => {
+    const { searchQuery } = this.state;
     return (
       <View style={styles.filtersContainer}>
-        <SearchBy
-          placeholder="Pesquisar por título..."
-          onSearch={this.handleSearchChange}
-        />
+        <View style={styles.searchBar}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Pesquisar filmes criados..."
+            placeholderTextColor="#888"
+            value={searchQuery}
+            onChangeText={this.handleSearchChange}
+          />
+        </View>
       </View>
     );
   }
@@ -195,6 +201,22 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     paddingVertical: 10,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#072330',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#3d5564',
+    borderWidth: 1,
+    marginBottom: 2,
+  },
+  searchInput: {
+    flex: 1,
+    color: '#FFF',
+    padding: 12,
+    fontSize: 16,
   },
   rowFront: {
     backgroundColor: '#072330',
