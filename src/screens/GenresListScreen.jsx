@@ -29,7 +29,25 @@ export default class GenresListScreen extends React.Component {
     if (this.props.navigation?.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', this.loadGeneros);
     }
+    if (this.props.navigation?.addListener) {
+      this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+        this.loadGeneros();
+        this.checkToastParam();
+      });
+    }
+    this.checkToastParam();
   }
+
+  checkToastParam = () => {
+    const toastParam = this.props.route?.params?.toast;
+    if (toastParam) {
+      Toast.show({
+        type: toastParam.type,
+        text1: toastParam.msg,
+      });
+      this.props.navigation.setParams({ toast: undefined });
+    }
+  };
 
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
@@ -93,6 +111,10 @@ export default class GenresListScreen extends React.Component {
               generos: prev.generos.filter(g => g.id !== id),
               filteredGeneros: prev.filteredGeneros.filter(g => g.id !== id),
             }));
+            Toast.show({
+              type: 'error',
+              text1: 'Gênero excluído',
+            });
           } catch (error) {
             Alert.alert('Erro', 'Falha ao excluir gênero');
           }
@@ -116,6 +138,7 @@ export default class GenresListScreen extends React.Component {
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar gêneros..."
+              value={this.state.searchText}
               onSearch={this.handleSearch}
             />
           </View>
