@@ -3,11 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-nativ
 import Icon from 'react-native-vector-icons/Feather';
 import Toast from 'react-native-toast-message';
 
-// --- Componente de formulário para adicionar/editar filmes ---
 const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onSave, onCancel, onOpenModal }) => {
   const [errors, setErrors] = useState({});
 
-  // Função para validar e salvar os dados
   const handleSave = async () => {
     const newErrors = {};
 
@@ -19,19 +17,13 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
-      let fieldName = '';
-      if (newErrors.title) fieldName = 'Título do Filme';
-      else if (newErrors.poster_path) fieldName = 'URL do Poster';
-      else if (newErrors.generos) fieldName = 'Gêneros';
-      else if (newErrors.atores) fieldName = 'Atores Principais';
-
       Toast.show({
         type: 'error',
-        text1: 'Por favor, preencha todos os campos',
-        text2: `Por favor, preencha o campo "${fieldName}".`,
+        text1: 'Campos obrigatórios',
+        text2: 'Por favor, preencha todos os campos destacados.',
         position: 'top',
       });
-      return;
+      return; 
     }
 
     try {
@@ -40,7 +32,7 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
       Toast.show({
         type: 'success',
         text1: isEditing ? 'Editado!' : 'Filme salvo com sucesso!',
-        text2: isEditing ? 'Filme editado com sucesso.' : 'Filme adicionado com sucesso.',
+        text2: isEditing ? 'As alterações foram salvas com sucesso.' : 'O novo filme foi adicionado à sua lista.',
         position: 'top',
         visibilityTime: 2000,
         topOffset: 50,
@@ -49,7 +41,7 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
       console.error('Erro ao salvar o filme:', error);
       Toast.show({
         type: 'error',
-        text1: 'Erro',
+        text1: 'Erro ao Salvar',
         text2: 'Não foi possível salvar o filme. Tente novamente.',
         position: 'top',
       });
