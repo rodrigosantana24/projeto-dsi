@@ -43,21 +43,6 @@ export default function FriendList() {
             });
         }
   };
-  const handleUpdate = async({userId, friendEmail, nickName}) => {
-    try {
-        await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
-        Toast.show({
-          type: 'success',  
-          text1: 'Amigo atualizado com sucesso!'
-        });
-    } catch (error) {
-        console.log("Erro ao atualizar");
-        Toast.show({
-          type: 'error',
-          text1: error.message || "Erro ao atualizar amigo"
-        });
-    }
-  };
 
   if (loading) {
     return (
