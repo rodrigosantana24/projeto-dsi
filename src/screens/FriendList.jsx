@@ -11,6 +11,21 @@ import SearchBar from '../components/search/SearchBar';
 import getFriendsFilter from '../services/getFriendsFilter';
 import AddButton from '../components/buttons/AddButton';
 import SearchGeneric from '../components/search/SearchGeneric';
+import AmigosService from '../services/AmigosService';
+import getNickName from '../services/getNickName';
+import FriendNickName from '../components/FriendNickName';
+
+const amigoService = new AmigosService();
+
+const handleUpdate = async({userId, friendEmail, nickName}) => {
+    try {
+        await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
+        Alert.alert("Amigo atualizado com sucesso!");
+    } catch (error) {
+        console.log("Erro ao atualizar");
+        Alert.alert(error.message || "Erro ao atualizar amigo");
+    }
+}
 
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
@@ -47,9 +62,14 @@ export default function FriendList() {
             <View key={amigo.uid} style={styles.friendBlock}>
               <Text style={styles.friendName}>{amigo.name}</Text>
               <Text style={styles.friendEmail}>{amigo.email}</Text>
+              <Text style={styles.subtitle}>Apelido:</Text>
+              <FriendNickName
+                userId={userCredentials.uid}
+                 amigoId={amigo.uid}
+                style={styles.nickName}
+              />
 
               <Text style={styles.subtitle}>Filmes Favoritos:</Text>
-              
               {amigo.favoritos.length === 0 ? (
                 <Text style={styles.noData}>Nenhum favorito.</Text>
               ) : (
@@ -153,6 +173,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 12,
     fontWeight: 'bold',
+
+  },
+  nickName: {
+    color: '#f4a03f',
+    fontSize: 14,
+    marginBottom: 12,
   },
 
   // Opção 2

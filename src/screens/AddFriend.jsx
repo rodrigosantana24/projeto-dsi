@@ -39,16 +39,6 @@ const handleRead = async({friendEmail = ""}) => {
     }
 }
 
-const handleUpdate = async({userId, friendEmail, nickName}) => {
-    try {
-        await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
-        Alert.alert("Amigo atualizado com sucesso!");
-    } catch (error) {
-        console.log("Erro ao atualizar");
-        Alert.alert(error.message || "Erro ao atualizar amigo");
-    }
-}
-
 export default function AddFriend() {
     const { userCredentials } = useContext(UserContext);
     const [search, setSearch] = useState('');
