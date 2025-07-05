@@ -1,49 +1,23 @@
-import { View, Text , StyleSheet, Alert} from 'react-native';
-import FriendForm from '../components/forms/FriendForm';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, Alert } from 'react-native';
+import { SwipeListView } from 'react-native-swipe-list-view';
+import { MaterialIcons } from '@expo/vector-icons';
+import HeaderBar from '../components/navi/HeaderBar';
+import SearchGeneric from '../components/search/SearchGeneric';
 import { UserContext } from '../Context/UserProvider';
 import AmigosService from '../services/AmigosService';
-import { useContext, useState} from 'react';
+import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
-import HeaderBar from '../components/navi/HeaderBar';
-import { TextInput } from '../components/inputs/TextInput';
-import { FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import React, { useEffect } from 'react';
-import getFriendFilter from '../services/getFriendsFilter';
-import SearchGeneric from '../components/search/SearchGeneric';
-const amigoService = new AmigosService();
 
-const handleAdicionar = async({userId, friendEmail}) =>{
-    try {
-        await amigoService.create({userId : userId , friendEmail : friendEmail})
-        Alert.alert("Amigo adicionado com sucesso!");
-    } catch (error) {
-        console.log("Erro ao adicionar");
-        Alert.alert(error.message || "Erro ao adicionar amigo");
-    } 
-}
-const handleRemover = async({userId, friendEmail}) =>{
-        try {
-            await amigoService.delete({userId : userId , friendEmail : friendEmail})
-            Alert.alert("Amigo removido com sucesso!");
-        } catch (error) {
-            Alert.alert(error.message || "Erro ao remover amigo");
-        }
-    }
-const handleRead = async({friendEmail = ""}) => {
-    try {
-        const users = await amigoService.read({friendEmail});
-        return users;
-    } catch (error) {
-        console.log("Erro ao buscar usuários");
-        Alert.alert(error.message || "Erro ao buscar usuários");
-    }
-}
+const PAGE_SIZE = 20;
+const amigoService = new AmigosService();
 
 export default function AddFriend() {
     const { userCredentials } = useContext(UserContext);
     const [search, setSearch] = useState('');
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -53,13 +27,11 @@ export default function AddFriend() {
     const carregarUsuarios = async () => {
         setLoading(true);
         const usersObj = await handleRead({friendEmail: search});
-        // usersObj pode ser undefined se der erro
         if (!usersObj) {
             setUsuarios([]);
             setLoading(false);
             return;
         }
-        // Transformar objeto em array
         const usersArr = Object.entries(usersObj).map(([id, data]) => ({
             id,
             ...data
@@ -68,47 +40,116 @@ export default function AddFriend() {
         setLoading(false);
     };
 
-    // Filtro usando getFriendFilter
-    
+    const handleAdicionar = async({userId, friendEmail}) => {
+        try {
+            await amigoService.create({userId, friendEmail});
+            Toast.show({
+                type: 'success',
+                text1: 'Amigo adicionado com sucesso!'
+            });
+            carregarUsuarios();
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: error.message || 'Erro ao adicionar amigo'
+            });
+        }
+    };
+
+    const handleRead = async({friendEmail = ""}) => {
+        try {
+            const users = await amigoService.read({friendEmail});
+            return users;
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: error.message || 'Erro ao buscar usuários'
+            });
+            return null;
+        }
+    };
+
+    const handleEndReached = () => {
+        if ((page * PAGE_SIZE) < usuarios.length) {
+            setPage(page + 1);
+        }
+    };
+
+    const dataToShow = usuarios.slice(0, page * PAGE_SIZE);
 
     const renderItem = ({ item }) => (
-        <View style={styles.card}>
+        <View style={styles.visibleContainer}>
             <Text style={styles.nome}>{item.name || 'Sem nome'}</Text>
             <Text style={styles.email}>{item.email}</Text>
-            <View style={styles.botoes}>
-                <TouchableOpacity
-                    style={[styles.botao, styles.adicionar]}
-                    onPress={() => handleAdicionar({ userId: userCredentials.uid, friendEmail: item.email })}
-                >
-                    <Text style={styles.botaoTexto}>Adicionar</Text>
-                </TouchableOpacity>
-            </View>
+        </View>
+    );
+
+    const renderHiddenItem = ({ item }) => (
+        <View style={styles.hiddenContainer}>
+            <TouchableOpacity
+                style={styles.addButton}
+                onPress={() => handleAdicionar({ 
+                    userId: userCredentials.uid, 
+                    friendEmail: item.email 
+                })}
+            >
+                <MaterialIcons name="person-add" size={28} color="#fff" />
+            </TouchableOpacity>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            <HeaderBar onBack={() => {navigation.goBack();navigation.replace('FriendList')}} title={"Adicionar Amigo"} />
-            <SearchGeneric
-                placeholder="Pesquisar..."
-                value={search}
-                onSearch={setSearch}
+            <HeaderBar 
+                onBack={() => {
+                    navigation.goBack();
+                    navigation.replace('FriendList');
+                }} 
+                title={"Adicionar Amigo"} 
             />
+            
+            <View style={styles.filterContainer}>
+                <View style={styles.searchContainer}>
+                    <SearchGeneric
+                        placeholder="Pesquisar amigos..."
+                        value={search}
+                        onSearch={setSearch}
+                    />
+                </View>
+            </View>
+
             {loading ? (
                 <ActivityIndicator size="large" color="#FFF" style={{ marginTop: 30 }} />
             ) : (
-                <FlatList
-                    data={usuarios}
+                <SwipeListView
+                    data={dataToShow}
                     keyExtractor={(item) => item.id}
                     renderItem={renderItem}
+                    renderHiddenItem={renderHiddenItem}
+                    rightOpenValue={-75}
+                    disableRightSwipe={false}
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.5}
                     contentContainerStyle={{ paddingBottom: 20 }}
                     ListEmptyComponent={
-                        <Text style={{ color: '#FFF', textAlign: 'center', marginTop: 30 }}>
+                        <Text style={{ color: '#fff', textAlign: 'center', margin: 20 }}>
                             Nenhum usuário encontrado.
                         </Text>
                     }
+                    ListFooterComponent={
+                        (page * PAGE_SIZE) < usuarios.length
+                            ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
+                            : null
+                    }
                 />
             )}
+
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() => navigation.navigate('AddFriend')}
+            >
+                <MaterialIcons name="add" size={32} color="#fff" />
+            </TouchableOpacity>
         </View>
     );
 }
@@ -118,70 +159,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     paddingTop: 25,
-    backgroundColor: '#072330', // Fundo escuro elegante
+    backgroundColor: '#072330',
   },
-
-  searchBar: {
-    backgroundColor: '#0e3a4d',
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    color: '#fff',
-    fontSize: 16,
+  filterContainer: {
+    flexDirection: 'row',
     marginBottom: 16,
   },
-
-  card: {
-    backgroundColor: '#113342',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 3,
+  searchContainer: {
+    flex: 2,
+    marginRight: 8,
   },
-
-  nome: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-
-  email: {
-    color: '#f4a03f',
-    fontSize: 14,
-    marginBottom: 12,
-  },
-
-  botoes: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: 10,
-  },
-
-  botao: {
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    borderRadius: 6,
-    marginLeft: 8,
-  },
-
-  botaoTexto: {
-    color: '#FFF',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-
-  adicionar: {
-    backgroundColor: '#2ecc40',
-  },
-
-  remover: {
-    backgroundColor: '#e74c3c',
-  },
-
   subheader: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -190,15 +177,56 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginLeft: 4,
   },
-
-  loading: {
-    marginTop: 30,
+  visibleContainer: {
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#0a3040',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0d3d52',
   },
-
-  emptyText: {
+  nome: {
     color: '#FFF',
-    textAlign: 'center',
-    marginTop: 30,
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  email: {
+    color: '#a0bcc8',
+    fontSize: 14,
+  },
+  hiddenContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end', 
+    alignItems: 'center',
+    backgroundColor: '#072330', 
+    paddingRight: 10,
+    paddingVertical: 4, 
+  },
+  addButton: {
+    backgroundColor: '#f4a03f',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 60,
+    height: '90%', 
+    borderRadius: 5, 
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
   },
 });
