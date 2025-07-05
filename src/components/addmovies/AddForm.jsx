@@ -19,7 +19,7 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
     if (Object.keys(newErrors).length > 0) {
       Toast.show({
         type: 'error',
-        text1: 'Campos obrigatórios',
+        text1: 'Preencha todos os campos',
         text2: 'Por favor, preencha todos os campos destacados.',
         position: 'top',
       });
@@ -31,7 +31,7 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
 
       Toast.show({
         type: 'success',
-        text1: isEditing ? 'Editado!' : 'Filme salvo com sucesso!',
+        text1: isEditing ? 'Filme editado com sucesso!' : 'Filme adicionado com sucesso!',
         text2: isEditing ? 'As alterações foram salvas com sucesso.' : 'O novo filme foi adicionado à sua lista.',
         position: 'top',
         visibilityTime: 2000,

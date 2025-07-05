@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    paddingTop: 30,
     backgroundColor: '#072330',
   },
   loading: {
@@ -167,8 +168,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   poster: {
-    width: '100%',
+    width: '80%',
     height: 400,
+    alignSelf: 'center',
     borderRadius: 8,
   },
   titleRow: {

@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 5
+    paddingTop: 30
   },
   loadingContainer: {
     justifyContent: 'center',
