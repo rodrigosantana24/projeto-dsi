@@ -15,6 +15,7 @@ import AmigosService from '../services/AmigosService';
 import getNickName from '../services/getNickName';
 import FriendNickName from '../components/FriendNickName';
 import {Alert} from 'react-native';
+import Toast from 'react-native-toast-message';
 
 const amigoService = new AmigosService();
 
@@ -30,20 +31,31 @@ export default function FriendList() {
   const handleRemover = async({userId, friendEmail}) =>{
         try {
           await amigoService.delete({userId : userId , friendEmail : friendEmail})
-          Alert.alert("Amigo removido com sucesso!", "", [
-            {text: "OK", onPress: () => navigation.replace('FriendList')}
-          ]);
+          Toast.show({
+            type: 'success',
+            text1: 'Amigo removido com sucesso!'
+          });
+          navigation.replace('FriendList')
         } catch (error) {
-            Alert.alert(error.message || "Erro ao remover amigo");
+            Toast.show({
+              type: 'error',  
+              text1: error.message || "Erro ao remover amigo"
+            });
         }
   };
   const handleUpdate = async({userId, friendEmail, nickName}) => {
     try {
         await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
-        Alert.alert("Amigo atualizado com sucesso!");
+        Toast.show({
+          type: 'success',  
+          text1: 'Amigo atualizado com sucesso!'
+        });
     } catch (error) {
         console.log("Erro ao atualizar");
-        Alert.alert(error.message || "Erro ao atualizar amigo");
+        Toast.show({
+          type: 'error',
+          text1: error.message || "Erro ao atualizar amigo"
+        });
     }
   };
 
