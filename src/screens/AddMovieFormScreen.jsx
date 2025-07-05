@@ -15,19 +15,19 @@ import Icon from 'react-native-vector-icons/Feather';
 import HeaderBar from '../components/navi/HeaderBar';
 import FilmeService from '../services/FilmeService';
 import AddForm from '../components/addmovies/AddForm';
-import Genero from '../models/Genero'; // Importar modelo Genero
-import Ator from '../models/Ator';     // Importar modelo Ator
+import Genero from '../models/Genero'; 
+import Ator from '../models/Ator';     
 
 const filmeService = new FilmeService();
 export default class MovieFormScreen extends React.Component {
   state = {
     title: '',
     poster_path: '',
-    generos: [], // Agora armazena objetos {id, nome}
-    atores: [],  // Agora armazena objetos {id, nome}
+    generos: [],
+    atores: [],
     editandoId: null,
-    generosList: [], // Lista de todos os objetos de gênero disponíveis
-    atoresList: [],  // Lista de todos os objetos de ator disponíveis
+    generosList: [],
+    atoresList: [],
     isModalVisible: false,
     modalData: [],
     modalTitle: '',
@@ -35,12 +35,11 @@ export default class MovieFormScreen extends React.Component {
   };
 
   async componentDidMount() {
-    await this.fetchOptions(); // Garante que as listas estejam carregadas
+    await this.fetchOptions(); 
     const filmeParaEditar = this.props.route.params?.filme;
     if (filmeParaEditar) {
-      // Mapeia os IDs do filme para os objetos completos para popular o estado
-      const generosSelecionados = this.state.generosList.filter(g => filmeParaEditar.genero_ids[g.id]);
-      const atoresSelecionados = this.state.atoresList.filter(a => filmeParaEditar.ator_ids[a.id]);
+      const generosSelecionados = this.state.generosList.filter(g => filmeParaEditar.genero_ids && filmeParaEditar.genero_ids[g.id]);
+      const atoresSelecionados = this.state.atoresList.filter(a => filmeParaEditar.ator_ids && filmeParaEditar.ator_ids[a.id]);
 
       this.setState({
         title: filmeParaEditar.title,
@@ -55,8 +54,8 @@ export default class MovieFormScreen extends React.Component {
   fetchOptions = async () => {
     try {
       const [generosList, atoresList] = await Promise.all([
-        Genero.getGenerosFromFirebase(false), // Busca objetos completos
-        Ator.getAtoresFromFirebase(false)     // Busca objetos completos
+        Genero.getGenerosFromFirebase(false),
+        Ator.getAtoresFromFirebase(false)
       ]);
       this.setState({ generosList, atoresList });
     } catch (e) {
@@ -69,11 +68,9 @@ export default class MovieFormScreen extends React.Component {
   handleSave = async () => {
     const { title, poster_path, generos, atores, editandoId } = this.state;
     if (!title || !poster_path || generos.length === 0 || atores.length === 0) {
-      // A validação de campos vazios no AddForm já trata isso visualmente
       return;
     }
     try {
-      // Converte os arrays de objetos para o formato { id: true }
       const genero_ids = generos.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
       const ator_ids = atores.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
 
@@ -109,7 +106,6 @@ export default class MovieFormScreen extends React.Component {
   handleSelection = (item) => {
     const { editingField } = this.state;
     const currentSelection = this.state[editingField];
-    // Verifica se o item já foi selecionado pelo ID
     if (currentSelection.some(i => i.id === item.id)) {
       this.setState({ [editingField]: currentSelection.filter(i => i.id !== item.id) });
     } else {
@@ -123,11 +119,17 @@ export default class MovieFormScreen extends React.Component {
 
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
-        {/* ... HeaderBar e ScrollView ... */}
+        <View style={styles.headerContainer}>
+          <HeaderBar
+            onBack={() => this.props.navigation.goBack()}
+            title={editandoId ? 'Editar Filme' : 'Adicionar Filme'}
+          />
+        </View>
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AddForm
             {...this.state}
-            isEditing={!!editandoId} // Passa um booleano claro
+            isEditing={!!editandoId}
             onChange={this.handleChange}
             onSave={this.handleSave}
             onCancel={this.handleCancel}
@@ -145,12 +147,16 @@ export default class MovieFormScreen extends React.Component {
             <View style={styles.modalBackdrop}>
               <TouchableWithoutFeedback>
                 <View style={styles.modalContent}>
-                  {/* ... Modal Header ... */}
+                  <View style={styles.modalHeader}>
+                    <Text style={styles.modalTitle}>{modalTitle}</Text>
+                    <TouchableOpacity onPress={() => this.setState({ isModalVisible: false })}>
+                      <Icon name="x" size={24} color="#B0B0B0" />
+                    </TouchableOpacity>
+                  </View>
                   <FlatList
                     data={modalData}
-                    keyExtractor={(item) => item.id.toString()} // Usa o ID como chave
+                    keyExtractor={(item) => item.id}
                     renderItem={({ item }) => {
-                      // Verifica a seleção pelo ID
                       const isSelected = currentSelection.some(i => i.id === item.id);
                       return (
                         <TouchableOpacity style={styles.modalOption} onPress={() => this.handleSelection(item)}>
@@ -160,7 +166,9 @@ export default class MovieFormScreen extends React.Component {
                       );
                     }}
                   />
-                  {/* ... Modal Close Button ... */}
+                  <TouchableOpacity style={styles.modalCloseButton} onPress={() => this.setState({ isModalVisible: false })}>
+                    <Text style={styles.modalCloseButtonText}>Concluir</Text>
+                  </TouchableOpacity>
                 </View>
               </TouchableWithoutFeedback>
             </View>
@@ -188,9 +196,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#072330',
   },
-  headerButton: { width: 30 },
-  header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
