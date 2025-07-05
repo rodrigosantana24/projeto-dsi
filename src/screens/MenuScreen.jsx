@@ -1,26 +1,44 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { Logo } from '../components/logo/Logo';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import FavoriteMovieScreen from './FavoriteMovieScreen';
 import AddMovieScreen from '../screens/AddMovieScreen';
 import GenresListScreen from './GenresListScreen';
 import ActorsListScreen from './ActorsListScreen';
-import ToScheduleScreen from './ToScheduleScreen';
 import { UserContext } from '../Context/UserProvider';
 import FriendList from './FriendList';
-import AddFriend from '../screens/AddFriend';
-import FilteringMovieScreen from '../screens/FilteringMovieScreen';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { signOut } from 'firebase/auth';
-import { auth } from '../configs/firebaseConfig';
+import { auth, database } from '../configs/firebaseConfig';
+import { ref, get } from 'firebase/database';
+
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const { setUserCredentials } = useContext(UserContext);
+  const { userCredentials, setUserCredentials } = useContext(UserContext);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (userCredentials?.uid) {
+        const nameRef = ref(database, `usuarios/${userCredentials.uid}/name`);
+        const snapshot = await get(nameRef);
+        
+        if (snapshot.exists()) {
+          setUserName(snapshot.val());
+        } else {
+          setUserName(userCredentials.email);
+        }
+      }
+    };
+
+    fetchUserName();
+  }, [userCredentials]); 
+
 
   const handleLogout = async () => {
     try {
@@ -36,12 +54,14 @@ const ProfileScreen = () => {
     }
   };
 
-  const {userCredentials} = useContext(UserContext)
   return ( 
       <View style={styles.container}>
         <View style={styles.header}>
-            <Text style={styles.username}>{userCredentials.email}</Text>
-            <FontAwesome name="user-circle-o" size={50} color="white"/>
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.username}>{userName}</Text>
+            <Text style={styles.email}>{userCredentials.email}</Text>
+          </View>
+          <Logo style={{ width: 100, height: 100 }} />
         </View>
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
@@ -144,7 +164,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 60,
+    paddingTop: 50,
     paddingHorizontal: 20,
   },
   content: {
@@ -160,16 +180,21 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'flex-end',
-    gap: 50,
-    marginRight: 10,
-    marginBottom: 60,
+    justifyContent:'space-between',
+    marginBottom: 35,
+  },
+  userInfoContainer: {
+    alignItems: 'flex-start',
+    marginLeft: 20,
   },
   username: {
-    marginTop: 10,
     color: 'white',
-    fontSize: 18,
+    fontSize: 28, 
     fontWeight: 'bold',
+  },
+  email: {
+    color: '#ccc', 
+    fontSize: 18, 
   },
   menuContainer: {
     backgroundColor: '#192936',
@@ -219,7 +244,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-
 });
 
 export default ProfileScreen;
