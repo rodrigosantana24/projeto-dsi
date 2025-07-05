@@ -1,5 +1,7 @@
 import { ref, get, query, limitToFirst, orderByKey, orderByChild, equalTo, startAt, endAt } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
+import Genero from './Genero'; 
+import Ator from './Ator';
 
 export default class Filme {
   constructor(
@@ -20,7 +22,9 @@ export default class Filme {
     release_date = '',
     vote_average = 0,
     vote_count = 0,
-    credits = '' // <-- Adicionado credits
+    credits = '',
+    genero_ids = {}, 
+    ator_ids = {}
   ) {
     this.id = id;
     this.title = title;
@@ -39,7 +43,9 @@ export default class Filme {
     this.release_date = release_date;
     this.vote_average = vote_average;
     this.vote_count = vote_count;
-    this.credits = credits; // <-- Adicionado credits
+    this.credits = credits; 
+    this.genero_ids = genero_ids; 
+    this.ator_ids = ator_ids;     
   }
 
   getImageUrl() {
@@ -50,15 +56,15 @@ export default class Filme {
   }
 
   isValid() {
-    return !!(this.title && this.genero && this.atores);
+    return !!(this.title && this.poster_path && Object.keys(this.genero_ids).length > 0 && Object.keys(this.ator_ids).length > 0);
   }
 
   toFirebase() {
     return {
       title: this.title,
       poster_path: this.poster_path,
-      genero: this.genero,
-      atores: this.atores,
+      genero_ids: this.genero_ids,
+      ator_ids: this.ator_ids,
       nativo: this.nativo ?? false,
     };
   }
@@ -89,7 +95,9 @@ export default class Filme {
       data.release_date || '',
       data.vote_average || 0,
       data.vote_count || 0,
-      data.credits || '' // <-- Adicionado credits
+      data.credits || '', 
+      data.genero_ids || {}, 
+      data.ator_ids || {}   
     );
   }
 
@@ -163,17 +171,36 @@ export default class Filme {
   }
 
   static async getFilmesCriadosFromFirebase(useCache = true) {
-    if (useCache && this.cacheAlt) return this.cacheAlt;
     const filmesRef = ref(database, 'filmes_criados');
     const snapshot = await get(filmesRef);
     if (!snapshot.exists()) {
       return [];
     }
+    const [generos, atores] = await Promise.all([
+      Genero.getGenerosFromFirebase(false),
+      Ator.getAtoresFromFirebase(false)
+    ]);
+    const generosMap = generos.reduce((acc, g) => ({ ...acc, [g.id]: g.nome }), {});
+    const atoresMap = atores.reduce((acc, a) => ({ ...acc, [a.id]: a.nome }), {});
     const data = snapshot.val();
-    const filmes = Object.entries(data).map(
-      ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
-    );
-    if (useCache) this.cacheAlt = filmes;
+    const filmes = Object.entries(data).map(([id, filmeData]) => {
+      const filme = Filme.fromFirebase(id, filmeData);
+      
+      if (filme.genero_ids) {
+        filme.genero = Object.keys(filme.genero_ids)
+          .map(generoId => generosMap[generoId] || '')
+          .filter(Boolean)
+          .join(', ');
+      }
+      if (filme.ator_ids) {
+        filme.atores = Object.keys(filme.ator_ids)
+          .map(atorId => atoresMap[atorId] || '')
+          .filter(Boolean)
+          .join(', ');
+      }
+      return filme;
+    });
+
     return filmes;
   }
 }

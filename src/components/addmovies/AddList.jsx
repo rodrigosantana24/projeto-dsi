@@ -1,8 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
-// Este é um exemplo de como seu AddList poderia parecer.
-// Adapte ao seu layout atual, removendo os botões de editar/excluir.
 const AddList = ({ item }) => {
   return (
     <View style={styles.itemContainer}>
