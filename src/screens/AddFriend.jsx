@@ -82,19 +82,13 @@ export default function AddFriend() {
                 >
                     <Text style={styles.botaoTexto}>Adicionar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.botao, styles.remover]}
-                    onPress={() => handleRemover({ userId: userCredentials.uid, friendEmail: item.email })}
-                >
-                    <Text style={styles.botaoTexto}>Remover</Text>
-                </TouchableOpacity>
             </View>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            <HeaderBar onBack={() => navigation.goBack()} title={"Adicionar Amigo"} />
+            <HeaderBar onBack={() => {navigation.goBack();navigation.replace('FriendList')}} title={"Adicionar Amigo"} />
             <SearchGeneric
                 placeholder="Pesquisar..."
                 value={search}

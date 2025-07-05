@@ -14,18 +14,10 @@ import SearchGeneric from '../components/search/SearchGeneric';
 import AmigosService from '../services/AmigosService';
 import getNickName from '../services/getNickName';
 import FriendNickName from '../components/FriendNickName';
+import {Alert} from 'react-native';
 
 const amigoService = new AmigosService();
 
-const handleUpdate = async({userId, friendEmail, nickName}) => {
-    try {
-        await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
-        Alert.alert("Amigo atualizado com sucesso!");
-    } catch (error) {
-        console.log("Erro ao atualizar");
-        Alert.alert(error.message || "Erro ao atualizar amigo");
-    }
-}
 
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
@@ -34,6 +26,26 @@ export default function FriendList() {
   const friendsArray = Array.isArray(amigos) ? amigos : [];
   const filteredFriends = getFriendsFilter(friendsArray, searchText);  
   const navigation = useNavigation();
+
+  const handleRemover = async({userId, friendEmail}) =>{
+        try {
+          await amigoService.delete({userId : userId , friendEmail : friendEmail})
+          Alert.alert("Amigo removido com sucesso!", "", [
+            {text: "OK", onPress: () => navigation.replace('FriendList')}
+          ]);
+        } catch (error) {
+            Alert.alert(error.message || "Erro ao remover amigo");
+        }
+  };
+  const handleUpdate = async({userId, friendEmail, nickName}) => {
+    try {
+        await amigoService.update({userId : userId , nickName: nickName , friendEmail : friendEmail})
+        Alert.alert("Amigo atualizado com sucesso!");
+    } catch (error) {
+        console.log("Erro ao atualizar");
+        Alert.alert(error.message || "Erro ao atualizar amigo");
+    }
+  };
 
   if (loading) {
     return (
@@ -60,12 +72,20 @@ export default function FriendList() {
         ) : (
           filteredFriends.map((amigo) => (
             <View key={amigo.uid} style={styles.friendBlock}>
-              <Text style={styles.friendName}>{amigo.name}</Text>
+              <View style={styles.friendHeader}>
+                <Text style={styles.friendName}>{amigo.name}</Text>
+                <TouchableOpacity
+                  onPress={() => handleRemover({ userId: userCredentials.uid, friendEmail: amigo.email })}
+                  style={styles.removeButton}
+                >
+                  <MaterialIcons name="delete" size={28} color="#f4a03f" />
+                </TouchableOpacity>
+              </View>
               <Text style={styles.friendEmail}>{amigo.email}</Text>
-              <Text style={styles.subtitle}>Apelido:</Text>
+
               <FriendNickName
                 userId={userCredentials.uid}
-                 amigoId={amigo.uid}
+                amigoId={amigo.uid}
                 style={styles.nickName}
               />
 
@@ -178,7 +198,7 @@ const styles = StyleSheet.create({
   nickName: {
     color: '#f4a03f',
     fontSize: 14,
-    marginBottom: 12,
+    marginBottom: 15,
   },
 
   // Opção 2
@@ -191,6 +211,14 @@ const styles = StyleSheet.create({
   },
   movieInfo: {
     padding: 10,
+  },
+  friendHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  removeButton: {
+    padding: 5,
   },
 });
 
