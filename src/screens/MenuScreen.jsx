@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, TouchableOpacity} from 'react-native';
-import { Ionicons, MaterialIcons, FontAwesome, AntDesign } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, AntDesign } from '@expo/vector-icons';
+import { Logo } from '../components/logo/Logo';
 import ProfileButton from '../components/buttons/ProfileButton';
 import BottomTab from '../components/navi/BottomTab'
 import { useNavigation } from '@react-navigation/native';
@@ -56,11 +57,11 @@ const ProfileScreen = () => {
   return ( 
       <View style={styles.container}>
         <View style={styles.header}>
-            <View style={styles.userInfoContainer}>
-              <Text style={styles.username}>{userName}</Text>
-              <Text style={styles.email}>{userCredentials.email}</Text>
-            </View>
-            <FontAwesome name="user-circle-o" size={50} color="white"/>
+          <View style={styles.userInfoContainer}>
+            <Text style={styles.username}>{userName}</Text>
+            <Text style={styles.email}>{userCredentials.email}</Text>
+          </View>
+          <Logo style={{ width: 100, height: 100 }} />
         </View>
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
@@ -176,25 +177,28 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1,
   },
+  logo: {
+    width: 220,
+    height: 220,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent:'space-between', // Alterado para space-between
+    justifyContent:'space-between',
     marginBottom: 60,
   },
-  // NOVO: Container para agrupar nome e email
   userInfoContainer: {
     alignItems: 'flex-start',
+    marginLeft: 20,
   },
   username: {
     color: 'white',
-    fontSize: 20, // Aumentado para dar destaque
+    fontSize: 28, 
     fontWeight: 'bold',
   },
-  // NOVO: Estilo para o email
   email: {
-    color: '#ccc', // Cor mais suave
-    fontSize: 14, // Fonte menor
+    color: '#ccc', 
+    fontSize: 18, 
   },
   menuContainer: {
     backgroundColor: '#192936',
@@ -244,7 +248,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-
 });
 
 export default ProfileScreen;
