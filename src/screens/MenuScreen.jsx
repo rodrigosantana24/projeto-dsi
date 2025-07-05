@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 60,
+    paddingTop: 50,
     paddingHorizontal: 20,
   },
   content: {
@@ -177,15 +177,11 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1,
   },
-  logo: {
-    width: 220,
-    height: 220,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent:'space-between',
-    marginBottom: 60,
+    marginBottom: 35,
   },
   userInfoContainer: {
     alignItems: 'flex-start',
