@@ -63,10 +63,6 @@ export default class HomeController {
     return this.erro;
   }
 
-  async getFilmesByPrimaryGenreIdLimited(genreId, limit = 10) {
-    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
-  }
-
   async getFilmesByPrimaryGenreId(genreId, limit = 100) {
     return await Filme.getFilmesByPrimaryGenreId(genreId, limit);r
   }
