@@ -87,7 +87,7 @@ async read({ friendEmail }: FriendReadParams = {}): Promise<any> {
 
   async update({ userId, nickName , friendId}: FriendParams): Promise<any> {
     const db = getDatabase();
-    const amigoRef = ref(db, `/usuarios/${userId}/amigos/${friendId}`);
+    const amigoRef = ref(db, `/usuarios/${userId}/amigos/${friendId}/nickname`);
 
     try {
       await update(amigoRef, {
