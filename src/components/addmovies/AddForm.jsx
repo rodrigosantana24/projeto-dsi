@@ -92,9 +92,8 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
           }}
         >
           <Text style={styles.selectButtonText} numberOfLines={1}>
-            {generos.length > 0 ? generos.join(', ') : 'Clique para selecionar'}
+            {generos.length > 0 ? generos.map(g => g.nome).join(', ') : 'Clique para selecionar'}
           </Text>
-          <Icon name="tag" size={20} color="#f4a03f" />
         </TouchableOpacity>
 
         <Text style={styles.label}>Atores Principais</Text>
@@ -106,9 +105,8 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
           }}
         >
           <Text style={styles.selectButtonText} numberOfLines={1}>
-            {atores.length > 0 ? atores.join(', ') : 'Clique para selecionar'}
+            {atores.length > 0 ? atores.map(a => a.nome).join(', ') : 'Clique para selecionar'}
           </Text>
-          <Icon name="users" size={20} color="#f4a03f" />
         </TouchableOpacity>
       </View>
 
