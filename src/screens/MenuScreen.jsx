@@ -66,6 +66,7 @@ const ProfileScreen = () => {
         </View>
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
             <ProfileButton 
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 50,
+    paddingTop: 40,
     paddingHorizontal: 20,
   },
   content: {
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent:'space-between',
-    marginBottom: 35,
+    marginBottom: 20,
   },
   userInfoContainer: {
     alignItems: 'flex-start',
