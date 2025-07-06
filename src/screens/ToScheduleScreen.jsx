@@ -5,10 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Keyboard,
-  Alert,
   Pressable,
-  Animated
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
@@ -17,15 +14,13 @@ import { Ionicons } from "@expo/vector-icons";
 import {  MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AddButton from "../components/buttons/AddButton";
+import Toast from "react-native-toast-message";
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
   const { userCredentials } = useContext(UserContext);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [novoFilme, setNovoFilme] = useState('');
-  const [novaData, setNovaData] = useState('');
-  const [novaHora, setNovaHora] = useState('');
   const [filtro, setFiltro] = useState("nenhum"); 
   const [valorFiltro, setValorFiltro] = useState('');
 
@@ -46,10 +41,19 @@ export default function ToScheduleScreen() {
   async function excluirAgendamento(id) {
     try {
       await service.delete({ userId: userCredentials.uid, id });
-      Alert.alert("Agendamento excluído");
+      Toast.show({
+        type: 'success',
+        text1: 'Agendamento excluído com sucesso!',
+        visibilityTime: 3000,
+      });
       setAgendamentos((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error(error);
+      Toast.show({
+        type: 'error',
+        text1: 'Erro ao excluir agendamento',
+        visibilityTime: 4000,
+      });
     }
   }
 
@@ -111,61 +115,6 @@ export default function ToScheduleScreen() {
 }
 
   const agendamentosFiltrados = filtrarAgendamentos();
-
-  const handleAddAgendamento = async () => {
-  if (!novoFilme || !novaData || !novaHora) {
-    alert("Preencha todos os campos");
-    return;
-  }
-
-  const partesData = novaData.split("/");
-  if (partesData.length !== 3) {
-    alert("Data inválida! Use o formato DD/MM/YYYY");
-    return;
-  }
-
-  const [dia, mes, ano] = partesData;
-  const dataInformada = new Date(`${ano}-${mes}-${dia}T00:00:00`);
-  if (isNaN(dataInformada)) {
-    alert("Data inválida! Use o formato DD/MM/YYYY");
-    return;
-  }
-
-  const dataAtual = new Date();
-  dataAtual.setHours(0, 0, 0, 0);
-
-  if (dataInformada < dataAtual) {
-    alert("Data inválida! A data deve ser hoje ou uma data futura.");
-    return;
-  }
-
-  
-  if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(novaHora)) {
-    alert("Hora inválida! Use o formato HH:mm");
-    return;
-  }
-
-  try {
-    const dataISO = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-    await service.create({
-      userId: userCredentials.uid,
-      filmeId: novoFilme,
-      data: dataISO,
-      hora: novaHora,
-    });
-    setNovoFilme("");
-    setNovaData("");
-    setNovaHora("");
-    setBuscaFilme("");
-    setFilmesFiltrados([]);
-    setFilmesPagina([]);
-    setPaginaAtual(0);
-    await carregarAgendamentos();
-    Keyboard.dismiss();
-  } catch (error) {
-    console.error("Erro ao adicionar agendamento:", error);
-  }
-  };
 
   useFocusEffect(
     useCallback(() => {
@@ -401,7 +350,5 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
   },
-  pressed: {
 
-  }
 });

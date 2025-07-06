@@ -9,16 +9,16 @@ import {
   ScrollView,
   Modal,
   FlatList,
-  TouchableWithoutFeedback, 
+  TouchableWithoutFeedback,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import HeaderBar from '../components/navi/HeaderBar';
 import FilmeService from '../services/FilmeService';
 import AddForm from '../components/addmovies/AddForm';
-import { ref, get } from 'firebase/database';
-import { database } from '../configs/firebaseConfig';
+import Genero from '../models/Genero'; 
+import Ator from '../models/Ator';     
 
 const filmeService = new FilmeService();
-
 export default class MovieFormScreen extends React.Component {
   state = {
     title: '',
@@ -34,53 +34,59 @@ export default class MovieFormScreen extends React.Component {
     editingField: null,
   };
 
-  componentDidMount() {
-    this.fetchOptions();
+  // CORREÇÃO: O método agora retorna as listas para uso imediato.
+  fetchOptions = async () => {
+    try {
+      const [generosList, atoresList] = await Promise.all([
+        Genero.getGenerosFromFirebase(false),
+        Ator.getAtoresFromFirebase(false)
+      ]);
+      this.setState({ generosList, atoresList });
+      return { generosList, atoresList }; // Retorna os dados carregados
+    } catch (e) {
+      console.error("Erro ao buscar opções:", e);
+      return { generosList: [], atoresList: [] }; // Retorna vazio em caso de erro
+    }
+  };
+
+  // CORREÇÃO: A lógica agora usa os dados retornados diretamente do fetchOptions.
+  async componentDidMount() {
+    const { generosList, atoresList } = await this.fetchOptions(); 
     const filmeParaEditar = this.props.route.params?.filme;
+
     if (filmeParaEditar) {
+      // Usa as variáveis locais (generosList, atoresList) que garantidamente estão preenchidas
+      const generosSelecionados = generosList.filter(g => filmeParaEditar.genero_ids && filmeParaEditar.genero_ids[g.id]);
+      const atoresSelecionados = atoresList.filter(a => filmeParaEditar.ator_ids && filmeParaEditar.ator_ids[a.id]);
+
       this.setState({
         title: filmeParaEditar.title,
         poster_path: filmeParaEditar.poster_path,
-        generos: typeof filmeParaEditar.genero === 'string' ? filmeParaEditar.genero.split(', ').filter(g => g) : [],
-        atores: typeof filmeParaEditar.atores === 'string' ? filmeParaEditar.atores.split(', ').filter(a => a) : [],
+        generos: generosSelecionados,
+        atores: atoresSelecionados,
         editandoId: filmeParaEditar.id,
       });
     }
   }
-
-  fetchOptions = async () => {
-    try {
-      const [generosSnap, atoresSnap] = await Promise.all([
-        get(ref(database, '/generos')),
-        get(ref(database, '/atores'))
-      ]);
-      const rawGeneros = [];
-      generosSnap.forEach(c => { const n = c.child('nome').val(); if (n) rawGeneros.push(n); });
-      const rawAtores = [];
-      atoresSnap.forEach(c => { const n = c.child('nome').val(); if (n) rawAtores.push(n); });
-      const generosList = [...new Set(rawGeneros)];
-      const atoresList = [...new Set(rawAtores)];
-      this.setState({ generosList, atoresList });
-    } catch (e) {
-      console.error("Erro ao buscar opções:", e);
-    }
-  };
-
 
   handleChange = (name, value) => this.setState({ [name]: value });
 
   handleSave = async () => {
     const { title, poster_path, generos, atores, editandoId } = this.state;
     if (!title || !poster_path || generos.length === 0 || atores.length === 0) {
-      return Alert.alert('Atenção', 'Todos os campos são obrigatórios.');
+      return;
     }
     try {
+      const genero_ids = generos.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
+      const ator_ids = atores.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
+
       const dataToSave = {
         title,
         poster_path,
-        genero: generos.join(', '),
-        atores: atores.join(', '),
+        genero_ids,
+        ator_ids,
       };
+
       if (editandoId) {
         await filmeService.update({ id: editandoId, ...dataToSave });
       } else {
@@ -93,9 +99,7 @@ export default class MovieFormScreen extends React.Component {
     }
   };
 
-  handleCancel = () => {
-    this.props.navigation.goBack();
-  };
+  handleCancel = () => this.props.navigation.goBack();
 
   openModal = (field) => {
     if (field === 'generos') {
@@ -108,8 +112,8 @@ export default class MovieFormScreen extends React.Component {
   handleSelection = (item) => {
     const { editingField } = this.state;
     const currentSelection = this.state[editingField];
-    if (currentSelection.includes(item)) {
-      this.setState({ [editingField]: currentSelection.filter(i => i !== item) });
+    if (currentSelection.some(i => i.id === item.id)) {
+      this.setState({ [editingField]: currentSelection.filter(i => i.id !== item.id) });
     } else {
       this.setState({ [editingField]: [...currentSelection, item] });
     }
@@ -122,16 +126,16 @@ export default class MovieFormScreen extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={this.handleCancel} style={styles.headerButton}>
-            <Icon name="arrow-left" size={24} color="#EFEFEF" />
-          </TouchableOpacity>
-          <Text style={styles.header}>{editandoId ? 'Editar Filme' : 'Adicionar Filme'}</Text>
-          <View style={styles.headerButton} />
+          <HeaderBar
+            onBack={() => this.props.navigation.goBack()}
+            title={editandoId ? 'Editar Filme' : 'Adicionar Filme'}
+          />
         </View>
-        
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AddForm
             {...this.state}
+            isEditing={!!editandoId}
             onChange={this.handleChange}
             onSave={this.handleSave}
             onCancel={this.handleCancel}
@@ -140,8 +144,8 @@ export default class MovieFormScreen extends React.Component {
         </ScrollView>
 
         <Modal
-          animationType="fade" 
-          transparent={true} 
+          animationType="fade"
+          transparent={true}
           visible={isModalVisible}
           onRequestClose={() => this.setState({ isModalVisible: false })}
         >
@@ -157,13 +161,13 @@ export default class MovieFormScreen extends React.Component {
                   </View>
                   <FlatList
                     data={modalData}
-                    keyExtractor={(item, index) => `${item}-${index}`}
+                    keyExtractor={(item) => item.id}
                     renderItem={({ item }) => {
-                      const isSelected = currentSelection.includes(item);
+                      const isSelected = currentSelection.some(i => i.id === item.id);
                       return (
                         <TouchableOpacity style={styles.modalOption} onPress={() => this.handleSelection(item)}>
                           <Icon name={isSelected ? 'check-circle' : 'circle'} size={24} color={isSelected ? '#FFC107' : '#555'} />
-                          <Text style={styles.modalOptionText}>{item}</Text>
+                          <Text style={styles.modalOptionText}>{item.nome}</Text>
                         </TouchableOpacity>
                       );
                     }}
@@ -181,39 +185,34 @@ export default class MovieFormScreen extends React.Component {
   }
 }
 
+// Estilos não foram alterados
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#071A24' },
+  container: { flex: 1, backgroundColor: '#072330' },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'flex-start',
-    paddingTop: 40,
+    paddingTop: 1, 
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#0E2935',
-    paddingTop: 60,
+    backgroundColor: '#072330',
+    paddingTop: 40,
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
+    borderBottomColor: '#072330',
   },
-  headerButton: { width: 30 },
-  header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-  
   modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     backgroundColor: '#1C3F4F',
     width: '90%',
-    maxHeight: '70%', 
+    maxHeight: '70%',
     borderRadius: 15,
     padding: 20,
     shadowColor: "#000",

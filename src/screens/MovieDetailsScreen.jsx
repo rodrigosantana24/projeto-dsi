@@ -39,6 +39,15 @@ export default function MovieDetailsScreen({ navigation, route }) {
     init();
   }, []);
 
+  const formatarElenco = (elenco) => {
+    if (!elenco || typeof elenco !== 'string' || elenco.trim() === '') {
+      return 'Elenco não disponível';
+    }
+    const atoresArray = elenco.split('-');
+    const atoresLimitados = atoresArray.slice(0, 10); 
+    return atoresLimitados.join(', ');
+  };
+
   const checkIfFavorite = async () => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -137,7 +146,7 @@ export default function MovieDetailsScreen({ navigation, route }) {
 
           <View style={styles.infoBox}>
             <Text style={styles.infoTitle}>Elenco</Text>
-            <Text style={styles.infoText}>{filme.credits}</Text>
+            <Text style={styles.infoText}>{formatarElenco(filme.credits)}</Text>
           </View>
 
           <View style={styles.infoBox}>
@@ -158,6 +167,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    paddingTop: 30,
     backgroundColor: '#072330',
   },
   loading: {
@@ -167,8 +177,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   poster: {
-    width: '100%',
+    width: '80%',
     height: 400,
+    alignSelf: 'center',
     borderRadius: 8,
   },
   titleRow: {

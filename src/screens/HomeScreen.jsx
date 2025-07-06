@@ -25,11 +25,11 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     const carregarDados = async () => {
       await controller.carregarFilmes();
-      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreIdLimited(0);
+      const filmesAcaoAventura = await controller.getFilmesByPrimaryGenreId(genreId = 0, limit = 10);
       setAcaoAventuraFilmes(filmesAcaoAventura);
-      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreIdLimited(6);
+      const filmesDramaSuspense = await controller.getFilmesByPrimaryGenreId(genreId = 6, limit = 10);
       setDramaSuspenseFilmes(filmesDramaSuspense);
-      const terrorFilmes = await controller.getFilmesByPrimaryGenreIdLimited(10);
+      const terrorFilmes = await controller.getFilmesByPrimaryGenreId(genreId = 10, limit = 10);
       setFilmesterrorFilmes(terrorFilmes);
       setCarregando(false);
     };
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#072330',
-    paddingTop: 5
+    paddingTop: 30
   },
   loadingContainer: {
     justifyContent: 'center',
