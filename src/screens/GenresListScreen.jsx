@@ -9,6 +9,7 @@ import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
 import Toast from 'react-native-toast-message';
+import CustomModal from '../components/modal/CustomModal'; 
 
 const generoService = new GeneroService();
 const PAGE_SIZE = 20;
@@ -20,6 +21,8 @@ export default class GenresListScreen extends React.Component {
     searchText: '',
     filterNativo: 'all',
     page: 1,
+    showDeleteModal: false,
+    generoParaExcluir: null,
   };
 
   unsubscribeFocus = null;
@@ -98,36 +101,45 @@ export default class GenresListScreen extends React.Component {
   };
 
   handleDelete = (id) => {
-    Alert.alert('Confirmar', 'Deseja excluir este gênero?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await generoService.delete({ id });
-            this.setState((prev) => ({
-              generos: prev.generos.filter(g => g.id !== id),
-              filteredGeneros: prev.filteredGeneros.filter(g => g.id !== id),
-            }));
-            Toast.show({
-              type: 'error',
-              text1: 'Gênero excluído',
-            });
-          } catch (error) {
-            Alert.alert('Erro', 'Falha ao excluir gênero');
-          }
-        },
-      },
-    ]);
+    const genero = this.state.filteredGeneros.find(g => g.id === id);
+    if (!genero || genero.nativo) return;
+
+    this.setState({
+      showDeleteModal: true,
+      generoParaExcluir: genero,
+    });
+  };
+
+  confirmDelete = async () => {
+    const { generoParaExcluir } = this.state;
+    if (!generoParaExcluir) return;
+
+    try {
+      await generoService.delete({ id: generoParaExcluir.id });
+      this.setState((prev) => ({
+        generos: prev.generos.filter(g => g.id !== generoParaExcluir.id),
+        filteredGeneros: prev.filteredGeneros.filter(g => g.id !== generoParaExcluir.id),
+        showDeleteModal: false,
+        generoParaExcluir: null,
+      }));
+      Toast.show({
+        type: 'error',
+        text1: 'Gênero excluído',
+      });
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao excluir gênero');
+      this.setState({ showDeleteModal: false, generoParaExcluir: null });
+    }
+  };
+
+  cancelDelete = () => {
+    this.setState({ showDeleteModal: false, generoParaExcluir: null });
   };
 
   handleRowOpen = (rowKey, rowMap) => {
     const item = this.state.filteredGeneros.find(g => g.id.toString() === rowKey);
-
     if (item && !item.nativo) {
       this.handleDelete(item.id);
-
       if (rowMap && rowMap[rowKey]) {
         rowMap[rowKey].closeRow();
       }
@@ -135,7 +147,7 @@ export default class GenresListScreen extends React.Component {
   };
 
   render() {
-    const { filteredGeneros, page } = this.state;
+    const { filteredGeneros, page, showDeleteModal, generoParaExcluir } = this.state;
     const dataToShow = filteredGeneros.slice(0, page * PAGE_SIZE);
 
     return (
@@ -217,6 +229,18 @@ export default class GenresListScreen extends React.Component {
         >
           <MaterialIcons name="add" size={32} color="#fff" />
         </TouchableOpacity>
+        
+         <CustomModal
+          visible={showDeleteModal}
+          title="Excluir gênero"
+          message={`Deseja realmente excluir${generoParaExcluir ? ` "${generoParaExcluir.nome}"` : ''}?`}
+          cancelText="Cancelar"
+          confirmText="Excluir"
+          onCancel={this.cancelDelete}
+          onConfirm={this.confirmDelete}
+          confirmColor="#dc3545"
+          cancelColor="#f4a03f"
+        />
       </View>
     );
   }
