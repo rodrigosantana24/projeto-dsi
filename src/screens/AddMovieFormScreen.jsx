@@ -34,7 +34,6 @@ export default class MovieFormScreen extends React.Component {
     editingField: null,
   };
 
-  // CORREÇÃO: O método agora retorna as listas para uso imediato.
   fetchOptions = async () => {
     try {
       const [generosList, atoresList] = await Promise.all([
@@ -42,20 +41,18 @@ export default class MovieFormScreen extends React.Component {
         Ator.getAtoresFromFirebase(false)
       ]);
       this.setState({ generosList, atoresList });
-      return { generosList, atoresList }; // Retorna os dados carregados
+      return { generosList, atoresList }; 
     } catch (e) {
       console.error("Erro ao buscar opções:", e);
-      return { generosList: [], atoresList: [] }; // Retorna vazio em caso de erro
+      return { generosList: [], atoresList: [] }; 
     }
   };
 
-  // CORREÇÃO: A lógica agora usa os dados retornados diretamente do fetchOptions.
   async componentDidMount() {
     const { generosList, atoresList } = await this.fetchOptions(); 
     const filmeParaEditar = this.props.route.params?.filme;
 
     if (filmeParaEditar) {
-      // Usa as variáveis locais (generosList, atoresList) que garantidamente estão preenchidas
       const generosSelecionados = generosList.filter(g => filmeParaEditar.genero_ids && filmeParaEditar.genero_ids[g.id]);
       const atoresSelecionados = atoresList.filter(a => filmeParaEditar.ator_ids && filmeParaEditar.ator_ids[a.id]);
 
@@ -185,7 +182,6 @@ export default class MovieFormScreen extends React.Component {
   }
 }
 
-// Estilos não foram alterados
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#072330' },
   scrollContainer: {
@@ -210,7 +206,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#1C3F4F',
+    backgroundColor: '#072330',
     width: '90%',
     maxHeight: '70%',
     borderRadius: 15,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 
 const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onSave, onCancel, onOpenModal }) => {
@@ -112,12 +113,12 @@ const AddForm = ({ title, poster_path, generos, atores, isEditing, onChange, onS
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Icon name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
+          <MaterialIcons name="check" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Salvar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
-          <Icon name="x" size={20} color="#FFF" style={{ marginRight: 8 }} />
+          <MaterialIcons name="cancel" size={20} color="#FFF" style={{ marginRight: 8 }} />
           <Text style={styles.buttonText}>Cancelar</Text>
         </TouchableOpacity>
       </View>
@@ -159,7 +160,7 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   label: {
-    color: '#f4a03f',
+    color: '#fff',
     fontWeight: 'bold',
     marginBottom: 6,
     fontSize: 15,
