@@ -64,7 +64,6 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ searchQuery: query }, this.applyFilters);
   };
 
-  // Opens the delete confirmation modal
   handleDelete = (id, rowMap) => {
     this.setState({
       isModalVisible: true,
@@ -73,7 +72,6 @@ export default class AddMovieScreen extends React.Component {
     });
   };
 
-  // Closes the modal and the swipe row
   handleCancelDelete = () => {
     const { rowMapToDelete, movieToDelete } = this.state;
     if (rowMapToDelete && rowMapToDelete[movieToDelete]) {
@@ -82,7 +80,6 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ isModalVisible: false, movieToDelete: null, rowMapToDelete: null });
   };
 
-  // Confirms deletion, executes the action, and closes the modal
   handleConfirmDelete = async () => {
     const { movieToDelete } = this.state;
     if (movieToDelete) {
@@ -122,7 +119,7 @@ export default class AddMovieScreen extends React.Component {
         style={[styles.backRightBtn, styles.backRightBtnRight]}
         onPress={() => this.handleDelete(data.item.id, rowMap)}
       >
-        <Icon name="trash-2" size={24} color="#FFF" />
+        <Icon name="trash-2" size={28} color="#FFF" />
       </TouchableOpacity>
     </View>
   );
@@ -176,6 +173,9 @@ export default class AddMovieScreen extends React.Component {
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
           disableRightSwipe={true}
+          onRowOpen={(rowKey, rowMap) => {
+            this.handleDelete(rowKey, rowMap);
+          }}
         />
 
         <TouchableOpacity onPress={this.navigateToAdd} style={styles.addButton}>
