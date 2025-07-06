@@ -9,6 +9,7 @@ import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
 import Toast from 'react-native-toast-message';
+import CustomModal from '../components/modal/CustomModal';
 
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
@@ -20,6 +21,8 @@ export default class ActorsListScreen extends React.Component {
     buscaNome: '',
     atoresFiltrados: [],
     page: 1,
+    showDeleteModal: false, // novo
+    atorParaExcluir: null,  // novo
   };
 
   unsubscribeFocus = null;
@@ -98,29 +101,30 @@ export default class ActorsListScreen extends React.Component {
     }
   };
 
-  handleDelete = async (id) => {
-    Alert.alert('Confirmar', 'Deseja excluir este ator?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await atorService.delete({ id });
-            this.setState((prev) => ({
-              atores: prev.atores.filter(g => g.id !== id),
-              atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== id),
-            }));
-            Toast.show({
-              type: 'error',
-              text1: 'Ator excluído',
-            });
-          } catch (error) {
-            Alert.alert('Erro', 'Falha ao excluir ator');
-          }
-        },
-      },
-    ]);
+  handleDelete = (id) => {
+    const ator = this.state.atoresFiltrados.find(a => a.id === id);
+    this.setState({ showDeleteModal: true, atorParaExcluir: ator });
+  };
+
+  confirmDelete = async () => {
+    const { atorParaExcluir } = this.state;
+    if (!atorParaExcluir) return;
+    try {
+      await atorService.delete({ id: atorParaExcluir.id });
+      this.setState((prev) => ({
+        atores: prev.atores.filter(g => g.id !== atorParaExcluir.id),
+        atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== atorParaExcluir.id),
+        showDeleteModal: false,
+        atorParaExcluir: null,
+      }));
+      Toast.show({
+        type: 'error',
+        text1: 'Ator excluído',
+      });
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao excluir ator');
+      this.setState({ showDeleteModal: false, atorParaExcluir: null });
+    }
   };
 
   handleRowOpen = (rowKey, rowMap) => {
@@ -143,7 +147,7 @@ export default class ActorsListScreen extends React.Component {
   };
 
   render() {
-    const { atoresFiltrados, page, filtroSexo, buscaNome } = this.state;
+    const { atoresFiltrados, page, filtroSexo, buscaNome, showDeleteModal, atorParaExcluir } = this.state;
     const dataToShow = atoresFiltrados.slice(0, page * PAGE_SIZE);
 
     return (
@@ -218,6 +222,19 @@ export default class ActorsListScreen extends React.Component {
         >
           <MaterialIcons name="add" size={32} color="#fff" />
         </TouchableOpacity>
+
+        {/* CustomModal para exclusão */}
+        <CustomModal
+          visible={showDeleteModal}
+          title="Excluir ator"
+          message={`Deseja realmente excluir${atorParaExcluir ? ` "${atorParaExcluir.nome}"` : ''}?`}
+          cancelText="Cancelar"
+          confirmText="Excluir"
+          onCancel={() => this.setState({ showDeleteModal: false, atorParaExcluir: null })}
+          onConfirm={this.confirmDelete}
+          confirmColor="#dc3545"
+          cancelColor="#f4a03f"
+        />
       </View>
     );
   }
