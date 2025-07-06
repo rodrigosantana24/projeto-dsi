@@ -10,6 +10,7 @@ import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
 import Toast from 'react-native-toast-message';
 import CustomModal from '../components/modal/CustomModal';
+import Icon from 'react-native-vector-icons/Feather';
 
 const atorService = new AtorService();
 const PAGE_SIZE = 20;
@@ -21,8 +22,9 @@ export default class ActorsListScreen extends React.Component {
     buscaNome: '',
     atoresFiltrados: [],
     page: 1,
-    showDeleteModal: false, // novo
-    atorParaExcluir: null,  // novo
+    showDeleteModal: false,
+    atorParaExcluir: null,
+    rowMapToDelete: null, // novo
   };
 
   unsubscribeFocus = null;
@@ -101,9 +103,17 @@ export default class ActorsListScreen extends React.Component {
     }
   };
 
-  handleDelete = (id) => {
+  handleDelete = (id, rowMap) => {
     const ator = this.state.atoresFiltrados.find(a => a.id === id);
-    this.setState({ showDeleteModal: true, atorParaExcluir: ator });
+    this.setState({ showDeleteModal: true, atorParaExcluir: ator, rowMapToDelete: rowMap });
+  };
+
+  handleCancelDelete = () => {
+    const { rowMapToDelete, atorParaExcluir } = this.state;
+    if (rowMapToDelete && atorParaExcluir && rowMapToDelete[atorParaExcluir.id]) {
+      rowMapToDelete[atorParaExcluir.id].closeRow();
+    }
+    this.setState({ showDeleteModal: false, atorParaExcluir: null, rowMapToDelete: null });
   };
 
   confirmDelete = async () => {
@@ -116,27 +126,40 @@ export default class ActorsListScreen extends React.Component {
         atoresFiltrados: prev.atoresFiltrados.filter(g => g.id !== atorParaExcluir.id),
         showDeleteModal: false,
         atorParaExcluir: null,
+        rowMapToDelete: null,
       }));
       Toast.show({
-        type: 'error',
-        text1: 'Ator excluído',
+        type: 'success',
+        text1: 'Ator excluído com sucesso',
       });
     } catch (error) {
       Alert.alert('Erro', 'Falha ao excluir ator');
-      this.setState({ showDeleteModal: false, atorParaExcluir: null });
+      this.setState({ showDeleteModal: false, atorParaExcluir: null, rowMapToDelete: null });
     }
   };
 
-  handleRowOpen = (rowKey, rowMap) => {
-    const item = this.state.atoresFiltrados.find(a => a.id.toString() === rowKey);
-    if (item) {
-      this.handleDelete(item.id);
-      // Fecha o swipe imediatamente
-      if (rowMap && rowMap[rowKey]) {
-        rowMap[rowKey].closeRow();
+  renderItem = (data) => (
+    <TouchableOpacity
+      style={styles.rowFront}
+      activeOpacity={0.9}
+      onPress={() =>
+        this.props.navigation.navigate('ActorFormScreen', { ator: data.item })
       }
-    }
-  };
+    >
+      <AtorItem ator={data.item} />
+    </TouchableOpacity>
+  );
+
+  renderHiddenItem = (data, rowMap) => (
+    <View style={styles.rowBack}>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
+        onPress={() => this.handleDelete(data.item.id, rowMap)}
+      >
+        <Icon name="trash-2" size={28} color="#FFF" />
+      </TouchableOpacity>
+    </View>
+  );
 
   showToast = (msg, type) => {
     Toast.show({
@@ -181,36 +204,23 @@ export default class ActorsListScreen extends React.Component {
 
         <SwipeListView
           data={dataToShow}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <AtorItem
-              ator={item}
-              onEdit={() =>
-                this.props.navigation.navigate('ActorFormScreen', { ator: item })
-              }
-              hideDelete={true}
-            />
-          )}
-          renderHiddenItem={({ item }) => (
-            <View style={styles.hiddenContainer}>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => this.handleDelete(item.id)}
-              >
-                <MaterialIcons name="delete" size={28} color="#fff" />
-              </TouchableOpacity>
-            </View>
-          )}
+          renderItem={this.renderItem}
+          renderHiddenItem={this.renderHiddenItem}
           rightOpenValue={-75}
-          disableRightSwipe={false}
+          keyExtractor={(item) => item.id.toString()}
+          disableRightSwipe={true}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
-          onRowOpen={this.handleRowOpen}
           ListFooterComponent={
             (page * PAGE_SIZE) < atoresFiltrados.length
               ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
               : null
           }
+          useNativeDriver={false}
+          onRowOpen={(rowKey, rowMap) => {
+            this.handleDelete(rowKey, rowMap);
+          }}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         />
 
         {/* FAB - Botão flutuante */}
@@ -230,7 +240,7 @@ export default class ActorsListScreen extends React.Component {
           message={`Deseja realmente excluir${atorParaExcluir ? ` "${atorParaExcluir.nome}"` : ''}?`}
           cancelText="Cancelar"
           confirmText="Excluir"
-          onCancel={() => this.setState({ showDeleteModal: false, atorParaExcluir: null })}
+          onCancel={this.handleCancelDelete}
           onConfirm={this.confirmDelete}
           confirmColor="#dc3545"
           cancelColor="#f4a03f"
@@ -266,7 +276,10 @@ const styles = StyleSheet.create({
     marginTop: -4,
     marginLeft: 4,
   },
-
+  rowFront: {
+    backgroundColor: '#072330',
+    borderRadius: 8, // Adicione esta linha
+  },
   hiddenContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -301,5 +314,33 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     zIndex: 100,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#D9534F',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    borderRadius: 8, // Adicione esta linha
+    overflow: 'hidden', // Garante que o conteúdo não ultrapasse a borda arredondada
+  },
+  backRightBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#D9534F',
+    borderTopRightRadius: 8, // Adicione para acompanhar a curvatura
+    borderBottomRightRadius: 8, // Adicione para acompanhar a curvatura
+  },
+  backRightBtnRight: {
+    backgroundColor: '#D9534F',
+    right: 0,
+    borderTopRightRadius: 8, // Adicione para acompanhar a curvatura
+    borderBottomRightRadius: 8, // Adicione para acompanhar a curvatura
   },
 });
