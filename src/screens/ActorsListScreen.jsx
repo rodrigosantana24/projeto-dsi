@@ -33,14 +33,8 @@ export default class ActorsListScreen extends React.Component {
     await this.loadAtores();
     if (this.props.navigation && this.props.navigation.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
-        // Limpa filtros e busca ao voltar para a tela
-        this.setState(
-          { filtroSexo: 'Sexo', buscaNome: '', page: 1 },
-          () => {
-            this.applyFilters();
-            this.checkToastParam();
-          }
-        );
+        this.loadAtores();
+        this.checkToastParam();
       });
     }
     this.checkToastParam();

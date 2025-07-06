@@ -23,24 +23,14 @@ export default class ActorFormScreen extends React.Component {
     const { nome, nacionalidade, sexo, editandoId } = this.state;
     const { navigation } = this.props;
 
-    if (!nome || !nacionalidade || !sexo) {
-      Toast.show({
-        type: 'error',
-        text1: 'Preencha todos os campos',
-      });
-      return;
-    }
     try {
       if (editandoId) {
         await atorService.update({ id: editandoId, nome, nacionalidade, sexo });
-        navigation.replace('ActorsListScreen', {
-          toast: { type: 'success', msg: 'Ator atualizado com sucesso' }
-        });
+        Toast.show({ type: 'success', text1: 'Ator atualizado com sucesso' });
       } else {
         await atorService.create({ nome, nacionalidade, sexo });
-        navigation.replace('ActorsListScreen', {
-          toast: { type: 'success', msg: 'Ator criado com sucesso' }
-        });
+        Toast.show({ type: 'success', text1: 'Ator criado com sucesso' });
+        navigation.goBack();
       }
     } catch (error) {
       Alert.alert('Erro', error.message);
