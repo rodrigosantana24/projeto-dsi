@@ -8,6 +8,7 @@ import GeneroItem from '../components/genres/GeneroItem';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
+import Toast from 'react-native-toast-message';
 
 const generoService = new GeneroService();
 const PAGE_SIZE = 20;
@@ -176,6 +177,14 @@ export default class GenresListScreen extends React.Component {
               : null
           }
         />
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() =>
+            this.props.navigation.navigate('GenresFormScreen')
+          }
+        >
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -224,5 +233,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: '90%',
     borderRadius: 5,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
   },
 });
