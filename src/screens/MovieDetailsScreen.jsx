@@ -44,7 +44,7 @@ export default function MovieDetailsScreen({ navigation, route }) {
       return 'Elenco não disponível';
     }
     const atoresArray = elenco.split('-');
-    const atoresLimitados = atoresArray.slice(0, 10); 
+    const atoresLimitados = atoresArray.slice(0, 20); 
     return atoresLimitados.join(', ');
   };
 

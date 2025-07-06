@@ -13,6 +13,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import FilmeService from '../services/FilmeService';
 import AddList from '../components/addmovies/AddList';
 import { SwipeListView } from 'react-native-swipe-list-view';
+import CustomModal from '../components/modal/CustomModal';
 
 const filmeService = new FilmeService();
 export default class AddMovieScreen extends React.Component {
@@ -20,6 +21,9 @@ export default class AddMovieScreen extends React.Component {
     filmes: [],
     allFilmes: [],
     searchQuery: '',
+    isModalVisible: false,
+    movieToDelete: null,
+    rowMapToDelete: null,
   };
   unsubscribeFocus = null;
 
@@ -60,34 +64,39 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ searchQuery: query }, this.applyFilters);
   };
 
+  // Opens the delete confirmation modal
   handleDelete = (id, rowMap) => {
-    const closeRow = () => {
-      if (rowMap && rowMap[id]) {
-        rowMap[id].closeRow();
-      }
-    };
-    Alert.alert('Confirmar Exclusão', 'Deseja realmente excluir este filme?', [
-      {
-        text: 'Cancelar',
-        style: 'cancel',
-        onPress: () => closeRow(),
-      },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          closeRow();
-          try {
-            await filmeService.delete({ id });
-            this.loadFilmes();
-          } catch (e) {
-            console.error(e);
-            Alert.alert('Erro', 'Falha ao excluir o filme.');
-          }
-        },
-      },
-    ]);
+    this.setState({
+      isModalVisible: true,
+      movieToDelete: id,
+      rowMapToDelete: rowMap,
+    });
   };
+
+  // Closes the modal and the swipe row
+  handleCancelDelete = () => {
+    const { rowMapToDelete, movieToDelete } = this.state;
+    if (rowMapToDelete && rowMapToDelete[movieToDelete]) {
+      rowMapToDelete[movieToDelete].closeRow();
+    }
+    this.setState({ isModalVisible: false, movieToDelete: null, rowMapToDelete: null });
+  };
+
+  // Confirms deletion, executes the action, and closes the modal
+  handleConfirmDelete = async () => {
+    const { movieToDelete } = this.state;
+    if (movieToDelete) {
+      try {
+        await filmeService.delete({ id: movieToDelete });
+        this.loadFilmes();
+      } catch (e) {
+        console.error(e);
+        Alert.alert('Erro', 'Falha ao excluir o filme.');
+      }
+    }
+    this.setState({ isModalVisible: false, movieToDelete: null, rowMapToDelete: null });
+  };
+
 
   navigateToEdit = (filme) => {
     this.props.navigation.navigate('MovieFormScreen', { filme });
@@ -136,7 +145,7 @@ export default class AddMovieScreen extends React.Component {
   }
 
   render() {
-    const { filmes } = this.state;
+    const { filmes, isModalVisible } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerContainer}>
@@ -145,6 +154,16 @@ export default class AddMovieScreen extends React.Component {
             title="Gerenciar Filmes"
           />
         </View>
+
+        <CustomModal
+          visible={isModalVisible}
+          title="Confirmar Exclusão"
+          message="Deseja realmente excluir este filme?"
+          onCancel={this.handleCancelDelete}
+          onConfirm={this.handleConfirmDelete}
+          cancelText="Cancelar"
+          confirmText="Excluir"
+        />
 
         <SwipeListView
           data={filmes}
@@ -157,9 +176,6 @@ export default class AddMovieScreen extends React.Component {
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
           disableRightSwipe={true}
-          onRowOpen={(rowKey, rowMap) => {
-            this.handleDelete(rowKey, rowMap);
-          }}
         />
 
         <TouchableOpacity onPress={this.navigateToAdd} style={styles.addButton}>
@@ -209,7 +225,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#3d5564',
-    borderWidth: 1,
     marginBottom: 2,
   },
   searchInput: {
