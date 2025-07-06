@@ -3,6 +3,7 @@ import { View, StyleSheet, Alert } from 'react-native';
 import GeneroService from '../services/GeneroService';
 import GeneroForm from '../components/genres/GeneroForm';
 import HeaderBar from '../components/navi/HeaderBar';
+import Toast from 'react-native-toast-message';
 
 const generoService = new GeneroService();
 
@@ -19,22 +20,26 @@ export default class GeneroFormScreen extends React.Component {
 
   handleSave = async () => {
     const { nome, descricao, editandoId } = this.state;
-
-    if (!nome || !descricao) {
-      return Alert.alert('Erro', 'Preencha todos os campos');
-    }
+    const { navigation } = this.props;
 
     try {
       if (editandoId) {
         await generoService.update({ id: editandoId, nome, descricao });
+        Toast.show({
+          type: 'success',
+          text1: 'Gênero atualizado',
+        });
       } else {
         await generoService.create({ nome, descricao });
+        navigation.replace('GenresListScreen', {
+          toast: { type: 'success', msg: 'Gênero criado' },
+        });
       }
-      this.props.navigation.goBack();
     } catch (error) {
       Alert.alert('Erro', error.message);
     }
   };
+
 
   render() {
     const { nome, descricao, editandoId } = this.state;
