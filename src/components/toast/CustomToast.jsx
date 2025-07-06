@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#fff',
-    fontSize: 15, // Aumente aqui o tamanho da fonte
+    fontSize: 15,
     fontWeight: 'bold',
     textAlign: 'center',
   },

@@ -8,6 +8,7 @@ import GeneroItem from '../components/genres/GeneroItem';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
+import Toast from 'react-native-toast-message';
 
 const generoService = new GeneroService();
 const PAGE_SIZE = 20;
@@ -28,7 +29,25 @@ export default class GenresListScreen extends React.Component {
     if (this.props.navigation?.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', this.loadGeneros);
     }
+    if (this.props.navigation?.addListener) {
+      this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+        this.loadGeneros();
+        this.checkToastParam();
+      });
+    }
+    this.checkToastParam();
   }
+
+  checkToastParam = () => {
+    const toastParam = this.props.route?.params?.toast;
+    if (toastParam) {
+      Toast.show({
+        type: toastParam.type,
+        text1: toastParam.msg,
+      });
+      this.props.navigation.setParams({ toast: undefined });
+    }
+  };
 
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
@@ -92,6 +111,10 @@ export default class GenresListScreen extends React.Component {
               generos: prev.generos.filter(g => g.id !== id),
               filteredGeneros: prev.filteredGeneros.filter(g => g.id !== id),
             }));
+            Toast.show({
+              type: 'error',
+              text1: 'Gênero excluído',
+            });
           } catch (error) {
             Alert.alert('Erro', 'Falha ao excluir gênero');
           }
@@ -99,6 +122,19 @@ export default class GenresListScreen extends React.Component {
       },
     ]);
   };
+
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.filteredGeneros.find(g => g.id.toString() === rowKey);
+
+    if (item && !item.nativo) {
+      this.handleDelete(item.id);
+
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
+  };
+
 
   render() {
     const { filteredGeneros, page } = this.state;
@@ -109,20 +145,13 @@ export default class GenresListScreen extends React.Component {
         <HeaderBar
           title="Gêneros"
           onBack={() => this.props.navigation.goBack()}
-          rightComponent={
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('GenresFormScreen')}
-              style={{ marginRight: 10 }}
-            >
-              <MaterialIcons name="add" size={28} color="#fff" />
-            </TouchableOpacity>
-          }
         />
 
         <View style={styles.filterContainer}>
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar gêneros..."
+              value={this.state.searchText}
               onSearch={this.handleSearch}
             />
           </View>
@@ -149,7 +178,16 @@ export default class GenresListScreen extends React.Component {
               genero={item}
               onEdit={() => {
                 if (!item.nativo) {
-                  this.props.navigation.navigate('GenresFormScreen', { genero: item });
+                  this.props.navigation.navigate('GenresFormScreen', {
+                    genero: item,
+                    onSave: (mensagem) => {
+                      Toast.show({
+                        type: 'success',
+                        text1: mensagem,
+                      });
+                      this.loadGeneros();
+                    }
+                  });
                 }
               }}
             />
@@ -168,6 +206,7 @@ export default class GenresListScreen extends React.Component {
           }
           rightOpenValue={-75}
           disableRightSwipe={false}
+          onRowOpen={this.handleRowOpen}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -176,6 +215,22 @@ export default class GenresListScreen extends React.Component {
               : null
           }
         />
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() =>
+            this.props.navigation.navigate('GenresFormScreen', {
+              onSave: (mensagem) => {
+                Toast.show({
+                  type: 'success',
+                  text1: mensagem,
+                });
+                this.loadGeneros(); // atualiza a lista
+              }
+            })
+          }
+        >
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
       </View>
     );
   }
@@ -224,5 +279,22 @@ const styles = StyleSheet.create({
     width: 60,
     height: '90%',
     borderRadius: 5,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
   },
 });
