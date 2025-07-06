@@ -11,7 +11,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message';
 
 const GeneroForm = ({
   nome,
@@ -23,35 +22,8 @@ const GeneroForm = ({
   title = 'Adicionar Gênero',
   onCancel
 }) => {
-  const dismissKeyboard = () => Keyboard.dismiss();
-
-  const [nomeError, setNomeError] = React.useState(false);
-  const [descricaoError, setDescricaoError] = React.useState(false);
-
-  const validateAndSubmit = () => {
-    let hasError = false;
-    setNomeError(false);
-    setDescricaoError(false);
-
-    if (!nome.trim()) {
-      setNomeError(true);
-      hasError = true;
-    }
-
-    if (!descricao.trim()) {
-      setDescricaoError(true);
-      hasError = true;
-    }
-
-    if (hasError) {
-      Toast.show({
-        type: 'error',
-        text1: 'Preencha todos os campos corretamente',
-      });
-      return;
-    }
-
-    onSubmit();
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
   };
 
   return (
@@ -74,32 +46,33 @@ const GeneroForm = ({
           <View style={styles.inputArea}>
             <Text style={styles.label}>Nome</Text>
             <TextInput
-              style={[styles.input, nomeError && styles.inputError]}
+              style={styles.input}
               placeholder="Nome do Gênero"
               placeholderTextColor="#999"
               value={nome}
-              onChangeText={(text) => {
-                setNomeError(false);
-                onChangeNome(text);
-              }}
+              onChangeText={onChangeNome}
               maxLength={40}
             />
 
             <Text style={styles.label}>Descrição</Text>
             <TextInput
-              style={[styles.input, descricaoError && styles.inputError]}
+              style={styles.input}
               placeholder="Descrição do Gênero"
               placeholderTextColor="#999"
               value={descricao}
-              onChangeText={(text) => {
-                setDescricaoError(false);
-                onChangeDescricao(text);
-              }}
+              onChangeText={onChangeDescricao}
               maxLength={80}
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={validateAndSubmit}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              (!nome?.trim() || !descricao?.trim()) ? styles.buttonDisabled : null,
+            ]}
+            onPress={onSubmit}
+            disabled={!nome?.trim() || !descricao?.trim()}
+          >
             <MaterialIcons name={editandoId ? 'save' : 'check'} size={22} color="#fff" style={{ marginRight: 8 }} />
             <Text style={styles.buttonText}>{editandoId ? 'Atualizar' : 'Salvar'}</Text>
           </TouchableOpacity>
@@ -184,10 +157,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#18394a',
     fontSize: 16,
   },
-  inputError: {
-    borderColor: '#dc3545',
-    backgroundColor: '#2a1a1a',
-  },
   button: {
     backgroundColor: '#f4a03f',
     padding: 14,
@@ -200,6 +169,9 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
+  },
+  buttonDisabled: {
+    backgroundColor: '#bfa07a',
   },
   buttonText: {
     color: '#FFF',
