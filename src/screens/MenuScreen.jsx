@@ -14,6 +14,7 @@ import FriendList from './FriendList';
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../configs/firebaseConfig';
 import { ref, get } from 'firebase/database';
+import CustomModal from '../components/modal/CustomModal';
 
 
 const ProfileScreen = () => {
@@ -123,38 +124,29 @@ const ProfileScreen = () => {
         </View>
 
         {showLogoutModal && (
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Deseja realmente sair?</Text>
-              <Text style={styles.modalMessage}>Você será desconectado da sua conta.</Text>
-              <View style={styles.modalButtons}>
-                <TouchableOpacity 
-                  style={[styles.modalButton, { backgroundColor: '#f4a03f' }]} 
-                  onPress={() => setShowLogoutModal(false)}
-                >
-                  <Text style={styles.modalButtonText}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton, { backgroundColor: '#dc3545' }]} 
-                  onPress={async () => {
-                    try {
-                      await signOut(auth);
-                      setUserCredentials(null);
-                      navigation.reset({
-                        index: 0,
-                        routes: [{ name: 'Login' }],
-                      });
-                    } catch (error) {
-                      Alert.alert('Erro ao sair', 'Não foi possível sair da conta.');
-                      console.error(error);
-                    }
-                  }}
-                >
-                  <Text style={styles.modalButtonText}>Sair</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
+          <CustomModal
+            visible={showLogoutModal}
+            title="Deseja realmente sair?"
+            message="Você será desconectado da sua conta."
+            cancelText="Cancelar"
+            confirmText="Sair"
+            onCancel={() => setShowLogoutModal(false)}
+            onConfirm={async () => {
+              try {
+                await signOut(auth);
+                setUserCredentials(null);
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'Login' }],
+                });
+              } catch (error) {
+                Alert.alert('Erro ao sair', 'Não foi possível sair da conta.');
+                console.error(error);
+              }
+            }}
+            confirmColor="#dc3545"
+            cancelColor="#f4a03f"
+          />
         )}
       </View>
   );
