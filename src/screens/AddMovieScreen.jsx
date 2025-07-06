@@ -1,17 +1,18 @@
 import React from 'react';
 import {
   View,
-  Text,
   Alert,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   SafeAreaView
 } from 'react-native';
+import HeaderBar from '../components/navi/HeaderBar';
 import Icon from 'react-native-vector-icons/Feather';
+import { MaterialIcons } from '@expo/vector-icons';
 import FilmeService from '../services/FilmeService';
 import AddList from '../components/addmovies/AddList';
-import { SwipeListView } from 'react-native-swipe-list-view'; 
+import { SwipeListView } from 'react-native-swipe-list-view';
 
 const filmeService = new FilmeService();
 export default class AddMovieScreen extends React.Component {
@@ -59,11 +60,23 @@ export default class AddMovieScreen extends React.Component {
     this.setState({ searchQuery: query }, this.applyFilters);
   };
 
-  handleDelete = id => {
+  handleDelete = (id, rowMap) => {
+    const closeRow = () => {
+      if (rowMap && rowMap[id]) {
+        rowMap[id].closeRow();
+      }
+    };
     Alert.alert('Confirmar Exclusão', 'Deseja realmente excluir este filme?', [
-      { text: 'Cancelar', style: 'cancel' },
       {
-        text: 'Excluir', style: 'destructive', onPress: async () => {
+        text: 'Cancelar',
+        style: 'cancel',
+        onPress: () => closeRow(),
+      },
+      {
+        text: 'Excluir',
+        style: 'destructive',
+        onPress: async () => {
+          closeRow();
           try {
             await filmeService.delete({ id });
             this.loadFilmes();
@@ -71,8 +84,8 @@ export default class AddMovieScreen extends React.Component {
             console.error(e);
             Alert.alert('Erro', 'Falha ao excluir o filme.');
           }
-        }
-      }
+        },
+      },
     ]);
   };
 
@@ -85,7 +98,7 @@ export default class AddMovieScreen extends React.Component {
   };
 
   renderItem = (data) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.rowFront}
       activeOpacity={0.9}
       onPress={() => this.navigateToEdit(data.item)}
@@ -98,7 +111,7 @@ export default class AddMovieScreen extends React.Component {
     <View style={styles.rowBack}>
       <TouchableOpacity
         style={[styles.backRightBtn, styles.backRightBtnRight]}
-        onPress={() => this.handleDelete(data.item.id)}
+        onPress={() => this.handleDelete(data.item.id, rowMap)}
       >
         <Icon name="trash-2" size={24} color="#FFF" />
       </TouchableOpacity>
@@ -110,10 +123,9 @@ export default class AddMovieScreen extends React.Component {
     return (
       <View style={styles.filtersContainer}>
         <View style={styles.searchBar}>
-          <Icon name="search" size={20} color="#888" style={{ marginLeft: 8 }} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Pesquisar por título..."
+            placeholder="Pesquisar filmes criados..."
             placeholderTextColor="#888"
             value={searchQuery}
             onChangeText={this.handleSearchChange}
@@ -128,57 +140,77 @@ export default class AddMovieScreen extends React.Component {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => this.props.navigation.goBack()} style={styles.headerButton}>
-            <Icon name="arrow-left" size={24} color="#EFEFEF" />
-          </TouchableOpacity>
-          <Text style={styles.header}>Gerenciar Filmes</Text>
-          <TouchableOpacity onPress={this.navigateToAdd} style={styles.headerButton}>
-            <Icon name="plus" size={24} color="#EFEFEF" />
-          </TouchableOpacity>
+          <HeaderBar
+            onBack={() => this.props.navigation.goBack()}
+            title="Gerenciar Filmes"
+          />
         </View>
 
         <SwipeListView
           data={filmes}
           renderItem={this.renderItem}
           renderHiddenItem={this.renderHiddenItem}
-          rightOpenValue={-75} 
+          rightOpenValue={-75}
           keyExtractor={f => f.id.toString()}
           ListHeaderComponent={this.renderListHeader}
           contentContainerStyle={styles.scrollContainer}
           ListHeaderComponentStyle={{ marginBottom: 8 }}
           useNativeDriver={false}
+          disableRightSwipe={true}
+          onRowOpen={(rowKey, rowMap) => {
+            this.handleDelete(rowKey, rowMap);
+          }}
         />
+
+        <TouchableOpacity onPress={this.navigateToAdd} style={styles.addButton}>
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#071A24' },
-  scrollContainer: { paddingHorizontal: 20 },
+  container: { flex: 1, backgroundColor: '#072330' },
+  scrollContainer: { paddingHorizontal: 20, paddingBottom: 100 },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#0E2935',
-    paddingTop: 60,
+    backgroundColor: '#072330',
+    paddingTop: 40,
     paddingHorizontal: 20,
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#1C3F4F',
+    borderBottomColor: '#072330',
   },
   header: { color: '#EFEFEF', fontSize: 20, fontWeight: 'bold' },
-  headerButton: { padding: 5 },
+  addButton: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
+  },
   filtersContainer: {
     paddingVertical: 10,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1C3F4F',
-    borderRadius: 8,
+    backgroundColor: '#072330',
+    borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#2a5a75',
+    borderColor: '#3d5564',
+    borderWidth: 1,
+    marginBottom: 2,
   },
   searchInput: {
     flex: 1,
@@ -187,11 +219,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   rowFront: {
-    backgroundColor: '#071A24', 
+    backgroundColor: '#072330',
   },
   rowBack: {
     alignItems: 'center',
-    backgroundColor: '#D9534F', 
+    backgroundColor: '#D9534F',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',

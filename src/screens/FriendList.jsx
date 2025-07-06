@@ -11,6 +11,14 @@ import SearchBar from '../components/search/SearchBar';
 import getFriendsFilter from '../services/getFriendsFilter';
 import AddButton from '../components/buttons/AddButton';
 import SearchGeneric from '../components/search/SearchGeneric';
+import AmigosService from '../services/AmigosService';
+import getNickName from '../services/getNickName';
+import FriendNickName from '../components/FriendNickName';
+import {Alert} from 'react-native';
+import Toast from 'react-native-toast-message';
+
+const amigoService = new AmigosService();
+
 
 export default function FriendList() {
   const { userCredentials } = useContext(UserContext);
@@ -19,6 +27,22 @@ export default function FriendList() {
   const friendsArray = Array.isArray(amigos) ? amigos : [];
   const filteredFriends = getFriendsFilter(friendsArray, searchText);  
   const navigation = useNavigation();
+
+  const handleRemover = async({userId, friendEmail}) =>{
+        try {
+          await amigoService.delete({userId : userId , friendEmail : friendEmail})
+          Toast.show({
+            type: 'success',
+            text1: 'Amigo removido com sucesso!'
+          });
+          navigation.replace('FriendList')
+        } catch (error) {
+            Toast.show({
+              type: 'error',  
+              text1: error.message || "Erro ao remover amigo"
+            });
+        }
+  };
 
   if (loading) {
     return (
@@ -45,11 +69,24 @@ export default function FriendList() {
         ) : (
           filteredFriends.map((amigo) => (
             <View key={amigo.uid} style={styles.friendBlock}>
-              <Text style={styles.friendName}>{amigo.name}</Text>
+              <View style={styles.friendHeader}>
+                <Text style={styles.friendName}>{amigo.name}</Text>
+                <TouchableOpacity
+                  onPress={() => handleRemover({ userId: userCredentials.uid, friendEmail: amigo.email })}
+                  style={styles.removeButton}
+                >
+                  <MaterialIcons name="delete" size={28} color="#f4a03f" />
+                </TouchableOpacity>
+              </View>
               <Text style={styles.friendEmail}>{amigo.email}</Text>
 
+              <FriendNickName
+                userId={userCredentials.uid}
+                amigoId={amigo.uid}
+                style={styles.nickName}
+              />
+
               <Text style={styles.subtitle}>Filmes Favoritos:</Text>
-              
               {amigo.favoritos.length === 0 ? (
                 <Text style={styles.noData}>Nenhum favorito.</Text>
               ) : (
@@ -153,6 +190,12 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 12,
     fontWeight: 'bold',
+
+  },
+  nickName: {
+    color: '#f4a03f',
+    fontSize: 14,
+    marginBottom: 15,
   },
 
   // Opção 2
@@ -165,6 +208,14 @@ const styles = StyleSheet.create({
   },
   movieInfo: {
     padding: 10,
+  },
+  friendHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  removeButton: {
+    padding: 5,
   },
 });
 

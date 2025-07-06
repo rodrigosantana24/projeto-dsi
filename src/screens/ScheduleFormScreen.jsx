@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import AgendamentoService from '../services/AgendamentoService';
 import AgendamentoForm from '../components/schedule/AgendamentoForm';
 import { Ionicons } from "@expo/vector-icons";
+import Toast from 'react-native-toast-message';
 
 const ScheduleFormScreen = ({ route, navigation }) => {
   const agendamento = route.params?.agendamento || null;
@@ -11,7 +12,11 @@ const ScheduleFormScreen = ({ route, navigation }) => {
   const userId = agendamento?.userId || route.params?.userId;
 
   if (!userId) {
-    Alert.alert('Erro', 'Usuário não identificado.');
+    Toast.show({
+            type: 'error',
+            text1: 'Usuário não identificado',
+            visibilityTime: 3000,
+          })
     navigation.goBack();
     return null;
   }
@@ -35,18 +40,32 @@ const ScheduleFormScreen = ({ route, navigation }) => {
 
   const salvar = async () => {
     if (!filmeSelecionado.title || !data || !hora) {
-      Alert.alert('Erro', 'Preencha todos os campos');
+      Toast.show({
+            type: 'error',
+            text1: 'Preencha todos os campos',
+            visibilityTime: 3000,
+          })
       return;
     }
 
     const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     if (!regexData.test(data)) {
-      Alert.alert('Erro', 'Data inválida! Use DD/MM/AAAA');
+      Toast.show({
+            type: 'error',
+            text1: 'Data inválida! Use DD/MM/AAAA',
+            visibilityTime: 3000,
+          })
+      setData('')
       return;
     }
 
     if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(hora)) {
-      Alert.alert('Erro', 'Hora inválida! Use HH:mm');
+      Toast.show({
+            type: 'error',
+            text1: 'Hora inválida! use HH:mm',
+            visibilityTime: 3000,
+          })
+      setHora('')
       return;
     }
 
@@ -69,11 +88,19 @@ const ScheduleFormScreen = ({ route, navigation }) => {
           hora,
         });
       }
-      Alert.alert('Sucesso', 'Agendamento salvo com sucesso!');
+      Toast.show({
+            type: 'success',
+            text1: 'Agendamento feito com sucesso',
+            visibilityTime: 3000,
+          })
       navigation.goBack();
     } catch (error) {
       console.error(error);
-      Alert.alert('Erro', 'Erro ao salvar agendamento.');
+      Toast.show({
+            type: 'error',
+            text1: 'Erro ao salvar agendamento',
+            visibilityTime: 3000,
+          })
     }
   };
 
