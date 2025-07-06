@@ -26,15 +26,14 @@ export default class GenresListScreen extends React.Component {
 
   async componentDidMount() {
     await this.loadGeneros();
-    if (this.props.navigation?.addListener) {
-      this.unsubscribeFocus = this.props.navigation.addListener('focus', this.loadGeneros);
-    }
+
     if (this.props.navigation?.addListener) {
       this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
         this.loadGeneros();
         this.checkToastParam();
       });
     }
+
     this.checkToastParam();
   }
 
@@ -123,6 +122,18 @@ export default class GenresListScreen extends React.Component {
     ]);
   };
 
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.filteredGeneros.find(g => g.id.toString() === rowKey);
+
+    if (item && !item.nativo) {
+      this.handleDelete(item.id);
+
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
+  };
+
   render() {
     const { filteredGeneros, page } = this.state;
     const dataToShow = filteredGeneros.slice(0, page * PAGE_SIZE);
@@ -165,7 +176,10 @@ export default class GenresListScreen extends React.Component {
               genero={item}
               onEdit={() => {
                 if (!item.nativo) {
-                  this.props.navigation.navigate('GenresFormScreen', { genero: item });
+                  this.props.navigation.navigate('GenresFormScreen', {
+                    genero: item,
+                    toast: { type: 'success', msg: 'Gênero atualizado com sucesso' },
+                  });
                 }
               }}
             />
@@ -184,6 +198,7 @@ export default class GenresListScreen extends React.Component {
           }
           rightOpenValue={-75}
           disableRightSwipe={false}
+          onRowOpen={this.handleRowOpen}
           onEndReached={this.handleEndReached}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
@@ -195,7 +210,9 @@ export default class GenresListScreen extends React.Component {
         <TouchableOpacity
           style={styles.fab}
           onPress={() =>
-            this.props.navigation.navigate('GenresFormScreen')
+            this.props.navigation.navigate('GenresFormScreen', {
+              toast: { type: 'success', msg: 'Gênero criado com sucesso' },
+            })
           }
         >
           <MaterialIcons name="add" size={32} color="#fff" />

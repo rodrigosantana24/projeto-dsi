@@ -25,15 +25,11 @@ export default class GeneroFormScreen extends React.Component {
     try {
       if (editandoId) {
         await generoService.update({ id: editandoId, nome, descricao });
-        Toast.show({
-          type: 'success',
-          text1: 'Gênero atualizado',
-        });
+        Toast.show({ type: 'success', text1: 'Gênero atualizado com sucesso!' });
       } else {
         await generoService.create({ nome, descricao });
-        navigation.replace('GenresListScreen', {
-          toast: { type: 'success', msg: 'Gênero criado' },
-        });
+        Toast.show({ type: 'success', text1: 'Gênero criado com sucesso!' });
+        navigation.goBack();
       }
     } catch (error) {
       Alert.alert('Erro', error.message);
