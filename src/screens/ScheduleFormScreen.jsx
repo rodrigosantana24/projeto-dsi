@@ -71,6 +71,20 @@ const ScheduleFormScreen = ({ route, navigation }) => {
 
     const dataISO = formatarDataISO(data);
 
+    const [day, month, year] = data.split('/').map(Number);
+    const selectedDate = new Date(year, month - 1, day); 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
+    if (selectedDate < today) {
+      Toast.show({
+        type: 'error',
+        text1: 'Não é possível agendar para uma data passada.',
+        visibilityTime: 3000,
+      });
+      return;
+    }
+
     try {
       if (isEdit) {
         await service.update({
