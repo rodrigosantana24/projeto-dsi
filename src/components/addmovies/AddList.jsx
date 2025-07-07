@@ -17,7 +17,7 @@ const AddList = ({ item }) => {
 const styles = StyleSheet.create({
     itemContainer: {
         flexDirection: 'row',
-        backgroundColor: '#0E2935',
+        backgroundColor: '#113342',
         padding: 10,
         marginVertical: 8,
         borderRadius: 8,
