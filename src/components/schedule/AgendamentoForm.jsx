@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Importar useRef
 import {
   View,
   Text,
@@ -10,10 +10,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Dimensions,
-  ActivityIndicator
+  ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import Toast from 'react-native-toast-message'; // Adicionado: Importação do Toast
+import Toast from 'react-native-toast-message';
 import Filme from '../../models/Filme';
 
 const PAGE_SIZE = 20;
@@ -40,7 +42,12 @@ const AgendamentoForm = ({
   const [dataError, setDataError] = useState(false);
   const [horaError, setHoraError] = useState(false);
 
+  // NOVO: Usaremos um useRef para evitar re-renderizações desnecessárias ao mudar isSelectingFilm
+  // e para ter uma referência mutável que não aciona useEffects
+  const isSelectingFilmRef = useRef(false);
+
   useEffect(() => {
+    // Se o texto de busca está vazio, não precisamos buscar nada
     if (!buscaFilme.trim()) {
       setFilmesFiltrados([]);
       setFilmesPagina([]);
@@ -48,15 +55,37 @@ const AgendamentoForm = ({
       setDropdownVisible(false);
       return;
     }
-    buscarFilmes();
-  }, [buscaFilme]);
+
+    // Se estivermos em um processo de seleção programática, não execute a busca
+    if (isSelectingFilmRef.current) {
+      return;
+    }
+
+    // Caso contrário, inicie a busca após um pequeno debounce para evitar muitas chamadas
+    const handler = setTimeout(() => {
+      buscarFilmes();
+    }, 300); // Adicionado debounce para melhorar performance
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [buscaFilme]); // Removido isSelectingFilm das dependências, pois usamos a ref
 
   useEffect(() => {
-    if (filmeSelecionado?.title) {
-      // Limpa o erro do filme quando um filme é selecionado
+    // Quando um filme é pré-selecionado (ex: em modo de edição),
+    // o campo de busca deve refletir o título.
+    // Usamos isSelectingFilmRef.current para evitar looping quando setBuscaFilme é chamado em selecionarFilme
+    if (filmeSelecionado?.title && buscaFilme === '' && !isSelectingFilmRef.current) {
+      setBuscaFilme(filmeSelecionado.title);
       setFilmeError(false);
+    } else if (!filmeSelecionado?.title && buscaFilme !== '' && !isSelectingFilmRef.current) {
+      // Se o filme selecionado for limpo mas o campo de busca tem algo,
+      // limpar o campo de busca também para evitar inconsistência.
+      // E só limpe se não estivermos selecionando programaticamente.
+      setBuscaFilme('');
     }
   }, [filmeSelecionado]);
+
 
   const buscarFilmes = async () => {
     setBuscandoFilmes(true);
@@ -64,44 +93,21 @@ const AgendamentoForm = ({
       const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
       setFilmesFiltrados(todos);
       setFilmesPagina(todos.slice(0, PAGE_SIZE));
+      // Só mostre o dropdown se houver resultados E se o campo de busca não estiver vazio
+      // e se o filme selecionado atual não corresponder perfeitamente ao que já está no campo de busca
+      const isAlreadySelected = filmeSelecionado?.title === buscaFilme && filmesFiltrados.some(f => f.id === filmeSelecionado.id);
+      if (todos.length > 0 && buscaFilme.trim().length > 0 && !isAlreadySelected) {
+        setDropdownVisible(true);
+      } else {
+        setDropdownVisible(false);
+      }
       setPaginaAtual(1);
-      setDropdownVisible(true);
     } catch (error) {
       console.error('Erro ao buscar filmes:', error);
+      setDropdownVisible(false); // Fechar dropdown em caso de erro
     } finally {
       setBuscandoFilmes(false);
     }
-  };
-
-  const formatarData = (text) => {
-    let cleanedText = text.replace(/\D/g, '');
-    let formattedText = '';
-
-    if (cleanedText.length > 0) {
-      formattedText = cleanedText.substring(0, 2); 
-      if (cleanedText.length >= 3) {
-        formattedText += '/' + cleanedText.substring(2, 4); 
-      }
-      if (cleanedText.length >= 5) {
-        formattedText += '/' + cleanedText.substring(4, 8); 
-      }
-    }
-    setDataError(false); 
-    onChangeData(formattedText);
-  };
-
-  const formatarHora = (text) => {
-    let cleanedText = text.replace(/\D/g, '');
-    let formattedText = '';
-
-    if (cleanedText.length > 0) {
-      formattedText = cleanedText.substring(0, 2); 
-      if (cleanedText.length >= 3) {
-        formattedText += ':' + cleanedText.substring(2, 4); 
-      }
-    }
-    setHoraError(false); 
-    onChangeHora(formattedText);
   };
 
   const carregarMaisFilmes = () => {
@@ -115,31 +121,38 @@ const AgendamentoForm = ({
   };
 
   const selecionarFilme = (filme) => {
+    isSelectingFilmRef.current = true; // Seta a ref para true ANTES de mudar o estado
     onChangeFilmeSelecionado({ id: filme.id, title: filme.title });
-    setBuscaFilme('');
-    setFilmesFiltrados([]);
-    setFilmesPagina([]);
+    setBuscaFilme(filme.title);
+    setFilmesFiltrados([]); // Limpa os filmes filtrados para não exibir sugestões antigas
+    setFilmesPagina([]); // Limpa a página de filmes também
     setDropdownVisible(false);
     Keyboard.dismiss();
-    setFilmeError(false); 
+    setFilmeError(false);
+
+    // Resetar isSelectingFilmRef.current para false APÓS um pequeno atraso
+    // Isso é crucial para que futuras digitações voltem a disparar a busca
+    setTimeout(() => {
+      isSelectingFilmRef.current = false;
+    }, 200); // Pequeno atraso para garantir que o ciclo de renderização termine
   };
 
   const validateAndSubmit = () => {
     let hasError = false;
     setFilmeError(false);
-    setDataError(false); 
-    setHoraError(false); 
+    setDataError(false);
+    setHoraError(false);
 
-    if (!filmeSelecionado?.id) { 
-      setFilmeError(true); 
+    if (!filmeSelecionado?.id) {
+      setFilmeError(true);
       hasError = true;
     }
-    if (!data.trim()) { 
-      setDataError(true); 
+    if (!data.trim()) {
+      setDataError(true);
       hasError = true;
     }
-    if (!hora.trim()) { 
-      setHoraError(true); 
+    if (!hora.trim()) {
+      setHoraError(true);
       hasError = true;
     }
 
@@ -156,11 +169,53 @@ const AgendamentoForm = ({
   const dismissDropdown = () => {
     setDropdownVisible(false);
     Keyboard.dismiss();
+    // Ajustar o campo de busca se nenhum filme válido foi selecionado ou se o texto está incorreto
+    if (!filmeSelecionado?.id) {
+        setBuscaFilme(''); // Limpa o campo se nada foi selecionado
+    } else if (buscaFilme !== filmeSelecionado.title) {
+        setBuscaFilme(filmeSelecionado.title); // Restaura o título do filme selecionado
+    }
+  };
+
+
+  const formatarData = (text) => {
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2);
+      if (cleanedText.length >= 3) {
+        formattedText += '/' + cleanedText.substring(2, 4);
+      }
+      if (cleanedText.length >= 5) {
+        formattedText += '/' + cleanedText.substring(4, 8);
+      }
+    }
+    setDataError(false);
+    onChangeData(formattedText);
+  };
+
+  const formatarHora = (text) => {
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2);
+      if (cleanedText.length >= 3) {
+        formattedText += ':' + cleanedText.substring(2, 4);
+      }
+    }
+    setHoraError(false);
+    onChangeHora(formattedText);
   };
 
   return (
-    <TouchableWithoutFeedback onPress={dismissDropdown}>
-      <View style={styles.fullScreenContainer}>
+    <KeyboardAvoidingView
+      style={styles.fullScreenContainer}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <TouchableWithoutFeedback onPress={dismissDropdown}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -186,33 +241,61 @@ const AgendamentoForm = ({
             <Text style={styles.label}>Buscar Filme</Text>
             <View style={{ position: 'relative' }}>
               <TextInput
-                style={styles.input}
-                placeholder="Digite o título do filme"
+                style={[styles.input, filmeError && styles.inputError]}
+                placeholder="Digite ou selecione o filme"
                 placeholderTextColor="#999"
                 value={buscaFilme}
-                onChangeText={setBuscaFilme}
-                onFocus={() => {
+                onChangeText={(text) => {
+                  setBuscaFilme(text);
+                  // Sempre que o usuário digita, queremos o dropdown visível
                   setDropdownVisible(true);
-                  // Limpar o erro do filme ao focar na busca (já estava aqui)
-                  setFilmeError(false);
+                  // Se o usuário está digitando novamente, desmarque o filme selecionado
+                  // Isso garante que a validação funcione corretamente se ele não selecionar
+                  // um item da lista.
+                  if (filmeSelecionado?.id && text !== filmeSelecionado.title) {
+                      onChangeFilmeSelecionado(null);
+                  }
+                }}
+                onFocus={() => {
+                    setFilmeError(false);
+                    // Se há um filme selecionado, e o campo de busca já contém o título dele,
+                    // não limpe o campo e não mude a visibilidade do dropdown.
+                    // Isso permite que o usuário veja o filme já selecionado e digite para buscar outro.
+                    if (filmeSelecionado?.id && buscaFilme === filmeSelecionado.title) {
+                        // Não faça nada ou reabra o dropdown se quiser que ele veja as sugestões para o título atual
+                        setDropdownVisible(true); // Opcional: manter o dropdown aberto ao focar
+                    } else {
+                        // Caso contrário, limpe o campo para uma nova busca
+                        setBuscaFilme('');
+                        onChangeFilmeSelecionado(null);
+                        setDropdownVisible(true); // Abre o dropdown para nova busca
+                    }
                 }}
                 maxLength={100}
               />
 
+              {/* Condição para mostrar o dropdown: Visível E houver filmes na página */}
               {dropdownVisible && filmesPagina.length > 0 && (
                 <View style={styles.dropdown}>
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 150 }}>
-                    {filmesPagina.map((item) => (
-                      <TouchableOpacity
-                        key={item.id}
-                        style={styles.dropdownOption}
-                        onPress={() => selecionarFilme(item)}
-                      >
-                        <Text style={styles.dropdownOptionText}>{item.title}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    {buscandoFilmes ? ( // Adicionado indicador de carregamento
+                      <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="small" color="#f4a03f" />
+                        <Text style={styles.loadingText}>Buscando filmes...</Text>
+                      </View>
+                    ) : (
+                      filmesPagina.map((item) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={styles.dropdownOption}
+                          onPress={() => selecionarFilme(item)}
+                        >
+                          <Text style={styles.dropdownOptionText}>{item.title}</Text>
+                        </TouchableOpacity>
+                      ))
+                    )}
 
-                    {filmesPagina.length < filmesFiltrados.length && (
+                    {filmesPagina.length < filmesFiltrados.length && !buscandoFilmes && (
                       <TouchableOpacity
                         style={[styles.dropdownOption, { backgroundColor: '#f4a03f' }]}
                         onPress={carregarMaisFilmes}
@@ -227,41 +310,32 @@ const AgendamentoForm = ({
               )}
             </View>
 
-            <Text style={styles.label}>Filme Selecionado</Text>
-            <TextInput
-              style={[styles.input, { backgroundColor: '#445a72' }, filmeError && styles.inputError]} // Aplica estilo de erro se filmeError for true
-              placeholder="Nenhum filme selecionado"
-              placeholderTextColor="#999"
-              value={filmeSelecionado?.title || ''}
-              editable={false}
-            />
-
             <Text style={styles.label}>Data (DD/MM/AAAA)</Text>
             <TextInput
-              style={[styles.input, dataError && styles.inputError]} 
+              style={[styles.input, dataError && styles.inputError]}
               placeholder="Ex: 25/12/2025"
               placeholderTextColor="#999"
               value={data}
               onChangeText={formatarData}
               maxLength={10}
-              keyboardType='numeric'
+              keyboardType="numeric"
             />
 
             <Text style={styles.label}>Hora (HH:mm)</Text>
             <TextInput
-              style={[styles.input, horaError && styles.inputError]} 
+              style={[styles.input, horaError && styles.inputError]}
               placeholder="Ex: 14:30"
               placeholderTextColor="#999"
               value={hora}
               onChangeText={formatarHora}
               maxLength={5}
-              keyboardType='numeric'
+              keyboardType="numeric"
             />
           </View>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={validateAndSubmit} // Corrigido: Agora chama validateAndSubmit
+            onPress={validateAndSubmit}
           >
             <MaterialIcons
               name={editando ? 'save' : 'check'}
@@ -284,8 +358,8 @@ const AgendamentoForm = ({
             </TouchableOpacity>
           )}
         </ScrollView>
-      </View>
-    </TouchableWithoutFeedback>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -311,8 +385,8 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   inputError: {
-    borderColor: '#dc3545', // Cor da borda: vermelho
-    backgroundColor: '#2a1a1a', // Cor do fundo: um tom mais escuro de vermelho/marrom
+    borderColor: '#dc3545',
+    backgroundColor: '#2a1a1a',
   },
   formTitle: {
     color: '#FFF',
@@ -389,6 +463,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  loadingContainer: { // Novo estilo para o indicador de carregamento
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: { // Novo estilo para o texto do carregamento
+    color: '#fff',
+    marginLeft: 10,
   },
   button: {
     backgroundColor: '#f4a03f',
