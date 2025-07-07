@@ -13,6 +13,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message'; // Adicionado: Importação do Toast
 import Filme from '../../models/Filme';
 
 const PAGE_SIZE = 20;
@@ -89,29 +90,30 @@ const AgendamentoForm = ({
     setFilmesPagina([]);
     setDropdownVisible(false);
     Keyboard.dismiss();
+    setFilmeError(false); // Limpa o erro ao selecionar um filme
   };
 
   const validateAndSubmit = () => {
     let hasError = false;
-    setFilmeError(false);
-    setDataError(false);
-    setHoraError(false);
+    setFilmeError(false); // Reinicia o estado de erro do filme
+    setDataError(false); // Reinicia o estado de erro da data
+    setHoraError(false); // Reinicia o estado de erro da hora
 
-    if (!filmeSelecionado?.id) {
-      setFilmeError(true);
+    if (!filmeSelecionado?.id) { // Verifica se um filme foi selecionado
+      setFilmeError(true); // Define o erro para filme
       hasError = true;
     }
-    if (!data.trim()) {
-      setDataError(true);
+    if (!data.trim()) { // Verifica se a data está vazia
+      setDataError(true); // Define o erro para data
       hasError = true;
     }
-    if (!hora.trim()) {
-      setHoraError(true);
+    if (!hora.trim()) { // Verifica se a hora está vazia
+      setHoraError(true); // Define o erro para hora
       hasError = true;
     }
 
     if (hasError) {
-      Toast.show({
+      Toast.show({ // Mostra o Toast de erro
         type: 'error',
         text1: 'Preencha todos os campos obrigatórios.',
       });
@@ -158,7 +160,11 @@ const AgendamentoForm = ({
                 placeholderTextColor="#999"
                 value={buscaFilme}
                 onChangeText={setBuscaFilme}
-                onFocus={() => setDropdownVisible(true)}
+                onFocus={() => {
+                  setDropdownVisible(true);
+                  // Limpar o erro do filme ao focar na busca (já estava aqui)
+                  setFilmeError(false);
+                }}
                 maxLength={100}
               />
 
@@ -192,7 +198,7 @@ const AgendamentoForm = ({
 
             <Text style={styles.label}>Filme Selecionado</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: '#445a72' }]}
+              style={[styles.input, { backgroundColor: '#445a72' }, filmeError && styles.inputError]} // Aplica estilo de erro se filmeError for true
               placeholder="Nenhum filme selecionado"
               placeholderTextColor="#999"
               value={filmeSelecionado?.title || ''}
@@ -201,28 +207,34 @@ const AgendamentoForm = ({
 
             <Text style={styles.label}>Data (DD/MM/AAAA)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, dataError && styles.inputError]} // Aplica estilo de erro se dataError for true
               placeholder="Ex: 25/12/2025"
               placeholderTextColor="#999"
               value={data}
-              onChangeText={onChangeData}
+              onChangeText={text => {
+                setDataError(false); // Limpa o erro ao digitar
+                onChangeData(text);
+              }}
               maxLength={10}
             />
 
             <Text style={styles.label}>Hora (HH:mm)</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, horaError && styles.inputError]} // Aplica estilo de erro se horaError for true
               placeholder="Ex: 14:30"
               placeholderTextColor="#999"
               value={hora}
-              onChangeText={onChangeHora}
+              onChangeText={text => {
+                setHoraError(false); // Limpa o erro ao digitar
+                onChangeHora(text);
+              }}
               maxLength={5}
             />
           </View>
 
           <TouchableOpacity
             style={styles.button}
-            onPress={onSubmit}
+            onPress={validateAndSubmit} // Corrigido: Agora chama validateAndSubmit
           >
             <MaterialIcons
               name={editando ? 'save' : 'check'}
@@ -270,6 +282,10 @@ const styles = StyleSheet.create({
   headerArea: {
     alignItems: 'center',
     marginBottom: 28,
+  },
+  inputError: {
+    borderColor: '#dc3545', // Cor da borda: vermelho
+    backgroundColor: '#2a1a1a', // Cor do fundo: um tom mais escuro de vermelho/marrom
   },
   formTitle: {
     color: '#FFF',
@@ -321,8 +337,8 @@ const styles = StyleSheet.create({
     top: 48,
     left: 0,
     right: 0,
-    backgroundColor: '#113342', 
-    borderRadius: 12,           
+    backgroundColor: '#113342',
+    borderRadius: 12,
     zIndex: 100,
     elevation: 30,
     borderWidth: 1,
@@ -338,12 +354,12 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#3d5564', 
-    backgroundColor: '#18394a',   
+    borderBottomColor: '#3d5564',
+    backgroundColor: '#18394a',
     justifyContent: 'center',
   },
   dropdownOptionText: {
-    color: '#FFFFFF',  
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
   },

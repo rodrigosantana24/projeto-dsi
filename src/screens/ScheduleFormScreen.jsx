@@ -33,6 +33,39 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     return `${d}/${m}/${y}`;
   }
 
+  const formatarData = (text) => {
+    // Remove tudo que não for dígito
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); // DD
+      if (cleanedText.length >= 3) {
+        formattedText += '/' + cleanedText.substring(2, 4); // MM
+      }
+      if (cleanedText.length >= 5) {
+        formattedText += '/' + cleanedText.substring(4, 8); // AAAA
+      }
+    }
+    setDataError(false); // Limpa o erro ao digitar
+    onChangeData(formattedText);
+  };
+
+  const formatarHora = (text) => {
+    // Remove tudo que não for dígito
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); // HH
+      if (cleanedText.length >= 3) {
+        formattedText += ':' + cleanedText.substring(2, 4); // MM
+      }
+    }
+    setHoraError(false); // Limpa o erro ao digitar
+    onChangeHora(formattedText);
+  };
+
   function formatarDataISO(ddmmyyyy) {
     const [d, m, y] = ddmmyyyy.split('/');
     return `${y}-${m}-${d}`;
