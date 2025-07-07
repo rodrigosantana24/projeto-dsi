@@ -18,6 +18,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import Filme from '../../models/Filme';
 
+
 const PAGE_SIZE = 20;
 const { width } = Dimensions.get('window');
 
@@ -191,15 +192,13 @@ const AgendamentoForm = ({
     onChangeHora(formattedText);
   };
 
-  // Ajustando o offset para dar mais espaço
-  // Aumentado os valores para testar se resolve o problema no campo de hora
-  const keyboardVerticalOffsetValue = Platform.OS === 'ios' ? 100 : 120; // Valores maiores
+  const keyboardVerticalOffsetValue = Platform.OS === 'ios' ? 100 : 120; 
 
   return (
     <KeyboardAvoidingView
       style={styles.fullScreenContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={keyboardVerticalOffsetValue} // Usando o valor ajustado
+      keyboardVerticalOffset={keyboardVerticalOffsetValue} 
     >
       <TouchableWithoutFeedback onPress={dismissDropdown}>
         <ScrollView
