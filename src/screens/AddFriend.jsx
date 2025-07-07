@@ -8,6 +8,7 @@ import { UserContext } from '../Context/UserProvider';
 import AmigosService from '../services/AmigosService';
 import Toast from 'react-native-toast-message';
 import { useNavigation } from '@react-navigation/native';
+import CustomModal from '../components/modal/CustomModal';
 
 const PAGE_SIZE = 20;
 const amigoService = new AmigosService();
@@ -19,10 +20,26 @@ export default function AddFriend() {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const navigation = useNavigation();
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [amigoParaAdicionar, setAmigoParaAdicionar] = useState(null);
+
 
     useEffect(() => {
         carregarUsuarios();
     }, [search]);
+
+    const handleRowOpen = (rowKey, rowMap) => {
+        const amigo = usuarios.find(user => user.id === rowKey);
+        if (amigo) {
+            setAmigoParaAdicionar(amigo);
+            setShowAddModal(true);
+
+            // opcional: fecha o swipe visualmente
+            if (rowMap[rowKey]) {
+            rowMap[rowKey].closeRow();
+            }
+        }
+    };
 
     const carregarUsuarios = async () => {
         setLoading(true);
@@ -78,16 +95,17 @@ export default function AddFriend() {
     const dataToShow = usuarios.slice(0, page * PAGE_SIZE);
 
     const renderItem = ({ item }) => (
-        <View style={styles.visibleContainer}>
+        <View style={styles.rowFront} activeOpacity={0.9}>
             <Text style={styles.nome}>{item.name || 'Sem nome'}</Text>
             <Text style={styles.email}>{item.email}</Text>
         </View>
+    
     );
 
     const renderHiddenItem = ({ item }) => (
-        <View style={styles.hiddenContainer}>
+        <View style={styles.rowBack}>
             <TouchableOpacity
-                style={styles.addButton}
+                style={styles.backRightBtn}
                 onPress={() => handleAdicionar({ 
                     userId: userCredentials.uid, 
                     friendEmail: item.email 
@@ -127,7 +145,12 @@ export default function AddFriend() {
                     renderItem={renderItem}
                     renderHiddenItem={renderHiddenItem}
                     rightOpenValue={-75}
-                    disableRightSwipe={false}
+                    previewRowKey={'0'} // opcional
+                    previewOpenValue={-75} // pré-visualização do swipe
+                    previewOpenDelay={3000}
+                    useNativeDriver={false} // ajuda com problemas visuais
+                    disableRightSwipe={true}
+                    onRowOpen={handleRowOpen}
                     onEndReached={handleEndReached}
                     onEndReachedThreshold={0.5}
                     contentContainerStyle={{ paddingBottom: 20 }}
@@ -150,83 +173,143 @@ export default function AddFriend() {
             >
                 <MaterialIcons name="add" size={32} color="#fff" />
             </TouchableOpacity>
+            <CustomModal
+                visible={showAddModal}
+                title="Adicionar amigo"
+                message={`Deseja realmente adicionar${amigoParaAdicionar ? ` "${amigoParaAdicionar.name}"` : ''} como amigo?`}
+                cancelText="Cancelar"
+                confirmText="Adicionar"
+                onCancel={() => {
+                    setShowAddModal(false);
+                    setAmigoParaAdicionar(null);
+                }}
+                onConfirm={async () => {
+                    if (!amigoParaAdicionar) return;
+                    await handleAdicionar({
+                    userId: userCredentials.uid,
+                    friendEmail: amigoParaAdicionar.email
+                    });
+                    setShowAddModal(false);
+                    setAmigoParaAdicionar(null);
+                }}
+                confirmColor="#f4a03f"
+                cancelColor="#dc3545"
+            />
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 25,
-    backgroundColor: '#072330',
-  },
-  filterContainer: {
+    container: {
+        flex: 1,
+        padding: 16,
+        paddingTop: 25,
+        backgroundColor: '#072330',
+    },
+    filterContainer: {
+        flexDirection: 'row',
+        marginBottom: 16,
+    },
+    searchContainer: {
+        flex: 2,
+        marginRight: 8,
+    },
+    subheader: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFF',
+        marginBottom: 12,
+        marginTop: -4,
+        marginLeft: 4,
+    },
+    visibleContainer: {
+        borderRadius: 8,
+        marginBottom: 10,
+        backgroundColor: '#0a3040',
+        padding: 16,
+    },
+    nome: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    email: {
+        color: '#a0bcc8',
+        fontSize: 14,
+    },
+    hiddenContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'flex-end', 
+        alignItems: 'center',
+        backgroundColor: '#072330', 
+        paddingRight: 10,
+        paddingVertical: 4, 
+    },
+    addButton: {
+        backgroundColor: '#f4a03f',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 60,
+        height: '90%', 
+        borderRadius: 5, 
+    },
+    fab: {
+        position: 'absolute',
+        right: 24,
+        bottom: 32,
+        backgroundColor: '#f4a03f',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        zIndex: 100,
+    },
+    backRightBtn: {
     flexDirection: 'row',
-    marginBottom: 16,
-  },
-  searchContainer: {
-    flex: 2,
-    marginRight: 8,
-  },
-  subheader: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFF',
-    marginBottom: 12,
-    marginTop: -4,
-    marginLeft: 4,
-  },
-  visibleContainer: {
-    borderRadius: 8,
-    marginBottom: 8,
-    backgroundColor: '#0a3040',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#0d3d52',
-  },
-  nome: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  email: {
-    color: '#a0bcc8',
-    fontSize: 14,
-  },
-  hiddenContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end', 
     alignItems: 'center',
-    backgroundColor: '#072330', 
-    paddingRight: 10,
-    paddingVertical: 4, 
-  },
-  addButton: {
-    backgroundColor: '#f4a03f',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 60,
-    height: '90%', 
-    borderRadius: 5, 
-  },
-  fab: {
+    paddingRight: 16, 
+    justifyContent: 'flex-end',
     position: 'absolute',
-    right: 24,
-    bottom: 32,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: '100%', // pega toda a largura do item
+    height: '100%', // pega toda a altura do item
     backgroundColor: '#f4a03f',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    alignItems: 'center',
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+    },
+    backRightBtnRight: {
+        backgroundColor: '#f4a03f',
+        right: 0,
+        borderTopRightRadius: 8,
+        borderBottomRightRadius: 8, 
+    },
+    rowBack: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    backgroundColor: 'transparent', 
+    marginBottom: 10,
+    borderRadius: 8,
+    overflow: 'hidden', 
+    height: 80,
+    },
+
+    rowFront: {
+    backgroundColor: '#0a3040',
+    borderRadius: 8,
+    marginBottom: 10,
+    height: 80,
     justifyContent: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    zIndex: 100,
-  },
+    padding: 16,
+    },
 });
