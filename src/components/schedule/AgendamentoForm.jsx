@@ -73,6 +73,37 @@ const AgendamentoForm = ({
     }
   };
 
+  const formatarData = (text) => {
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); 
+      if (cleanedText.length >= 3) {
+        formattedText += '/' + cleanedText.substring(2, 4); 
+      }
+      if (cleanedText.length >= 5) {
+        formattedText += '/' + cleanedText.substring(4, 8); 
+      }
+    }
+    setDataError(false); 
+    onChangeData(formattedText);
+  };
+
+  const formatarHora = (text) => {
+    let cleanedText = text.replace(/\D/g, '');
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); 
+      if (cleanedText.length >= 3) {
+        formattedText += ':' + cleanedText.substring(2, 4); 
+      }
+    }
+    setHoraError(false); 
+    onChangeHora(formattedText);
+  };
+
   const carregarMaisFilmes = () => {
     if (buscandoFilmes) return;
     const inicio = paginaAtual * PAGE_SIZE;
@@ -90,30 +121,30 @@ const AgendamentoForm = ({
     setFilmesPagina([]);
     setDropdownVisible(false);
     Keyboard.dismiss();
-    setFilmeError(false); // Limpa o erro ao selecionar um filme
+    setFilmeError(false); 
   };
 
   const validateAndSubmit = () => {
     let hasError = false;
-    setFilmeError(false); // Reinicia o estado de erro do filme
-    setDataError(false); // Reinicia o estado de erro da data
-    setHoraError(false); // Reinicia o estado de erro da hora
+    setFilmeError(false);
+    setDataError(false); 
+    setHoraError(false); 
 
-    if (!filmeSelecionado?.id) { // Verifica se um filme foi selecionado
-      setFilmeError(true); // Define o erro para filme
+    if (!filmeSelecionado?.id) { 
+      setFilmeError(true); 
       hasError = true;
     }
-    if (!data.trim()) { // Verifica se a data está vazia
-      setDataError(true); // Define o erro para data
+    if (!data.trim()) { 
+      setDataError(true); 
       hasError = true;
     }
-    if (!hora.trim()) { // Verifica se a hora está vazia
-      setHoraError(true); // Define o erro para hora
+    if (!hora.trim()) { 
+      setHoraError(true); 
       hasError = true;
     }
 
     if (hasError) {
-      Toast.show({ // Mostra o Toast de erro
+      Toast.show({
         type: 'error',
         text1: 'Preencha todos os campos obrigatórios.',
       });
@@ -207,28 +238,24 @@ const AgendamentoForm = ({
 
             <Text style={styles.label}>Data (DD/MM/AAAA)</Text>
             <TextInput
-              style={[styles.input, dataError && styles.inputError]} // Aplica estilo de erro se dataError for true
+              style={[styles.input, dataError && styles.inputError]} 
               placeholder="Ex: 25/12/2025"
               placeholderTextColor="#999"
               value={data}
-              onChangeText={text => {
-                setDataError(false); // Limpa o erro ao digitar
-                onChangeData(text);
-              }}
+              onChangeText={formatarData}
               maxLength={10}
+              keyboardType='numeric'
             />
 
             <Text style={styles.label}>Hora (HH:mm)</Text>
             <TextInput
-              style={[styles.input, horaError && styles.inputError]} // Aplica estilo de erro se horaError for true
+              style={[styles.input, horaError && styles.inputError]} 
               placeholder="Ex: 14:30"
               placeholderTextColor="#999"
               value={hora}
-              onChangeText={text => {
-                setHoraError(false); // Limpa o erro ao digitar
-                onChangeHora(text);
-              }}
+              onChangeText={formatarHora}
               maxLength={5}
+              keyboardType='numeric'
             />
           </View>
 
