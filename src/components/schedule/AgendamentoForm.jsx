@@ -35,6 +35,9 @@ const AgendamentoForm = ({
   const [paginaAtual, setPaginaAtual] = useState(0);
   const [buscandoFilmes, setBuscandoFilmes] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [filmeError, setFilmeError] = useState(false);
+  const [dataError, setDataError] = useState(false);
+  const [horaError, setHoraError] = useState(false);
 
   useEffect(() => {
     if (!buscaFilme.trim()) {
@@ -46,6 +49,13 @@ const AgendamentoForm = ({
     }
     buscarFilmes();
   }, [buscaFilme]);
+
+  useEffect(() => {
+    if (filmeSelecionado?.title) {
+      // Limpa o erro do filme quando um filme é selecionado
+      setFilmeError(false);
+    }
+  }, [filmeSelecionado]);
 
   const buscarFilmes = async () => {
     setBuscandoFilmes(true);
@@ -81,8 +91,34 @@ const AgendamentoForm = ({
     Keyboard.dismiss();
   };
 
-  const isFormValid = () =>
-    filmeSelecionado?.id && data.trim() && hora.trim();
+  const validateAndSubmit = () => {
+    let hasError = false;
+    setFilmeError(false);
+    setDataError(false);
+    setHoraError(false);
+
+    if (!filmeSelecionado?.id) {
+      setFilmeError(true);
+      hasError = true;
+    }
+    if (!data.trim()) {
+      setDataError(true);
+      hasError = true;
+    }
+    if (!hora.trim()) {
+      setHoraError(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      Toast.show({
+        type: 'error',
+        text1: 'Preencha todos os campos obrigatórios.',
+      });
+      return;
+    }
+    onSubmit();
+  };
 
   const dismissDropdown = () => {
     setDropdownVisible(false);
@@ -185,9 +221,8 @@ const AgendamentoForm = ({
           </View>
 
           <TouchableOpacity
-            style={[styles.button, !isFormValid() ? styles.buttonDisabled : null]}
+            style={styles.button}
             onPress={onSubmit}
-            disabled={!isFormValid()}
           >
             <MaterialIcons
               name={editando ? 'save' : 'check'}
@@ -265,7 +300,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   label: {
-    color: '#f4a03f',
+    color: '#fff',
     fontWeight: 'bold',
     marginBottom: 6,
     marginTop: 14,
