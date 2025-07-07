@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // Importar useRef
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -42,12 +42,9 @@ const AgendamentoForm = ({
   const [dataError, setDataError] = useState(false);
   const [horaError, setHoraError] = useState(false);
 
-  // NOVO: Usaremos um useRef para evitar re-renderizações desnecessárias ao mudar isSelectingFilm
-  // e para ter uma referência mutável que não aciona useEffects
   const isSelectingFilmRef = useRef(false);
 
   useEffect(() => {
-    // Se o texto de busca está vazio, não precisamos buscar nada
     if (!buscaFilme.trim()) {
       setFilmesFiltrados([]);
       setFilmesPagina([]);
@@ -56,36 +53,27 @@ const AgendamentoForm = ({
       return;
     }
 
-    // Se estivermos em um processo de seleção programática, não execute a busca
     if (isSelectingFilmRef.current) {
       return;
     }
 
-    // Caso contrário, inicie a busca após um pequeno debounce para evitar muitas chamadas
     const handler = setTimeout(() => {
       buscarFilmes();
-    }, 300); // Adicionado debounce para melhorar performance
+    }, 300);
 
     return () => {
       clearTimeout(handler);
     };
-  }, [buscaFilme]); // Removido isSelectingFilm das dependências, pois usamos a ref
+  }, [buscaFilme]);
 
   useEffect(() => {
-    // Quando um filme é pré-selecionado (ex: em modo de edição),
-    // o campo de busca deve refletir o título.
-    // Usamos isSelectingFilmRef.current para evitar looping quando setBuscaFilme é chamado em selecionarFilme
     if (filmeSelecionado?.title && buscaFilme === '' && !isSelectingFilmRef.current) {
       setBuscaFilme(filmeSelecionado.title);
       setFilmeError(false);
     } else if (!filmeSelecionado?.title && buscaFilme !== '' && !isSelectingFilmRef.current) {
-      // Se o filme selecionado for limpo mas o campo de busca tem algo,
-      // limpar o campo de busca também para evitar inconsistência.
-      // E só limpe se não estivermos selecionando programaticamente.
       setBuscaFilme('');
     }
   }, [filmeSelecionado]);
-
 
   const buscarFilmes = async () => {
     setBuscandoFilmes(true);
@@ -93,9 +81,7 @@ const AgendamentoForm = ({
       const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
       setFilmesFiltrados(todos);
       setFilmesPagina(todos.slice(0, PAGE_SIZE));
-      // Só mostre o dropdown se houver resultados E se o campo de busca não estiver vazio
-      // e se o filme selecionado atual não corresponder perfeitamente ao que já está no campo de busca
-      const isAlreadySelected = filmeSelecionado?.title === buscaFilme && filmesFiltrados.some(f => f.id === filmeSelecionado.id);
+      const isAlreadySelected = filmeSelecionado?.title === buscaFilme && todos.some(f => f.id === filmeSelecionado.id);
       if (todos.length > 0 && buscaFilme.trim().length > 0 && !isAlreadySelected) {
         setDropdownVisible(true);
       } else {
@@ -104,7 +90,7 @@ const AgendamentoForm = ({
       setPaginaAtual(1);
     } catch (error) {
       console.error('Erro ao buscar filmes:', error);
-      setDropdownVisible(false); // Fechar dropdown em caso de erro
+      setDropdownVisible(false);
     } finally {
       setBuscandoFilmes(false);
     }
@@ -121,20 +107,18 @@ const AgendamentoForm = ({
   };
 
   const selecionarFilme = (filme) => {
-    isSelectingFilmRef.current = true; // Seta a ref para true ANTES de mudar o estado
+    isSelectingFilmRef.current = true;
     onChangeFilmeSelecionado({ id: filme.id, title: filme.title });
     setBuscaFilme(filme.title);
-    setFilmesFiltrados([]); // Limpa os filmes filtrados para não exibir sugestões antigas
-    setFilmesPagina([]); // Limpa a página de filmes também
+    setFilmesFiltrados([]);
+    setFilmesPagina([]);
     setDropdownVisible(false);
     Keyboard.dismiss();
     setFilmeError(false);
 
-    // Resetar isSelectingFilmRef.current para false APÓS um pequeno atraso
-    // Isso é crucial para que futuras digitações voltem a disparar a busca
     setTimeout(() => {
       isSelectingFilmRef.current = false;
-    }, 200); // Pequeno atraso para garantir que o ciclo de renderização termine
+    }, 200);
   };
 
   const validateAndSubmit = () => {
@@ -169,14 +153,12 @@ const AgendamentoForm = ({
   const dismissDropdown = () => {
     setDropdownVisible(false);
     Keyboard.dismiss();
-    // Ajustar o campo de busca se nenhum filme válido foi selecionado ou se o texto está incorreto
     if (!filmeSelecionado?.id) {
-        setBuscaFilme(''); // Limpa o campo se nada foi selecionado
+        setBuscaFilme('');
     } else if (buscaFilme !== filmeSelecionado.title) {
-        setBuscaFilme(filmeSelecionado.title); // Restaura o título do filme selecionado
+        setBuscaFilme(filmeSelecionado.title);
     }
   };
-
 
   const formatarData = (text) => {
     let cleanedText = text.replace(/\D/g, '');
@@ -209,11 +191,15 @@ const AgendamentoForm = ({
     onChangeHora(formattedText);
   };
 
+  // Ajustando o offset para dar mais espaço
+  // Aumentado os valores para testar se resolve o problema no campo de hora
+  const keyboardVerticalOffsetValue = Platform.OS === 'ios' ? 100 : 120; // Valores maiores
+
   return (
     <KeyboardAvoidingView
       style={styles.fullScreenContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+      keyboardVerticalOffset={keyboardVerticalOffsetValue} // Usando o valor ajustado
     >
       <TouchableWithoutFeedback onPress={dismissDropdown}>
         <ScrollView
@@ -247,38 +233,28 @@ const AgendamentoForm = ({
                 value={buscaFilme}
                 onChangeText={(text) => {
                   setBuscaFilme(text);
-                  // Sempre que o usuário digita, queremos o dropdown visível
                   setDropdownVisible(true);
-                  // Se o usuário está digitando novamente, desmarque o filme selecionado
-                  // Isso garante que a validação funcione corretamente se ele não selecionar
-                  // um item da lista.
                   if (filmeSelecionado?.id && text !== filmeSelecionado.title) {
                       onChangeFilmeSelecionado(null);
                   }
                 }}
                 onFocus={() => {
                     setFilmeError(false);
-                    // Se há um filme selecionado, e o campo de busca já contém o título dele,
-                    // não limpe o campo e não mude a visibilidade do dropdown.
-                    // Isso permite que o usuário veja o filme já selecionado e digite para buscar outro.
                     if (filmeSelecionado?.id && buscaFilme === filmeSelecionado.title) {
-                        // Não faça nada ou reabra o dropdown se quiser que ele veja as sugestões para o título atual
-                        setDropdownVisible(true); // Opcional: manter o dropdown aberto ao focar
+                        setDropdownVisible(true);
                     } else {
-                        // Caso contrário, limpe o campo para uma nova busca
                         setBuscaFilme('');
                         onChangeFilmeSelecionado(null);
-                        setDropdownVisible(true); // Abre o dropdown para nova busca
+                        setDropdownVisible(true);
                     }
                 }}
                 maxLength={100}
               />
 
-              {/* Condição para mostrar o dropdown: Visível E houver filmes na página */}
               {dropdownVisible && filmesPagina.length > 0 && (
                 <View style={styles.dropdown}>
                   <ScrollView nestedScrollEnabled style={{ maxHeight: 150 }}>
-                    {buscandoFilmes ? ( // Adicionado indicador de carregamento
+                    {buscandoFilmes ? (
                       <View style={styles.loadingContainer}>
                         <ActivityIndicator size="small" color="#f4a03f" />
                         <Text style={styles.loadingText}>Buscando filmes...</Text>
@@ -464,13 +440,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  loadingContainer: { // Novo estilo para o indicador de carregamento
+  loadingContainer: {
     padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  loadingText: { // Novo estilo para o texto do carregamento
+  loadingText: {
     color: '#fff',
     marginLeft: 10,
   },

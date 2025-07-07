@@ -11,7 +11,7 @@ import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import {  MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import AddButton from "../components/buttons/AddButton";
 import Toast from "react-native-toast-message";
@@ -21,7 +21,7 @@ export default function ToScheduleScreen() {
   const { userCredentials } = useContext(UserContext);
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [filtro, setFiltro] = useState("nenhum"); 
+  const [filtro, setFiltro] = useState("nenhum");
   const [valorFiltro, setValorFiltro] = useState('');
 
   const service = new AgendamentoService();
@@ -57,7 +57,6 @@ export default function ToScheduleScreen() {
     }
   }
 
-
   function converterDataParaISO(dataBR) {
     const partes = dataBR.split("/");
     if (partes.length !== 3) return null;
@@ -79,135 +78,164 @@ export default function ToScheduleScreen() {
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
 
+  const formatarDataFiltro = (text) => {
+    let cleanedText = text.replace(/\D/g, ''); 
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); 
+      if (cleanedText.length >= 3) {
+        formattedText += '/' + cleanedText.substring(2, 4); 
+      }
+      if (cleanedText.length >= 5) {
+        formattedText += '/' + cleanedText.substring(4, 8);
+      }
+    }
+    setValorFiltro(formattedText);
+  };
+
+  const formatarHoraFiltro = (text) => {
+    let cleanedText = text.replace(/\D/g, ''); 
+    let formattedText = '';
+
+    if (cleanedText.length > 0) {
+      formattedText = cleanedText.substring(0, 2); 
+      if (cleanedText.length >= 3) {
+        formattedText += ':' + cleanedText.substring(2, 4); 
+      }
+    }
+    setValorFiltro(formattedText);
+  };
+
   function filtrarAgendamentos() {
-  if (filtro === "nenhum" || !valorFiltro.trim()) return agendamentos;
+    if (filtro === "nenhum" || !valorFiltro.trim()) return agendamentos;
 
-  if (filtro === "data") {
-    const dataBR = valorFiltro.trim();
-    const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    if (filtro === "data") {
+      const dataBR = valorFiltro.trim();
+      const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
 
-    if (!regex.test(dataBR)) {
-      return [];
+      if (!regex.test(dataBR)) {
+        return [];
+      }
+      const [dia, mes, ano] = dataBR.split("/").map(Number);
+      const dataObj = new Date(ano, mes - 1, dia);
+      if (
+        dataObj.getDate() !== dia ||
+        dataObj.getMonth() !== mes - 1 ||
+        dataObj.getFullYear() !== ano
+      ) {
+        return [];
+      }
+
+      const filtroISO = converterDataParaISO(dataBR);
+      return agendamentos.filter((item) => item.data === filtroISO);
     }
-    const [dia, mes, ano] = dataBR.split("/").map(Number);
-    const dataObj = new Date(ano, mes - 1, dia);
-    if (
-      dataObj.getDate() !== dia ||
-      dataObj.getMonth() !== mes - 1 ||
-      dataObj.getFullYear() !== ano
-    ) {
-      return [];
+
+    if (filtro === "hora") {
+      const horaFiltro = valorFiltro.trim();
+      if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(horaFiltro)) {
+        return [];
+      }
+      return agendamentos.filter(item => item.hora === horaFiltro);
     }
 
-    const filtroISO = converterDataParaISO(dataBR);
-    return agendamentos.filter((item) => item.data >= filtroISO);
+    return agendamentos;
   }
-
-  if (filtro === "hora") {
-    const horaFiltro = valorFiltro.trim();
-    if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(horaFiltro)) {
-      return []; 
-    }
-    return agendamentos.filter(item => {return item.hora >= horaFiltro;});    
-  }
-
-  return agendamentos;
-}
 
   const agendamentosFiltrados = filtrarAgendamentos();
 
   useFocusEffect(
     useCallback(() => {
-    carregarAgendamentos();
+      carregarAgendamentos();
     }, [userCredentials.uid])
   );
 
   return (
-  <View style={styles.container}>
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Ionicons name="arrow-back" size={28} color="#c7defa" />
-      </TouchableOpacity>
-      <Text style={styles.titulo}>Seus agendamentos</Text>
-    </View>
-
-    <View style={styles.filtroContainer}>
-      <Text style={styles.labelFiltro}>Filtrar por:</Text>
-      <View style={styles.filtroOpcoes}>
-        <TouchableOpacity
-          style={[styles.filtroBotao, filtro === "nenhum" && styles.filtroBotaoSelecionado]}
-          onPress={() => {
-            setFiltro("nenhum");
-            setValorFiltro("");
-          }}
-        >
-          <Text style={styles.textoFiltro}>Nenhum</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={28} color="#c7defa" />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filtroBotao, filtro === "data" && styles.filtroBotaoSelecionado]}
-          onPress={() => {
-            setFiltro("data");
-            setValorFiltro("");
-          }}
-        >
-          <Text style={styles.textoFiltro}>Data</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.filtroBotao, filtro === "hora" && styles.filtroBotaoSelecionado]}
-          onPress={() => {
-            setFiltro("hora");
-            setValorFiltro("");
-          }}
-        >
-          <Text style={styles.textoFiltro}>Hora</Text>
-        </TouchableOpacity>
+        <Text style={styles.titulo}>Seus agendamentos</Text>
       </View>
-      {filtro !== "nenhum" && (
-        <TextInput
-          style={styles.inputFiltro}
-          placeholder={filtro === "data" ? "Digite a data (DD/MM/YYYY)" : "Digite a hora (HH:mm)"}
-          placeholderTextColor={'#999'}
-          value={valorFiltro}
-          onChangeText={setValorFiltro}
+
+      <View style={styles.filtroContainer}>
+        <Text style={styles.labelFiltro}>Filtrar por:</Text>
+        <View style={styles.filtroOpcoes}>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtro === "nenhum" && styles.filtroBotaoSelecionado]}
+            onPress={() => {
+              setFiltro("nenhum");
+              setValorFiltro("");
+            }}
+          >
+            <Text style={styles.textoFiltro}>Nenhum</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtro === "data" && styles.filtroBotaoSelecionado]}
+            onPress={() => {
+              setFiltro("data");
+              setValorFiltro("");
+            }}
+          >
+            <Text style={styles.textoFiltro}>Data</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filtroBotao, filtro === "hora" && styles.filtroBotaoSelecionado]}
+            onPress={() => {
+              setFiltro("hora");
+              setValorFiltro("");
+            }}
+          >
+            <Text style={styles.textoFiltro}>Hora</Text>
+          </TouchableOpacity>
+        </View>
+        {filtro !== "nenhum" && (
+          <TextInput
+            style={styles.inputFiltro}
+            placeholder={filtro === "data" ? "DD/MM/AAAA" : "HH:mm"} 
+            placeholderTextColor={'#999'}
+            value={valorFiltro}
+            onChangeText={filtro === "data" ? formatarDataFiltro : formatarHoraFiltro} 
+            maxLength={filtro === "data" ? 10 : 5} 
+            keyboardType="numeric" 
+          />
+        )}
+      </View>
+
+      {loading ? (
+        <Text style={styles.loadingText}>Carregando agendamentos...</Text>
+      ) : (
+        <SwipeListView
+          data={agendamentosFiltrados}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})} style={({ pressed }) => [
+              styles.card, { transform: [{ scale: pressed ? 1.02 : 1 }] },
+            ]}>
+              <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
+              <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+              <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
+            </Pressable>
+          )}
+          renderHiddenItem={({ item }) => (
+            <View style={styles.hiddenContainer}>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => excluirAgendamento(item.id)}
+              >
+                <MaterialIcons name="delete" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+          rightOpenValue={-75}
+          disableRightSwipe
+          swipeToOpenPercent={100}
+          contentContainerStyle={{ paddingBottom: 60 }}
         />
       )}
+      <AddButton onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}></AddButton>
     </View>
-
-
-    {loading ? (
-      <Text style={styles.loadingText}>Carregando agendamentos...</Text>
-    ) : (
-      
-  <SwipeListView
-    data={agendamentosFiltrados}
-    keyExtractor={(item) => item.id}
-    renderItem={({ item }) => (
-        <Pressable onPress={() => navigation.navigate("ScheduleFormScreen", {agendamento: item})} style={({ pressed }) => [
-        styles.card, { transform: [{ scale: pressed ? 1.02 : 1 }] },
-    ]}>
-          <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
-          <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-          <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
-        </Pressable>
-    )}
-    renderHiddenItem={({ item }) => (
-      <View style={styles.hiddenContainer}>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => excluirAgendamento(item.id)}
-        >
-          <MaterialIcons name="delete" size={28} color="#fff" />
-        </TouchableOpacity>
-      </View>
-    )}
-    rightOpenValue={-75}
-    disableRightSwipe
-    swipeToOpenPercent={100}
-    contentContainerStyle={{ paddingBottom: 60 }}
-    />
-  )}
-    <AddButton onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}></AddButton>
-  </View>
   );
 }
 
@@ -339,16 +367,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingRight: 10,    
+    paddingRight: 10,
   },
   deleteButton: {
     backgroundColor: '#c00',
     width: 75,
-    height: '80%',
+    height: '80%', 
     justifyContent: 'center',
     alignItems: 'center',
     borderTopRightRadius: 10,
     borderBottomRightRadius: 10,
   },
-
 });
