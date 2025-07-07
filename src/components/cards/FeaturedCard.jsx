@@ -15,6 +15,7 @@ export default function FeaturedCard({ title, imageUrl, onPress }) {
         source={{ uri: imageUrl }}
         style={styles.image}
         imageStyle={styles.image}
+        resizeMode="stretch"
       >
         <View style={styles.overlay}>
           <Text style={styles.title}>{title}</Text>

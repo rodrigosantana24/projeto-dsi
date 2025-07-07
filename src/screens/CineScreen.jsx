@@ -24,7 +24,7 @@ export default function CineScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#192936',
+        backgroundColor: '#072330',
         paddingTop: 60,
         paddingHorizontal: 20,
     },

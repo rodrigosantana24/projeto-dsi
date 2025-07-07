@@ -8,6 +8,9 @@ import GeneroItem from '../components/genres/GeneroItem';
 import HeaderBar from '../components/navi/HeaderBar';
 import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
+import Toast from 'react-native-toast-message';
+import CustomModal from '../components/modal/CustomModal'; 
+import Icon from 'react-native-vector-icons/Feather';
 
 const generoService = new GeneroService();
 const PAGE_SIZE = 20;
@@ -19,16 +22,35 @@ export default class GenresListScreen extends React.Component {
     searchText: '',
     filterNativo: 'all',
     page: 1,
+    showDeleteModal: false,
+    generoParaExcluir: null,
   };
 
   unsubscribeFocus = null;
 
   async componentDidMount() {
     await this.loadGeneros();
+
     if (this.props.navigation?.addListener) {
-      this.unsubscribeFocus = this.props.navigation.addListener('focus', this.loadGeneros);
+      this.unsubscribeFocus = this.props.navigation.addListener('focus', () => {
+        this.loadGeneros();
+        this.checkToastParam();
+      });
     }
+
+    this.checkToastParam();
   }
+
+  checkToastParam = () => {
+    const toastParam = this.props.route?.params?.toast;
+    if (toastParam) {
+      Toast.show({
+        type: toastParam.type,
+        text1: toastParam.msg,
+      });
+      this.props.navigation.setParams({ toast: undefined });
+    }
+  };
 
   componentWillUnmount() {
     if (this.unsubscribeFocus) {
@@ -80,28 +102,53 @@ export default class GenresListScreen extends React.Component {
   };
 
   handleDelete = (id) => {
-    Alert.alert('Confirmar', 'Deseja excluir este gênero?', [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Excluir',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await generoService.delete({ id });
-            this.setState((prev) => ({
-              generos: prev.generos.filter(g => g.id !== id),
-              filteredGeneros: prev.filteredGeneros.filter(g => g.id !== id),
-            }));
-          } catch (error) {
-            Alert.alert('Erro', 'Falha ao excluir gênero');
-          }
-        },
-      },
-    ]);
+    const genero = this.state.filteredGeneros.find(g => g.id === id);
+    if (!genero || genero.nativo) return;
+
+    this.setState({
+      showDeleteModal: true,
+      generoParaExcluir: genero,
+    });
+  };
+
+  confirmDelete = async () => {
+    const { generoParaExcluir } = this.state;
+    if (!generoParaExcluir) return;
+
+    try {
+      await generoService.delete({ id: generoParaExcluir.id });
+      this.setState((prev) => ({
+        generos: prev.generos.filter(g => g.id !== generoParaExcluir.id),
+        filteredGeneros: prev.filteredGeneros.filter(g => g.id !== generoParaExcluir.id),
+        showDeleteModal: false,
+        generoParaExcluir: null,
+      }));
+      Toast.show({
+        type: 'success',
+        text1: 'Gênero excluído com sucesso',
+      });
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao excluir gênero');
+      this.setState({ showDeleteModal: false, generoParaExcluir: null });
+    }
+  };
+
+  cancelDelete = () => {
+    this.setState({ showDeleteModal: false, generoParaExcluir: null });
+  };
+
+  handleRowOpen = (rowKey, rowMap) => {
+    const item = this.state.filteredGeneros.find(g => g.id.toString() === rowKey);
+    if (item && !item.nativo) {
+      this.handleDelete(item.id);
+      if (rowMap && rowMap[rowKey]) {
+        rowMap[rowKey].closeRow();
+      }
+    }
   };
 
   render() {
-    const { filteredGeneros, page } = this.state;
+    const { filteredGeneros, page, showDeleteModal, generoParaExcluir } = this.state;
     const dataToShow = filteredGeneros.slice(0, page * PAGE_SIZE);
 
     return (
@@ -109,20 +156,13 @@ export default class GenresListScreen extends React.Component {
         <HeaderBar
           title="Gêneros"
           onBack={() => this.props.navigation.goBack()}
-          rightComponent={
-            <TouchableOpacity
-              onPress={() => this.props.navigation.navigate('GenresFormScreen')}
-              style={{ marginRight: 10 }}
-            >
-              <MaterialIcons name="add" size={28} color="#fff" />
-            </TouchableOpacity>
-          }
         />
 
         <View style={styles.filterContainer}>
           <View style={styles.searchContainer}>
             <SearchBy
               placeholder="Pesquisar gêneros..."
+              value={this.state.searchText}
               onSearch={this.handleSearch}
             />
           </View>
@@ -145,36 +185,65 @@ export default class GenresListScreen extends React.Component {
           data={dataToShow}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <GeneroItem
-              genero={item}
-              onEdit={() => {
-                if (!item.nativo) {
-                  this.props.navigation.navigate('GenresFormScreen', { genero: item });
-                }
-              }}
-            />
+            <View style={styles.rowFront}>
+              <GeneroItem
+                genero={item}
+                onEdit={() => {
+                  if (!item.nativo) {
+                    this.props.navigation.navigate('GenresFormScreen', {
+                      genero: item,
+                      toast: { type: 'success', msg: 'Gênero atualizado com sucesso' },
+                    });
+                  }
+                }}
+              />
+            </View>
           )}
-          renderHiddenItem={({ item }) =>
+          renderHiddenItem={({ item }, rowMap) =>
             !item.nativo && (
-              <View style={styles.hiddenContainer}>
+              <View style={styles.rowBack}>
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={styles.backRightBtn}
                   onPress={() => this.handleDelete(item.id)}
                 >
-                  <MaterialIcons name="delete" size={28} color="#fff" />
+                  <Icon name="trash-2" size={28} color="#fff" />
                 </TouchableOpacity>
               </View>
             )
           }
           rightOpenValue={-75}
-          disableRightSwipe={false}
+          disableRightSwipe={true}
+          onRowOpen={this.handleRowOpen}
           onEndReached={this.handleEndReached}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             (page * PAGE_SIZE) < filteredGeneros.length
               ? <Text style={{ color: '#fff', textAlign: 'center', margin: 10 }}>Deslize para carregar mais...</Text>
               : null
           }
+        />
+        <TouchableOpacity
+          style={styles.fab}
+          onPress={() =>
+            this.props.navigation.navigate('GenresFormScreen', {
+              toast: { type: 'success', msg: 'Gênero criado com sucesso' },
+            })
+          }
+        >
+          <MaterialIcons name="add" size={32} color="#fff" />
+        </TouchableOpacity>
+        
+         <CustomModal
+          visible={showDeleteModal}
+          title="Excluir gênero"
+          message={`Deseja realmente excluir${generoParaExcluir ? ` "${generoParaExcluir.nome}"` : ''}?`}
+          cancelText="Cancelar"
+          confirmText="Excluir"
+          onCancel={this.cancelDelete}
+          onConfirm={this.confirmDelete}
+          confirmColor="#dc3545"
+          cancelColor="#f4a03f"
         />
       </View>
     );
@@ -224,5 +293,51 @@ const styles = StyleSheet.create({
     width: 60,
     height: '90%',
     borderRadius: 5,
+  },
+  fab: {
+    position: 'absolute',
+    right: 24,
+    bottom: 32,
+    backgroundColor: '#f4a03f',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
+  },
+  rowFront: {
+    backgroundColor: '#113342',
+    borderRadius: 8,
+    overflow: 'hidden',
+    minHeight: 80,
+    flex: 1,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#D9534F',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  backRightBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#D9534F',
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
 });

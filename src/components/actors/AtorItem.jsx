@@ -3,13 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const AtorItem = ({ ator, onEdit }) => {
   return (
-    <TouchableOpacity onPress={onEdit} activeOpacity={0.7}>
       <View style={styles.container}>
         <Text style={styles.nome}>{ator.nome}</Text>
         <Text style={styles.descricao}>{ator.nacionalidade}</Text>
         <Text style={styles.descricao}>{ator.sexo}</Text>
       </View>
-    </TouchableOpacity>
   );
 };
 
@@ -17,7 +15,6 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#113342',
     padding: 12,
-    marginBottom: 8,
     borderRadius: 8,
   },
   nome: {

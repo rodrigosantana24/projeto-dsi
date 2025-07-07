@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#072330", 
-    paddingTop: 24,
+    paddingTop: 30,
   },
   center: {
     flex: 1,
@@ -130,12 +130,8 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginBottom: 10,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#ccc', 
-    marginBottom: 20, 
-  },
   flatListContentContainer: {
+    marginTop: 20,
     paddingHorizontal: 10, 
     paddingBottom: 20, 
   },

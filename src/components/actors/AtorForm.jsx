@@ -208,7 +208,7 @@ const AtorForm = ({
           <TouchableOpacity
             style={[
               styles.button,
-              // Remova a lógica de desabilitar cor
+
             ]}
             onPress={validateAndSubmit}
           >
