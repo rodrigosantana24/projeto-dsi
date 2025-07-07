@@ -124,7 +124,7 @@ export default class GenresListScreen extends React.Component {
         generoParaExcluir: null,
       }));
       Toast.show({
-        type: 'error',
+        type: 'success',
         text1: 'Gênero excluído com sucesso',
       });
     } catch (error) {
