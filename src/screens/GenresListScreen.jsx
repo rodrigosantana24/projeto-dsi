@@ -10,6 +10,7 @@ import SearchBy from '../components/search/SearchBy';
 import SelectBy from '../components/search/SelectBy';
 import Toast from 'react-native-toast-message';
 import CustomModal from '../components/modal/CustomModal'; 
+import Icon from 'react-native-vector-icons/Feather';
 
 const generoService = new GeneroService();
 const PAGE_SIZE = 20;
@@ -123,8 +124,8 @@ export default class GenresListScreen extends React.Component {
         generoParaExcluir: null,
       }));
       Toast.show({
-        type: 'error',
-        text1: 'Gênero excluído',
+        type: 'success',
+        text1: 'Gênero excluído com sucesso',
       });
     } catch (error) {
       Alert.alert('Erro', 'Falha ao excluir gênero');
@@ -184,34 +185,37 @@ export default class GenresListScreen extends React.Component {
           data={dataToShow}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <GeneroItem
-              genero={item}
-              onEdit={() => {
-                if (!item.nativo) {
-                  this.props.navigation.navigate('GenresFormScreen', {
-                    genero: item,
-                    toast: { type: 'success', msg: 'Gênero atualizado com sucesso' },
-                  });
-                }
-              }}
-            />
+            <View style={styles.rowFront}>
+              <GeneroItem
+                genero={item}
+                onEdit={() => {
+                  if (!item.nativo) {
+                    this.props.navigation.navigate('GenresFormScreen', {
+                      genero: item,
+                      toast: { type: 'success', msg: 'Gênero atualizado com sucesso' },
+                    });
+                  }
+                }}
+              />
+            </View>
           )}
-          renderHiddenItem={({ item }) =>
+          renderHiddenItem={({ item }, rowMap) =>
             !item.nativo && (
-              <View style={styles.hiddenContainer}>
+              <View style={styles.rowBack}>
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={styles.backRightBtn}
                   onPress={() => this.handleDelete(item.id)}
                 >
-                  <MaterialIcons name="delete" size={28} color="#fff" />
+                  <Icon name="trash-2" size={28} color="#fff" />
                 </TouchableOpacity>
               </View>
             )
           }
           rightOpenValue={-75}
-          disableRightSwipe={false}
+          disableRightSwipe={true}
           onRowOpen={this.handleRowOpen}
           onEndReached={this.handleEndReached}
+          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             (page * PAGE_SIZE) < filteredGeneros.length
@@ -306,5 +310,34 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     zIndex: 100,
+  },
+  rowFront: {
+    backgroundColor: '#113342',
+    borderRadius: 8,
+    overflow: 'hidden',
+    minHeight: 80,
+    flex: 1,
+  },
+  rowBack: {
+    alignItems: 'center',
+    backgroundColor: '#D9534F',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  backRightBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#D9534F',
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
 });

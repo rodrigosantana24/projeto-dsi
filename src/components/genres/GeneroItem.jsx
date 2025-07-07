@@ -9,7 +9,9 @@ const GeneroItem = ({ genero, onEdit }) => {
       <View style={styles.container}>
         <Text style={styles.nome}>{genero.nome}</Text>
         <Text style={styles.descricao}>{genero.descricao}</Text>
-        {isNativo && <Text style={styles.nativo}>Gênero nativo</Text>}
+        <Text style={styles.nativo}>
+          {isNativo ? 'Gênero nativo' : ' '}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -19,9 +21,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#113342',
     padding: 12,
-    marginBottom: 8,
-    borderRadius: 8,
-    minHeight: 80
+    borderRadius: 8
   },
   nome: {
     fontSize: 16,
@@ -35,24 +35,6 @@ const styles = StyleSheet.create({
   nativo: {
     fontStyle: 'italic',
     color: '#FFD700',
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 10,
-  },
-  actionButton: {
-    flex: 1,
-    paddingVertical: 6,
-    borderRadius: 6,
-    marginHorizontal: 4,
-    alignItems: 'center',
-  },
-  editButton: {
-    backgroundColor: '#f4a03f',
-  },
-  deleteButton: {
-    backgroundColor: '#dc3545',
   },
   buttonText: {
     color: '#FFF',
