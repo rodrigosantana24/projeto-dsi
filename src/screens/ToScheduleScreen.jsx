@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1f4e6a",
     paddingVertical: 8,
     paddingHorizontal: 18,
-    borderRadius: 8,
+    borderRadius: 4,
   },
   filtroBotaoSelecionado: {
     backgroundColor: "#f4a03f",

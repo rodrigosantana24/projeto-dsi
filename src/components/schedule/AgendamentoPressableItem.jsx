@@ -36,7 +36,7 @@ function AgendamentoPressableItem({ item, swipeRefs }) {
 const itemStyles = StyleSheet.create({
   rowFront: {
     backgroundColor: "#113342",
-    borderRadius: 2,
+    borderRadius: 8,
     marginBottom: 12,
     padding: 16,
   },
