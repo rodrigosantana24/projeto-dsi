@@ -1,7 +1,6 @@
-// src/components/AgendamentoPressableItem.js
 import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Necessário para navegar
+import { useNavigation } from '@react-navigation/native'; 
 
 
 const formatarData = (dataISO) => {
@@ -12,7 +11,7 @@ const formatarData = (dataISO) => {
 };
 
 function AgendamentoPressableItem({ item, swipeRefs }) {
-  const navigation = useNavigation(); // Hook para acessar a navegação
+  const navigation = useNavigation(); 
 
   return (
     <Pressable
@@ -37,7 +36,7 @@ function AgendamentoPressableItem({ item, swipeRefs }) {
 const itemStyles = StyleSheet.create({
   rowFront: {
     backgroundColor: "#113342",
-    borderRadius: 8,
+    borderRadius: 2,
     marginBottom: 12,
     padding: 16,
   },
@@ -52,7 +51,6 @@ const itemStyles = StyleSheet.create({
     color: "#fff",
     marginBottom: 4,
   },
-  // Se houver outros estilos que eram específicos do item, mova-os para cá
 });
 
 export default AgendamentoPressableItem;

@@ -5,8 +5,6 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Pressable, // Mantenha Pressable se for usar em outro lugar, mas ele não será o principal aqui
-  Platform,
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
 import { UserContext } from "../Context/UserProvider";
@@ -18,7 +16,7 @@ import Toast from "react-native-toast-message";
 import CustomModal from "../components/modal/CustomModal";
 import Icon from 'react-native-vector-icons/Feather';
 
-// Importe o novo componente do item da lista
+
 import AgendamentoPressableItem from "../components/schedule/AgendamentoPressableItem";
 
 export default function ToScheduleScreen() {
@@ -101,7 +99,7 @@ export default function ToScheduleScreen() {
     return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
   }
 
-  // Mantenha formatarData aqui ou mova para um arquivo de utilitário compartilhado
+  
   function formatarData(dataISO) {
     if (!dataISO) return "";
     const partes = dataISO.split("-");
@@ -249,7 +247,6 @@ export default function ToScheduleScreen() {
         <SwipeListView
           data={agendamentosFiltrados}
           keyExtractor={(item) => item.id}
-          // Agora renderiza o novo componente do item
           renderItem={({ item }) => (
             <AgendamentoPressableItem item={item} swipeRefs={swipeRefs} />
           )}
@@ -313,31 +310,13 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  // REMOVA rowFront, cardTitle e cardText daqui, eles foram movidos para itemStyles em AgendamentoPressableItem.js
-  // rowFront: {
-  //   backgroundColor: "#113342",
-  //   borderRadius: 8,
-  //   marginBottom: 12,
-  //   padding: 16,
-  // },
-  // cardTitle: {
-  //   fontSize: 16,
-  //   fontWeight: "700",
-  //   color: "#fff",
-  //   marginBottom: 4,
-  // },
-  // cardText: {
-  //   fontSize: 16,
-  //   color: "#fff",
-  //   marginBottom: 4,
-  // },
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#D9534F',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    borderRadius: 8,
+    borderRadius: 20,
     marginBottom: 12,
   },
   backRightBtn: {
