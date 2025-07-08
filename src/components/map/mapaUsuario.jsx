@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 const GOOGLE_API_KEY = Constants.expoConfig?.extra?.GOOGLE_API_KEY;
 
-const { height } = Dimensions.get('window'); // A altura da tela ainda é usada para o mapa
+const { height } = Dimensions.get('window'); 
 
 export default function MapaUsuario() {
   const [userLocation, setUserLocation] = useState(null);
@@ -75,7 +75,6 @@ export default function MapaUsuario() {
     );
 
   return (
-    // Removendo o paddingBottom daqui, ele será tratado pelo `contentContainerStyle` da FlatList/ScrollView
     <View style={styles.mainContainer}> 
       <MapView
         style={styles.map}
@@ -130,7 +129,7 @@ export default function MapaUsuario() {
           data={cinemas}
           renderItem={renderCinemaItem}
           keyExtractor={(item) => item.place_id}
-          contentContainerStyle={styles.cinemaListContent} // Usar cinemaListContent para padding
+          contentContainerStyle={styles.cinemaListContent} 
           ListEmptyComponent={<Text style={styles.emptyListText}>Nenhum cinema encontrado por perto.</Text>}
         />
       )}
@@ -140,16 +139,15 @@ export default function MapaUsuario() {
 
 const styles = StyleSheet.create({
   mainContainer: {
-    flex: 1, // Permite que ocupe a altura definida pelo pai (SafeAreaView)
+    flex: 1, 
     width: '100%',
-    // paddingBottom removido daqui, adicionado nos contentContainerStyles
   },
   map: {
     width: "100%",
     height: height * 0.30,
     borderRadius: 8,
     overflow: 'hidden',
-    marginBottom: 15, // Espaçamento entre o mapa e a lista/card
+    marginBottom: 15, 
   },
   center: {
     flex: 1,
@@ -162,7 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   cinemaDetailCard: {
-    flex: 1, // Garante que a ScrollView ocupe o espaço restante
+    flex: 1, 
     backgroundColor: "#192936",
     padding: 20,
     borderRadius: 10,
@@ -173,8 +171,8 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   cinemaDetailCardContent: {
-    flexGrow: 1, // Isso é crucial para que o ScrollView funcione corretamente
-    paddingBottom: 15, // Padding para o final da rolagem
+    flexGrow: 1, 
+    paddingBottom: 15, 
   },
   cinemaImage: {
     width: '100%',
@@ -207,10 +205,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
   },
-  cinemaListContent: { // ContentContainerStyle para a FlatList
+  cinemaListContent: { 
     flexGrow: 1,
     paddingVertical: 15,
-    paddingBottom: 15, // Padding para o final da rolagem da lista
+    paddingBottom: 15, 
   },
   listItem: {
     flexDirection: 'row',
