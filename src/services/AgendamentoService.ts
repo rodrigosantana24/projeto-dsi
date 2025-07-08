@@ -48,7 +48,6 @@ export default class AgendamentoService
   }
 
   async update(params: AgendamentoUpdateDTO): Promise<Agendamento> {
-    console.log(params)
     const { id, userId, data: dia, hora, filmeId } = params;
     const agendamento = new Agendamento(id, userId, dia, hora, filmeId);
 

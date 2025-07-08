@@ -5,7 +5,7 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  Pressable,
+  Pressable, // Mantenha Pressable se for usar em outro lugar, mas ele não será o principal aqui
   Platform,
 } from "react-native";
 import AgendamentoService from "../services/AgendamentoService";
@@ -17,6 +17,9 @@ import AddButton from "../components/buttons/AddButton";
 import Toast from "react-native-toast-message";
 import CustomModal from "../components/modal/CustomModal";
 import Icon from 'react-native-vector-icons/Feather';
+
+// Importe o novo componente do item da lista
+import AgendamentoPressableItem from "../components/schedule/AgendamentoPressableItem";
 
 export default function ToScheduleScreen() {
   const navigation = useNavigation();
@@ -98,6 +101,7 @@ export default function ToScheduleScreen() {
     return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
   }
 
+  // Mantenha formatarData aqui ou mova para um arquivo de utilitário compartilhado
   function formatarData(dataISO) {
     if (!dataISO) return "";
     const partes = dataISO.split("-");
@@ -245,27 +249,15 @@ export default function ToScheduleScreen() {
         <SwipeListView
           data={agendamentosFiltrados}
           keyExtractor={(item) => item.id}
+          // Agora renderiza o novo componente do item
           renderItem={({ item }) => (
-            <Pressable
-              style={styles.rowFront}
-              activeOpacity={0.9} 
-              onPress={() => {
-                if (swipeRefs.current[item.id]) {
-                  swipeRefs.current[item.id].closeRow(); 
-                }
-                navigation.navigate("ScheduleFormScreen", {agendamento: item});
-              }}
-            >
-              <Text style={styles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
-              <Text style={styles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-              <Text style={styles.cardText}>⏰ Hora: {item.hora}</Text>
-            </Pressable>
+            <AgendamentoPressableItem item={item} swipeRefs={swipeRefs} />
           )}
           renderHiddenItem={({ item, rowMap }) => (
             <View style={styles.rowBack}>
               <TouchableOpacity
                 style={[styles.backRightBtn, styles.backRightBtnRight]}
-                onPress={() => handleConfirmDelete(item.id)} 
+                onPress={() => handleConfirmDelete(item.id)}
               >
                 <Icon name="trash-2" size={28} color="#fff" />
               </TouchableOpacity>
@@ -283,7 +275,7 @@ export default function ToScheduleScreen() {
                 delete swipeRefs.current[rowKey];
             }
           }}
-          closeOnRowPress={true} 
+          closeOnRowPress={true}
         />
       )}
       <AddButton onPress={() => navigation.navigate("ScheduleFormScreen", {userId: userCredentials.uid})}></AddButton>
@@ -321,12 +313,24 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
   },
-  rowFront: {
-    backgroundColor: "#113342",
-    borderRadius: 8,
-    marginBottom: 12,
-    padding: 16,
-  },
+  // REMOVA rowFront, cardTitle e cardText daqui, eles foram movidos para itemStyles em AgendamentoPressableItem.js
+  // rowFront: {
+  //   backgroundColor: "#113342",
+  //   borderRadius: 8,
+  //   marginBottom: 12,
+  //   padding: 16,
+  // },
+  // cardTitle: {
+  //   fontSize: 16,
+  //   fontWeight: "700",
+  //   color: "#fff",
+  //   marginBottom: 4,
+  // },
+  // cardText: {
+  //   fontSize: 16,
+  //   color: "#fff",
+  //   marginBottom: 4,
+  // },
   rowBack: {
     alignItems: 'center',
     backgroundColor: '#D9534F',
@@ -335,6 +339,25 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     borderRadius: 8,
     marginBottom: 12,
+  },
+  backRightBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 75,
+    height: '100%',
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#D9534F',
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  backRightBtnRight: {
+    backgroundColor: '#D9534F',
+    right: 0,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
   titulo: {
     fontSize: 24,
@@ -357,40 +380,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 12,
   },
-  backRightBtn: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 75,
-    height: '100%',
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: '#D9534F',
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-  },
-  backRightBtnRight: {
-    backgroundColor: '#D9534F',
-    right: 0,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 8,
-  },
   buttonText: {
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#fff",
-    marginBottom: 4,
-  },
-  cardText: {
-    fontSize: 16,
-    color: "#fff",
-    marginBottom: 4,
   },
   cardButtons: {
     flexDirection: "row",
