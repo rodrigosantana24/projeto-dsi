@@ -26,7 +26,6 @@ export default function ToScheduleScreen() {
   const [loading, setLoading] = useState(false);
   const [filtro, setFiltro] = useState("nenhum");
   const [valorFiltro, setValorFiltro] = useState('');
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [agendamentoToDeleteId, setAgendamentoToDeleteId] = useState(null);
   const swipeRefs = useRef({});
@@ -97,14 +96,6 @@ export default function ToScheduleScreen() {
     )
       return null;
     return `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`;
-  }
-
-  
-  function formatarData(dataISO) {
-    if (!dataISO) return "";
-    const partes = dataISO.split("-");
-    if (partes.length !== 3) return dataISO;
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
 
   const formatarDataFiltro = (text) => {
