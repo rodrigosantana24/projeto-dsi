@@ -1,6 +1,7 @@
 import { getDatabase, ref, set,get, remove,update, limitToFirst, query ,orderByChild, startAt , endAt } from "firebase/database";
 import ICrud from "./ICrud";
 import getUserByEmail from "./getUserByEmail";
+import Usuario from "../models/Usuario";
 
 
 interface FriendParams {
@@ -26,7 +27,7 @@ export default class AmigosService implements ICrud<FriendParams, never, never, 
       if (!user || Object.keys(user).length === 0) {
         throw new Error("Usuário não encontrado.");
       }
-      const idFriend = Object.keys(user)[0];
+      const idFriend = user.id
       const amigoRef = ref(db, `/usuarios/${userId}/amigos/${idFriend}`);
       await set(amigoRef, {
         amigo_id: idFriend
@@ -41,7 +42,7 @@ export default class AmigosService implements ICrud<FriendParams, never, never, 
 
     try {
       const user = await getUserByEmail(friendEmail);
-      const idFriend = Object.keys(user)[0];
+      const idFriend = user.id
       const amigoRef = ref(db, `/usuarios/${userId}/amigos/${idFriend}`);
       const amigoSnapshot = await get(amigoRef);
 
@@ -55,14 +56,13 @@ export default class AmigosService implements ICrud<FriendParams, never, never, 
     }
   }
 
-async read({ friendEmail }: FriendReadParams = {}): Promise<any> {
+async read({ friendEmail }: FriendReadParams = {}): Promise<Record<string, Usuario>> {
   const db = getDatabase();
   const usuariosRef = ref(db, '/usuarios');
 
   let usuariosQuery;
 
   if (friendEmail && friendEmail.trim() !== "") {
-    
     usuariosQuery = query(
       usuariosRef,
       orderByChild('email'),
@@ -72,14 +72,41 @@ async read({ friendEmail }: FriendReadParams = {}): Promise<any> {
   } else {
     usuariosQuery = query(
       usuariosRef,
-      limitToFirst(20)
+      limitToFirst(30)
     );
   }
 
   try {
     const snapshot = await get(usuariosQuery);
-    if (!snapshot.exists()) return {};
-    return snapshot.val();
+    
+    if (!snapshot.exists()) {
+      return {};
+    }
+
+    const usuariosData = snapshot.val();
+    const usuarios: Record<string, Usuario> = {};
+
+    // Converte cada usuário para uma instância da classe Usuario
+    Object.keys(usuariosData).forEach(userId => {
+      const userData = usuariosData[userId];
+      
+      // Normaliza os dados
+      const normalizedData = {
+        email: userData.email || '',
+        name: userData.name || '',
+        amigos: userData.amigos || {},
+        favoritos: Array.isArray(userData.favoritos) 
+                  ? userData.favoritos.map(String) 
+                  : [],
+        filmes: Array.isArray(userData.filmes) 
+               ? userData.filmes.map(Number) 
+               : []
+      };
+
+      usuarios[userId] = Usuario.fromFirebase(userId, normalizedData);
+    });
+
+    return usuarios;
   } catch (error: any) {
     throw new Error(error.message || "Erro ao ler usuários.");
   }
