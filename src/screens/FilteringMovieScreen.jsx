@@ -11,7 +11,7 @@ export default function FilteringMovieScreen({ navigation, route }) {
   const [controller] = useState(new HomeController(navigation));
   const [carregando, setCarregando] = useState(true);
   const [filmes, setFilmes] = useState([]);
-  const generoId = route?.params?.generoId ?? 0;
+  const generoId = route?.params?.generoId ?? 'Todos';
   const generoLabel = route?.params?.generoLabel ?? 'Filmes';
   const searchTerm = route?.params?.searchTerm ?? null;
 

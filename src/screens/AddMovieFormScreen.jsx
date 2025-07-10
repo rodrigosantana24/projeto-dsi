@@ -15,19 +15,19 @@ import Icon from 'react-native-vector-icons/Feather';
 import HeaderBar from '../components/navi/HeaderBar';
 import FilmeService from '../services/FilmeService';
 import AddForm from '../components/addmovies/AddForm';
-import Genero from '../models/Genero'; 
-import Ator from '../models/Ator';     
+import Genero from '../models/Genero';
+import Ator from '../models/Ator';
 
 const filmeService = new FilmeService();
 export default class MovieFormScreen extends React.Component {
   state = {
     title: '',
     poster_path: '',
-    generos: [],
-    atores: [],
+    generos: [], 
+    atores: [],  
     editandoId: null,
-    generosList: [],
-    atoresList: [],
+    generosList: [], 
+    atoresList: [],  
     isModalVisible: false,
     modalData: [],
     modalTitle: '',
@@ -41,26 +41,25 @@ export default class MovieFormScreen extends React.Component {
         Ator.getAtoresFromFirebase(false)
       ]);
       this.setState({ generosList, atoresList });
-      return { generosList, atoresList }; 
     } catch (e) {
       console.error("Erro ao buscar opções:", e);
-      return { generosList: [], atoresList: [] }; 
     }
   };
 
   async componentDidMount() {
-    const { generosList, atoresList } = await this.fetchOptions(); 
+    await this.fetchOptions();
     const filmeParaEditar = this.props.route.params?.filme;
 
     if (filmeParaEditar) {
-      const generosSelecionados = generosList.filter(g => filmeParaEditar.genero_ids && filmeParaEditar.genero_ids[g.id]);
-      const atoresSelecionados = atoresList.filter(a => filmeParaEditar.ator_ids && filmeParaEditar.ator_ids[a.id]);
-
+      // ✅ VERSÃO CORRIGIDA
       this.setState({
         title: filmeParaEditar.title,
         poster_path: filmeParaEditar.poster_path,
-        generos: generosSelecionados,
-        atores: atoresSelecionados,
+        // 'generos' provavelmente já é o array de objetos, o que está correto.
+        generos: filmeParaEditar.generos || [],
+        // Use a propriedade que contém o ARRAY de objetos de ator.
+        // O nome pode ser 'elenco' ou outro que você tenha definido no modelo.
+        atores: filmeParaEditar.elenco || [], // <<<<< CORREÇÃO
         editandoId: filmeParaEditar.id,
       });
     }
@@ -71,17 +70,16 @@ export default class MovieFormScreen extends React.Component {
   handleSave = async () => {
     const { title, poster_path, generos, atores, editandoId } = this.state;
     if (!title || !poster_path || generos.length === 0 || atores.length === 0) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
-    try {
-      const genero_ids = generos.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
-      const ator_ids = atores.reduce((acc, curr) => ({ ...acc, [curr.id]: true }), {});
 
+    try {
       const dataToSave = {
         title,
         poster_path,
-        genero_ids,
-        ator_ids,
+        generos, 
+        atores,  
       };
 
       if (editandoId) {
