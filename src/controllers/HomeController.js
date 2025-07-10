@@ -42,7 +42,6 @@ export default class HomeController {
 
   getFiltros() {
   return [
-    { label: 'Todos', id: "Todos" },
     { label: 'Ação', id: 0 },
     { label: 'Comédia', id: 3 },
     { label: 'Terror', id: 10 },
@@ -65,13 +64,7 @@ export default class HomeController {
   }
 
   async getFilmesByPrimaryGenreId(genreId, limit = 100) {
-  if (genreId === "Todos") {
-    // Retorna todos os filmes sem filtro
-    return await Filme.getFilmesFromFirebase(limit);
-  } else {
-    // Filtra normalmente por gênero
-    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);
-  }
+    return await Filme.getFilmesByPrimaryGenreId(genreId, limit);r
   }
 
   async searchFilmesByName(searchTerm) {

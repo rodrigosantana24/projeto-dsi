@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 8,
-    minHeight: 440,
   },
   cinemaDetailCardContent: {
     flexGrow: 1, 
