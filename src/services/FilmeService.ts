@@ -1,6 +1,6 @@
 import { ref, set, push, remove, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
-import Filme from '../models/Filme';
+import { FilmeCriado } from '../models/FilmeCriado'; 
 import ICrud from './ICrud';
 
 export interface FilmeDTO {
@@ -8,7 +8,6 @@ export interface FilmeDTO {
   poster_path: string;
   genero_ids: { [key: string]: boolean };
   ator_ids: { [key: string]: boolean };
-  nativo?: boolean; 
 }
 
 export interface FilmeUpdateDTO extends FilmeDTO {
@@ -24,26 +23,50 @@ export interface FilmeReadParams {
 }
 
 export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, FilmeUpdateDTO, FilmeDeleteDTO> {
-  async create(data: FilmeDTO): Promise<any> {
+  
+  /**
+   * Cria um novo filme no banco de dados.
+   * @param data - Os dados do filme para criar.
+   * @returns O filme criado com seu ID.
+   */
+  async create(data: FilmeDTO): Promise<FilmeCriado> {
     const { title, poster_path, genero_ids, ator_ids } = data;
-    const filme = new Filme(null, title, poster_path, '', '', false, '', 0, 0, 0, '', '', 0, '', '', 0, 0, '', genero_ids, ator_ids);
+    
+    // A instância é criada apenas com os IDs, como deve ser para validação inicial.
+    const filme = new FilmeCriado(null, title, poster_path, genero_ids, ator_ids, false);
     
     if (!filme.isValid()) {
-      throw new Error('Dados do filme inválidos');
+      throw new Error('Dados do filme inválidos. Título, pôster, gêneros e atores são obrigatórios.');
     }
 
     const filmesCriadosRef = ref(database, 'filmes_criados');
     const newRef = push(filmesCriadosRef);
+    
+    // O método toFirebase() garante que apenas os IDs serão salvos.
     await set(newRef, filme.toFirebase());
-    return Filme.fromFirebase(newRef.key, { ...filme.toFirebase(), id: newRef.key });
+    
+    // Retorna a instância completa (ainda sem os objetos de gênero/ator populados, pois não é necessário aqui)
+    filme.id = newRef.key;
+    return filme;
   }
 
-  async read(params: FilmeReadParams): Promise<any> {
+  /**
+   * Lê a lista de filmes do banco de dados, populando os gêneros e atores.
+   * @param params - Opções de leitura, como o uso de cache.
+   * @returns Uma lista de instâncias de FilmeCriado com os dados completos.
+   */
+  async read(params: FilmeReadParams): Promise<FilmeCriado[]> {
     const { useCache = true } = params;
-    return await Filme.getFilmesCriadosFromFirebase(useCache);
+    // Este método já faz a "mágica" de transformar IDs em objetos.
+    return await FilmeCriado.getFilmesCriadosFromFirebase(useCache);
   }
 
-  async update(params: FilmeUpdateDTO): Promise<any> {
+  /**
+   * Atualiza um filme existente.
+   * @param params - Os dados do filme para atualizar, incluindo o ID.
+   * @returns A instância do filme atualizado.
+   */
+  async update(params: FilmeUpdateDTO): Promise<FilmeCriado> {
     const { id, title, poster_path, genero_ids, ator_ids } = params;
     const filmeRef = ref(database, `filmes_criados/${id}`);
     const snapshot = await get(filmeRef);
@@ -53,15 +76,25 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
     }
 
     const existingData = snapshot.val();
-    const filme = new Filme(id, title, poster_path, '', '', existingData.nativo, '', 0, 0, 0, '', '', 0, '', '', 0, 0, '', genero_ids, ator_ids);
+    const filme = new FilmeCriado(id, title, poster_path, genero_ids, ator_ids, existingData.nativo);
+
     if (!filme.isValid()) {
       throw new Error('Dados do filme inválidos');
     }
 
+    // toFirebase() garante que apenas os IDs sejam enviados para o banco.
     await set(filmeRef, filme.toFirebase());
+    
+    // Idealmente, após atualizar, você poderia querer retornar o filme com os atores/gêneros populados.
+    // Por simplicidade, retornamos a instância como está. Se precisar dos dados completos,
+    // seria necessário buscar os atores/gêneros novamente.
     return filme;
   }
 
+  /**
+   * Exclui um filme do banco de dados.
+   * @param params - O ID do filme a ser excluído.
+   */
   async delete(params: FilmeDeleteDTO): Promise<void> {
     const { id } = params;
     if (!id) throw new Error('ID do filme é necessário para excluir');
