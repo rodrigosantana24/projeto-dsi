@@ -1,6 +1,6 @@
 import { ref, set, push, remove, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
-import Filme from '../models/Filme';
+import { FilmeCriado } from '../models/FilmeCriado'; 
 import ICrud from './ICrud';
 
 export interface FilmeDTO {
@@ -8,7 +8,6 @@ export interface FilmeDTO {
   poster_path: string;
   genero_ids: { [key: string]: boolean };
   ator_ids: { [key: string]: boolean };
-  nativo?: boolean; 
 }
 
 export interface FilmeUpdateDTO extends FilmeDTO {
@@ -24,26 +23,32 @@ export interface FilmeReadParams {
 }
 
 export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, FilmeUpdateDTO, FilmeDeleteDTO> {
-  async create(data: FilmeDTO): Promise<any> {
+  async create(data: FilmeDTO): Promise<FilmeCriado> {
     const { title, poster_path, genero_ids, ator_ids } = data;
-    const filme = new Filme(null, title, poster_path, '', '', false, '', 0, 0, 0, '', '', 0, '', '', 0, 0, '', genero_ids, ator_ids);
+    // A instância é criada apenas com os IDs.
+    const filme = new FilmeCriado(null, title, poster_path, genero_ids, ator_ids, false);
     
     if (!filme.isValid()) {
-      throw new Error('Dados do filme inválidos');
+      throw new Error('Dados do filme inválidos. Título, pôster, gêneros e atores são obrigatórios.');
     }
 
     const filmesCriadosRef = ref(database, 'filmes_criados');
     const newRef = push(filmesCriadosRef);
+    
+    // O método toFirebase() garante que apenas os IDs serão salvos.
     await set(newRef, filme.toFirebase());
-    return Filme.fromFirebase(newRef.key, { ...filme.toFirebase(), id: newRef.key });
+
+    filme.id = newRef.key;
+    return filme;
   }
 
-  async read(params: FilmeReadParams): Promise<any> {
+  async read(params: FilmeReadParams): Promise<FilmeCriado[]> {
     const { useCache = true } = params;
-    return await Filme.getFilmesCriadosFromFirebase(useCache);
+    // Este método transforma OS IDs de Gênero e Ator em objetos.
+    return await FilmeCriado.getFilmesCriadosFromFirebase(useCache);
   }
 
-  async update(params: FilmeUpdateDTO): Promise<any> {
+  async update(params: FilmeUpdateDTO): Promise<FilmeCriado> {
     const { id, title, poster_path, genero_ids, ator_ids } = params;
     const filmeRef = ref(database, `filmes_criados/${id}`);
     const snapshot = await get(filmeRef);
@@ -53,11 +58,13 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
     }
 
     const existingData = snapshot.val();
-    const filme = new Filme(id, title, poster_path, '', '', existingData.nativo, '', 0, 0, 0, '', '', 0, '', '', 0, 0, '', genero_ids, ator_ids);
+    const filme = new FilmeCriado(id, title, poster_path, genero_ids, ator_ids, existingData.nativo);
+
     if (!filme.isValid()) {
       throw new Error('Dados do filme inválidos');
     }
 
+    // toFirebase() garante que apenas os IDs sejam enviados para o banco.
     await set(filmeRef, filme.toFirebase());
     return filme;
   }
