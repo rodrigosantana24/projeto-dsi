@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Toast from 'react-native-toast-message';
 
 const ScheduleFormScreen = ({ route, navigation }) => {
+  // agendamento agora tem filmeId no banco, mas Agendamento.fromFirebase hidrata em agendamento.filme
   const agendamento = route.params?.agendamento || null;
   const isEdit = !!agendamento;
   const service = new AgendamentoService();
@@ -21,10 +22,16 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     return null;
   }
 
+  // Alteração: filmeSelecionado agora armazena id, title E poster_path,
+  // pois isso será passado para o AgendamentoService.
   const [filmeSelecionado, setFilmeSelecionado] = useState(
-    agendamento && agendamento.filme 
-      ? { id: agendamento.filme.id, title: agendamento.filme.title, poster_path: agendamento.filme.poster_path }
-      : { id: '', title: '', poster_path: '' } 
+    agendamento && agendamento.filme // Verifica se o objeto filme hidratado existe
+      ? { 
+          id: agendamento.filme.id, 
+          title: agendamento.filme.title, 
+          poster_path: agendamento.filme.poster_path 
+        } // Pega ID, TÍTULO e POSTER_PATH do objeto hidratado
+      : { id: '', title: '', poster_path: '' } // Inicializa com todos os campos vazios
   );
 
   const [data, setData] = useState(agendamento ? formatarData(agendamento.data) : '');
@@ -42,6 +49,7 @@ const ScheduleFormScreen = ({ route, navigation }) => {
   }
 
   const salvar = async () => {
+    // Alteração: Valida se todos os campos essenciais do filmeSelecionado estão preenchidos
     if (!filmeSelecionado.id || !filmeSelecionado.title || !filmeSelecionado.poster_path || !data || !hora) {
       Toast.show({
         type: 'error',
@@ -89,17 +97,18 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     }
 
     try {
+      // Alteração: Passa o objeto filmeSelecionado COMPLETO para o serviço
       const agendamentoData = {
         userId,
-        filme: filmeSelecionado, 
+        filme: filmeSelecionado, // Passa o objeto filme completo (id, title, poster_path)
         data: dataISO,
         hora,
       };
 
       if (isEdit) {
         await service.update({
-          ...agendamentoData, 
-          id: agendamento.id, 
+          ...agendamentoData,
+          id: agendamento.id,
         });
       } else {
         await service.create(agendamentoData);
@@ -114,7 +123,7 @@ const ScheduleFormScreen = ({ route, navigation }) => {
       console.error(error);
       Toast.show({
         type: 'error',
-        text1: `Erro ao salvar agendamento: ${error.message}`, 
+        text1: `Erro ao salvar agendamento: ${error.message}`,
         visibilityTime: 3000,
       });
     }
