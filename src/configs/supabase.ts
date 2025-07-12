@@ -6,6 +6,6 @@ console.log(supabasekey);
 
 
 export const supabase = createClient(
-    'url',
-    'key'
+    'https://lzmqjagqaeszfztbcdrv.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx6bXFqYWdxYWVzemZ6dGJjZHJ2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTIyNTQwNTIsImV4cCI6MjA2NzgzMDA1Mn0.nDdrS3KhfivFRqStK0XvsNGUDxvnYDKfJ4Do_leQ_Hs'
 ) 
