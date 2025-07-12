@@ -15,6 +15,8 @@ import { signOut } from 'firebase/auth';
 import { auth, database } from '../configs/firebaseConfig';
 import { ref, get } from 'firebase/database';
 import CustomModal from '../components/modal/CustomModal';
+import ProfileImage from '../components/cards/ProfileImage';
+import { supabase } from '../configs/supabase';
 
 
 const ProfileScreen = () => {
@@ -62,7 +64,7 @@ const ProfileScreen = () => {
             <Text style={styles.username}>{userName}</Text>
             <Text style={styles.email}>{userCredentials.email}</Text>
           </View>
-          <Logo style={{ width: 100, height: 100 }} />
+          <ProfileImage></ProfileImage>
         </View>
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
