@@ -13,17 +13,20 @@ const ScheduleFormScreen = ({ route, navigation }) => {
 
   if (!userId) {
     Toast.show({
-            type: 'error',
-            text1: 'Usuário não identificado',
-            visibilityTime: 3000,
-          })
+      type: 'error',
+      text1: 'Usuário não identificado',
+      visibilityTime: 3000,
+    });
     navigation.goBack();
     return null;
   }
 
   const [filmeSelecionado, setFilmeSelecionado] = useState(
-    agendamento ? { id: '', title: agendamento.filmeId || '' } : { id: '', title: '' }
+    agendamento && agendamento.filme 
+      ? { id: agendamento.filme.id, title: agendamento.filme.title, poster_path: agendamento.filme.poster_path }
+      : { id: '', title: '', poster_path: '' } 
   );
+
   const [data, setData] = useState(agendamento ? formatarData(agendamento.data) : '');
   const [hora, setHora] = useState(agendamento?.hora || '');
 
@@ -39,42 +42,42 @@ const ScheduleFormScreen = ({ route, navigation }) => {
   }
 
   const salvar = async () => {
-    if (!filmeSelecionado.title || !data || !hora) {
+    if (!filmeSelecionado.id || !filmeSelecionado.title || !filmeSelecionado.poster_path || !data || !hora) {
       Toast.show({
-            type: 'error',
-            text1: 'Preencha todos os campos',
-            visibilityTime: 3000,
-          })
+        type: 'error',
+        text1: 'Preencha todos os campos obrigatórios (Filme, Data, Hora).',
+        visibilityTime: 3000,
+      });
       return;
     }
 
     const regexData = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     if (!regexData.test(data)) {
       Toast.show({
-            type: 'error',
-            text1: 'Data inválida! Use DD/MM/AAAA',
-            visibilityTime: 3000,
-          })
-      setData('')
+        type: 'error',
+        text1: 'Data inválida! Use DD/MM/AAAA',
+        visibilityTime: 3000,
+      });
+      setData('');
       return;
     }
 
     if (!/^([0-1]\d|2[0-3]):([0-5]\d)$/.test(hora)) {
       Toast.show({
-            type: 'error',
-            text1: 'Hora inválida! use HH:mm',
-            visibilityTime: 3000,
-          })
-      setHora('')
+        type: 'error',
+        text1: 'Hora inválida! use HH:mm',
+        visibilityTime: 3000,
+      });
+      setHora('');
       return;
     }
 
     const dataISO = formatarDataISO(data);
 
     const [day, month, year] = data.split('/').map(Number);
-    const selectedDate = new Date(year, month - 1, day); 
+    const selectedDate = new Date(year, month - 1, day);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); 
+    today.setHours(0, 0, 0, 0);
 
     if (selectedDate < today) {
       Toast.show({
@@ -86,35 +89,34 @@ const ScheduleFormScreen = ({ route, navigation }) => {
     }
 
     try {
+      const agendamentoData = {
+        userId,
+        filme: filmeSelecionado, 
+        data: dataISO,
+        hora,
+      };
+
       if (isEdit) {
         await service.update({
-          id: agendamento.id,
-          userId: agendamento.userId,
-          filmeId: filmeSelecionado.title,
-          data: dataISO,
-          hora,
+          ...agendamentoData, 
+          id: agendamento.id, 
         });
       } else {
-        await service.create({
-          userId,
-          filmeId: filmeSelecionado.title,
-          data: dataISO,
-          hora,
-        });
+        await service.create(agendamentoData);
       }
       Toast.show({
-            type: 'success',
-            text1: 'Agendamento feito com sucesso',
-            visibilityTime: 3000,
-          })
+        type: 'success',
+        text1: 'Agendamento feito com sucesso',
+        visibilityTime: 3000,
+      });
       navigation.goBack();
     } catch (error) {
       console.error(error);
       Toast.show({
-            type: 'error',
-            text1: 'Erro ao salvar agendamento',
-            visibilityTime: 3000,
-          })
+        type: 'error',
+        text1: `Erro ao salvar agendamento: ${error.message}`, 
+        visibilityTime: 3000,
+      });
     }
   };
 
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start", 
+    justifyContent: "flex-start",
     gap: 12,
     marginBottom: 5,
     marginTop: 20,
