@@ -49,18 +49,15 @@ export default class MovieFormScreen extends React.Component {
   };
 
   async componentDidMount() {
-    const { generosList, atoresList } = await this.fetchOptions(); 
+    await this.fetchOptions(); 
     const filmeParaEditar = this.props.route.params?.filme;
 
     if (filmeParaEditar) {
-      const generosSelecionados = generosList.filter(g => filmeParaEditar.genero_ids && filmeParaEditar.genero_ids[g.id]);
-      const atoresSelecionados = atoresList.filter(a => filmeParaEditar.ator_ids && filmeParaEditar.ator_ids[a.id]);
-
       this.setState({
         title: filmeParaEditar.title,
         poster_path: filmeParaEditar.poster_path,
-        generos: generosSelecionados,
-        atores: atoresSelecionados,
+        generos: filmeParaEditar.generos || [],
+        atores: filmeParaEditar.atores || [],
         editandoId: filmeParaEditar.id,
       });
     }

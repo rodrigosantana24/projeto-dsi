@@ -32,7 +32,6 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
         Ator.getAtoresFromFirebase()
     ]);
 
-    // Filtra para encontrar os objetos completos que correspondem aos IDs recebidos
     const generosDoFilme = todosGeneros.filter(g => g.id && genero_ids[g.id]);
     const atoresDoFilme = todosAtores.filter(a => a.id && ator_ids[a.id]);
 
@@ -50,7 +49,7 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
       throw new Error('Dados do filme inválidos. Título, pôster, gêneros e atores são obrigatórios.');
     }
 
-    // 4. Salva no Firebase apenas os IDs
+    // Salva no Firebase apenas os IDs
     const filmesCriadosRef = ref(database, 'filmes_criados');
     const newRef = push(filmesCriadosRef);
     await set(newRef, filme.toFirebase());
@@ -81,10 +80,8 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
 
     const generosDoFilme = todosGeneros.filter(g => g.id && genero_ids[g.id]);
     const atoresDoFilme = todosAtores.filter(a => a.id && ator_ids[a.id]);
-
     const existingData = snapshot.val();
     
-    // Instancia o filme com os arrays de objetos Ator e Genero
     const filme = new FilmeCriado(
       id, 
       title, 
@@ -98,10 +95,7 @@ export default class FilmeService implements ICrud<FilmeDTO, FilmeReadParams, Fi
       throw new Error('Dados do filme inválidos');
     }
 
-    // O método toFirebase() garante que apenas os IDs sejam enviados para o banco
     await set(filmeRef, filme.toFirebase());
-    
-    // Retorna a instância completa
     return filme;
   }
 
