@@ -16,6 +16,7 @@ import getNickName from '../services/getNickName';
 import FriendNickName from '../components/FriendNickName';
 import {Alert} from 'react-native';
 import Toast from 'react-native-toast-message';
+import FriendProfileImage from '../components/cards/FriendProfileImage';
 
 const amigoService = new AmigosService();
 
@@ -69,16 +70,20 @@ export default function FriendList() {
         ) : (
           filteredFriends.map((amigo) => (
             <View key={amigo.uid} style={styles.friendBlock}>
+              
               <View style={styles.friendHeader}>
-                <Text style={styles.friendName}>{amigo.name}</Text>
+                <FriendProfileImage friendId={amigo.uid} />
+                  <View style={styles.friendInfo}>
+                    <Text style={styles.friendName}>{amigo.name}</Text>
+                    <Text style={styles.friendEmail}>{amigo.email}</Text>
+                </View>
                 <TouchableOpacity
                   onPress={() => handleRemover({ userId: userCredentials.uid, friendEmail: amigo.email })}
                   style={styles.removeButton}
                 >
-                  <MaterialIcons name="delete" size={28} color="#f4a03f" />
+                  <MaterialIcons name="delete" size={30} color="#f4a03f" />
                 </TouchableOpacity>
               </View>
-              <Text style={styles.friendEmail}>{amigo.email}</Text>
 
               <FriendNickName
                 userId={userCredentials.uid}
@@ -136,7 +141,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   friendEmail: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#f4a03f',
     marginBottom: 15,
   },
@@ -215,7 +220,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   removeButton: {
+    marginLeft: 10,
     padding: 5,
+  },
+  friendHeader : {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+  },
+  friendInfo: {
+    flex: 1,
+    marginLeft: 10,
   },
 });
 
