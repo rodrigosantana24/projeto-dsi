@@ -1,7 +1,9 @@
 import { ref, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
+import Filme from './Filme'; 
 
 export default class Agendamento {
+  
   constructor(id, userId, data, hora, filme) {
     this.id = id;
     this.userId = userId;
@@ -15,10 +17,8 @@ export default class Agendamento {
       this.userId &&
       this.data &&
       this.hora &&
-      this.filme &&
-      this.filme.id &&
-      this.filme.title &&
-      this.filme.poster_path
+      this.filme && 
+      this.filme.id 
     );
   }
 
@@ -26,26 +26,28 @@ export default class Agendamento {
     return {
       data: this.data,
       hora: this.hora,
-      filme: {
-        id: this.filme.id,
-        title: this.filme.title,
-        poster_path: this.filme.poster_path,
-      },
+      filmeId: this.filme.id,
     };
   }
 
-  static fromFirebase(id, userId, data) {
-    const filmeData = data.filme || {}; 
+  static async fromFirebase(id, userId, data) {
+    const filmeIdDoBanco = data.filmeId; 
+    let filmeCompleto = null;
+
+    if (filmeIdDoBanco) {
+      try {
+        filmeCompleto = await Filme.getById(filmeIdDoBanco);
+      } catch (error) {
+        filmeCompleto = { id: filmeIdDoBanco, title: 'Filme (Erro/Não encontrado)', poster_path: '' };
+      }
+    }
+
     return new Agendamento(
       id,
       userId,
       data.data,
       data.hora,
-      {
-        id: filmeData.id,
-        title: filmeData.title,
-        poster_path: filmeData.poster_path,
-      } 
+      filmeCompleto 
     );
   }
 
@@ -54,8 +56,9 @@ export default class Agendamento {
     if (!snapshot.exists()) return [];
 
     const data = snapshot.val();
-    return Object.entries(data).map(
+    const agendamentosPromises = Object.entries(data).map(
       ([id, agendamentoData]) => Agendamento.fromFirebase(id, userId, agendamentoData)
     );
+    return Promise.all(agendamentosPromises);
   }
 }

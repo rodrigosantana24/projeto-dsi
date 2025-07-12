@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  Image, 
   TouchableWithoutFeedback,
   Keyboard,
   Dimensions,
@@ -41,7 +42,23 @@ const AgendamentoForm = ({
   const [dataError, setDataError] = useState(false);
   const [horaError, setHoraError] = useState(false);
 
+
+  const [posterUrl, setPosterUrl] = useState(null);
+
   const isSelectingFilmRef = useRef(false);
+
+  useEffect(() => {
+    if (filmeSelecionado?.id) {
+      setBuscaFilme(filmeSelecionado.title);
+      setFilmeError(false);
+
+      const filmeInstance = new Filme(null, null, filmeSelecionado.poster_path);
+      setPosterUrl(filmeInstance.getImageUrl());
+    } else {
+      setBuscaFilme('');
+      setPosterUrl(null);
+    }
+  }, [filmeSelecionado]); 
 
   useEffect(() => {
     if (!buscaFilme.trim()) {
@@ -65,15 +82,6 @@ const AgendamentoForm = ({
     };
   }, [buscaFilme]);
 
-  useEffect(() => {
-    if (filmeSelecionado?.title && buscaFilme === '' && !isSelectingFilmRef.current) {
-      setBuscaFilme(filmeSelecionado.title);
-      setFilmeError(false);
-    } else if (!filmeSelecionado?.title && buscaFilme !== '' && !isSelectingFilmRef.current) {
-      setBuscaFilme('');
-    }
-  }, [filmeSelecionado]);
-
 
   const buscarFilmes = async () => {
     setBuscandoFilmes(true);
@@ -81,7 +89,7 @@ const AgendamentoForm = ({
       const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
       setFilmesFiltrados(todos);
       setFilmesPagina(todos.slice(0, PAGE_SIZE));
-      
+
       const isAlreadySelected = filmeSelecionado?.id && todos.some(f => f.id === filmeSelecionado.id);
       if (todos.length > 0 && buscaFilme.trim().length > 0 && !isAlreadySelected) {
         setDropdownVisible(true);
@@ -112,9 +120,12 @@ const AgendamentoForm = ({
     onChangeFilmeSelecionado({
       id: filme.id,
       title: filme.title,
-      poster_path: filme.poster_path
+      poster_path: filme.poster_path 
     });
     setBuscaFilme(filme.title); 
+    
+    setPosterUrl(filme.getImageUrl());
+
     setFilmesFiltrados([]);
     setFilmesPagina([]);
     setDropdownVisible(false);
@@ -159,6 +170,7 @@ const AgendamentoForm = ({
     setDropdownVisible(false);
     Keyboard.dismiss();
     if (!filmeSelecionado?.id) {
+        onChangeFilmeSelecionado({ id: '', title: '', poster_path: '' }); 
         setBuscaFilme('');
     } else if (buscaFilme !== filmeSelecionado.title) {
       setBuscaFilme(filmeSelecionado.title);
@@ -238,7 +250,7 @@ const AgendamentoForm = ({
                   setBuscaFilme(text);
                   setDropdownVisible(true);
                   if (filmeSelecionado?.id && text !== filmeSelecionado.title) {
-                      onChangeFilmeSelecionado({ id: '', title: '', poster_path: '' }); 
+                      onChangeFilmeSelecionado({ id: '', title: '', poster_path: '' });
                   }
                 }}
                 onFocus={() => {
@@ -288,6 +300,17 @@ const AgendamentoForm = ({
                 </View>
               )}
             </View>
+            {posterUrl && (
+              <View style={styles.posterPreviewContainer}>
+                <Text style={styles.label}>Filme Selecionado:</Text>
+                <Image
+                  source={{ uri: posterUrl }}
+                  style={styles.posterPreviewImage}
+                  resizeMode="cover"
+                />
+                <Text style={styles.posterPreviewTitle}>{filmeSelecionado.title}</Text>
+              </View>
+            )}
 
             <Text style={styles.label}>Data (DD/MM/AAAA)</Text>
             <TextInput
@@ -492,6 +515,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 17,
     letterSpacing: 0.5,
+  },
+  posterPreviewContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+    backgroundColor: '#18394a',
+    borderRadius: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#3d5564',
+  },
+  posterPreviewImage: {
+    width: 100,
+    height: 150, 
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  posterPreviewTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
