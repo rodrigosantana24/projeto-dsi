@@ -45,11 +45,10 @@ export default class Agendamento {
         id: filmeData.id,
         title: filmeData.title,
         poster_path: filmeData.poster_path,
-      } // Passa o objeto filme
+      } 
     );
   }
 
-  // O método getByUser não precisa de muitas mudanças, pois ele chama fromFirebase
   static async getByUser(userId) {
     const snapshot = await get(ref(database, `agendamentos/${userId}`));
     if (!snapshot.exists()) return [];
