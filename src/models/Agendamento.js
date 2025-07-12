@@ -2,28 +2,51 @@ import { ref, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Agendamento {
-  constructor(id, userId, data, hora, filmeId) {
+  constructor(id, userId, data, hora, filme) {
     this.id = id;
     this.userId = userId;
     this.data = data;
     this.hora = hora;
-    this.filmeId = filmeId;
+    this.filme = filme; 
   }
 
   isValid() {
-    return !!(this.userId && this.data && this.hora && this.filmeId);
+    return !!(
+      this.userId &&
+      this.data &&
+      this.hora &&
+      this.filme &&
+      this.filme.id &&
+      this.filme.title &&
+      this.filme.poster_path
+    );
   }
 
   toFirebase() {
     return {
       data: this.data,
       hora: this.hora,
-      filmeId: this.filmeId,
+      filme: {
+        id: this.filme.id,
+        title: this.filme.title,
+        poster_path: this.filme.poster_path,
+      },
     };
   }
 
   static fromFirebase(id, userId, data) {
-    return new Agendamento(id, userId, data.data, data.hora, data.filmeId);
+    const filmeData = data.filme || {}; 
+    return new Agendamento(
+      id,
+      userId,
+      data.data,
+      data.hora,
+      {
+        id: filmeData.id,
+        title: filmeData.title,
+        poster_path: filmeData.poster_path,
+      } 
+    );
   }
 
   static async getByUser(userId) {

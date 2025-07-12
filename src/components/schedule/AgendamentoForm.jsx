@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  FlatList,
   TouchableWithoutFeedback,
   Keyboard,
   Dimensions,
@@ -16,15 +15,14 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import Filme from '../../models/Filme';
-
+import Filme from '../../models/Filme'; 
 
 const PAGE_SIZE = 20;
 const { width } = Dimensions.get('window');
 
 const AgendamentoForm = ({
-  filmeSelecionado,
-  onChangeFilmeSelecionado,
+  filmeSelecionado, 
+  onChangeFilmeSelecionado, 
   data,
   onChangeData,
   hora,
@@ -76,13 +74,15 @@ const AgendamentoForm = ({
     }
   }, [filmeSelecionado]);
 
+
   const buscarFilmes = async () => {
     setBuscandoFilmes(true);
     try {
       const todos = await Filme.getFilmesFirebaseFiltrados(buscaFilme.trim());
       setFilmesFiltrados(todos);
       setFilmesPagina(todos.slice(0, PAGE_SIZE));
-      const isAlreadySelected = filmeSelecionado?.title === buscaFilme && todos.some(f => f.id === filmeSelecionado.id);
+      
+      const isAlreadySelected = filmeSelecionado?.id && todos.some(f => f.id === filmeSelecionado.id);
       if (todos.length > 0 && buscaFilme.trim().length > 0 && !isAlreadySelected) {
         setDropdownVisible(true);
       } else {
@@ -109,8 +109,12 @@ const AgendamentoForm = ({
 
   const selecionarFilme = (filme) => {
     isSelectingFilmRef.current = true;
-    onChangeFilmeSelecionado({ id: filme.id, title: filme.title });
-    setBuscaFilme(filme.title);
+    onChangeFilmeSelecionado({
+      id: filme.id,
+      title: filme.title,
+      poster_path: filme.poster_path
+    });
+    setBuscaFilme(filme.title); 
     setFilmesFiltrados([]);
     setFilmesPagina([]);
     setDropdownVisible(false);
@@ -128,7 +132,7 @@ const AgendamentoForm = ({
     setDataError(false);
     setHoraError(false);
 
-    if (!filmeSelecionado?.id) {
+    if (!filmeSelecionado?.id || !filmeSelecionado?.title || !filmeSelecionado?.poster_path) {
       setFilmeError(true);
       hasError = true;
     }
@@ -157,7 +161,7 @@ const AgendamentoForm = ({
     if (!filmeSelecionado?.id) {
         setBuscaFilme('');
     } else if (buscaFilme !== filmeSelecionado.title) {
-        setBuscaFilme(filmeSelecionado.title);
+      setBuscaFilme(filmeSelecionado.title);
     }
   };
 
@@ -192,13 +196,13 @@ const AgendamentoForm = ({
     onChangeHora(formattedText);
   };
 
-  const keyboardVerticalOffsetValue = Platform.OS === 'ios' ? 100 : 120; 
+  const keyboardVerticalOffsetValue = Platform.OS === 'ios' ? 100 : 120;
 
   return (
     <KeyboardAvoidingView
       style={styles.fullScreenContainer}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={keyboardVerticalOffsetValue} 
+      keyboardVerticalOffset={keyboardVerticalOffsetValue}
     >
       <TouchableWithoutFeedback onPress={dismissDropdown}>
         <ScrollView
@@ -234,7 +238,7 @@ const AgendamentoForm = ({
                   setBuscaFilme(text);
                   setDropdownVisible(true);
                   if (filmeSelecionado?.id && text !== filmeSelecionado.title) {
-                      onChangeFilmeSelecionado(null);
+                      onChangeFilmeSelecionado({ id: '', title: '', poster_path: '' }); 
                   }
                 }}
                 onFocus={() => {
@@ -243,7 +247,7 @@ const AgendamentoForm = ({
                         setDropdownVisible(true);
                     } else {
                         setBuscaFilme('');
-                        onChangeFilmeSelecionado(null);
+                        onChangeFilmeSelecionado({ id: '', title: '', poster_path: '' });
                         setDropdownVisible(true);
                     }
                 }}
@@ -263,7 +267,7 @@ const AgendamentoForm = ({
                         <TouchableOpacity
                           key={item.id}
                           style={styles.dropdownOption}
-                          onPress={() => selecionarFilme(item)}
+                          onPress={() => selecionarFilme(item)} 
                         >
                           <Text style={styles.dropdownOptionText}>{item.title}</Text>
                         </TouchableOpacity>
