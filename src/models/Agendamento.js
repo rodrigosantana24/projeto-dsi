@@ -2,17 +2,15 @@ import { ref, get } from 'firebase/database';
 import { database } from '../configs/firebaseConfig';
 
 export default class Agendamento {
-  // Alteração: filme agora é um objeto com id, title, poster_path
   constructor(id, userId, data, hora, filme) {
     this.id = id;
     this.userId = userId;
     this.data = data;
     this.hora = hora;
-    this.filme = filme; // Agora armazena o objeto filme
+    this.filme = filme; 
   }
 
   isValid() {
-    // Valida se o objeto filme e seus campos essenciais existem
     return !!(
       this.userId &&
       this.data &&
@@ -28,7 +26,6 @@ export default class Agendamento {
     return {
       data: this.data,
       hora: this.hora,
-      // Alteração: Salva o objeto filme com id, title e poster_path
       filme: {
         id: this.filme.id,
         title: this.filme.title,
@@ -38,8 +35,6 @@ export default class Agendamento {
   }
 
   static fromFirebase(id, userId, data) {
-    // Alteração: Recupera o objeto filme do Firebase
-    // Garante que data.filme exista antes de acessar suas propriedades
     const filmeData = data.filme || {}; 
     return new Agendamento(
       id,
