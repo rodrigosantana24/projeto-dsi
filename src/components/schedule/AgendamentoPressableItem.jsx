@@ -1,7 +1,7 @@
 import React from 'react';
-import { Pressable, Text, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
-
+import { Pressable, Text, StyleSheet, Image, View } from 'react-native'; 
+import { useNavigation } from '@react-navigation/native';
+import Filme from '../../models/Filme'; 
 
 const formatarData = (dataISO) => {
   if (!dataISO) return "";
@@ -11,13 +11,18 @@ const formatarData = (dataISO) => {
 };
 
 function AgendamentoPressableItem({ item, swipeRefs }) {
-  const navigation = useNavigation(); 
+  const navigation = useNavigation();
+
+  const filmeTitle = item.filme?.title || 'Filme Desconhecido';
+  const filmePosterPath = item.filme?.poster_path || null;
+  
+  const imageUrl = filmePosterPath ? new Filme(null, null, filmePosterPath).getImageUrl() : null;
 
   return (
     <Pressable
       style={({ pressed }) => [
         itemStyles.rowFront,
-        { transform: [{ scale: pressed ? 1.02 : 1 }] } 
+        { transform: [{ scale: pressed ? 1.02 : 1 }] }
       ]}
       onPress={() => {
         if (swipeRefs && swipeRefs.current[item.id]) {
@@ -26,9 +31,20 @@ function AgendamentoPressableItem({ item, swipeRefs }) {
         navigation.navigate("ScheduleFormScreen", { agendamento: item });
       }}
     >
-      <Text style={itemStyles.cardTitle}>🎬 Filme: {typeof item.filmeId === 'object' ? item.filmeId.title : item.filmeId}</Text>
-      <Text style={itemStyles.cardText}>📅 Data: {formatarData(item.data)}</Text>
-      <Text style={itemStyles.cardText}>⏰ Hora: {item.hora}</Text>
+      <View style={itemStyles.contentContainer}>
+        {imageUrl && (
+          <Image
+            source={{ uri: imageUrl }}
+            style={itemStyles.posterImage}
+            resizeMode="cover"
+          />
+        )}
+        <View style={itemStyles.textContainer}>
+          <Text style={itemStyles.cardTitle}>🎬 Filme: {filmeTitle}</Text>
+          <Text style={itemStyles.cardText}>📅 Data: {formatarData(item.data)}</Text>
+          <Text style={itemStyles.cardText}>⏰ Hora: {item.hora}</Text>
+        </View>
+      </View>
     </Pressable>
   );
 }
@@ -39,6 +55,23 @@ const itemStyles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     padding: 16,
+    flexDirection: 'row', 
+    alignItems: 'center', 
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1, 
+  },
+  posterImage: {
+    width: 60, 
+    height: 90, 
+    borderRadius: 6,
+    marginRight: 12,
+    backgroundColor: '#072330', 
+  },
+  textContainer: {
+    flex: 1, 
   },
   cardTitle: {
     fontSize: 16,
