@@ -169,38 +169,4 @@ export default class Filme {
       ([id, filmeData]) => Filme.fromFirebase(id, filmeData)
     );
   }
-
-  static async getFilmesCriadosFromFirebase(useCache = true) {
-    const filmesRef = ref(database, 'filmes_criados');
-    const snapshot = await get(filmesRef);
-    if (!snapshot.exists()) {
-      return [];
-    }
-    const [generos, atores] = await Promise.all([
-      Genero.getGenerosFromFirebase(false),
-      Ator.getAtoresFromFirebase(false)
-    ]);
-    const generosMap = generos.reduce((acc, g) => ({ ...acc, [g.id]: g.nome }), {});
-    const atoresMap = atores.reduce((acc, a) => ({ ...acc, [a.id]: a.nome }), {});
-    const data = snapshot.val();
-    const filmes = Object.entries(data).map(([id, filmeData]) => {
-      const filme = Filme.fromFirebase(id, filmeData);
-      
-      if (filme.genero_ids) {
-        filme.genero = Object.keys(filme.genero_ids)
-          .map(generoId => generosMap[generoId] || '')
-          .filter(Boolean)
-          .join(', ');
-      }
-      if (filme.ator_ids) {
-        filme.atores = Object.keys(filme.ator_ids)
-          .map(atorId => atoresMap[atorId] || '')
-          .filter(Boolean)
-          .join(', ');
-      }
-      return filme;
-    });
-
-    return filmes;
-  }
 }
