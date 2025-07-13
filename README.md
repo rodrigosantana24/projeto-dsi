@@ -26,6 +26,7 @@ Este projeto foi desenvolvido como parte da disciplina de Desenvolvimento de Sis
 | Nome                | E-mail                     |
 |---------------------|-----------------------------|
 | Victor de Souza     | victorsouza183@gmail.com   |
+| Gabriel Vinícius     | gabrielvto18@gmail.com   |
 
 
 
