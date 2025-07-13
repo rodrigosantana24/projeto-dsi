@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Modal, TouchableOpacity, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AmigosService from '../services/AmigosService';
-import { TouchableOpacity } from 'react-native';
 import getNickName from '../services/getNickName';
 
 const amigoService = new AmigosService();
+
 export default function FriendNickName({ userId, amigoId, style }) {
   const [nick, setNick] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [tempNick, setTempNick] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -19,9 +20,10 @@ export default function FriendNickName({ userId, amigoId, style }) {
     return () => { isMounted = false; };
   }, [userId, amigoId]);
 
-  const handleUpdate = async() => {
+  const handleUpdate = async () => {
     try {
-      if (!nick.trim() || nick.trim().length > 20) {
+      const trimmed = tempNick.trim();
+      if (!trimmed || trimmed.length > 20) {
         Toast.show({
           type: 'error',
           text1: 'O apelido não pode estar vazio e deve ter no máximo 20 caracteres'
@@ -31,15 +33,16 @@ export default function FriendNickName({ userId, amigoId, style }) {
 
       await amigoService.update({
         userId: userId,
-        nickName: nick,
+        nickName: trimmed,
         friendId: amigoId
       });
-      
+
+      setNick(trimmed);
       Toast.show({
         type: 'success',
         text1: 'Apelido atualizado com sucesso!'
       });
-      setIsEditing(false);
+      setModalVisible(false);
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -50,46 +53,97 @@ export default function FriendNickName({ userId, amigoId, style }) {
 
   return (
     <View>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>Apelido :</Text>
-      </View>
-      
-      {isEditing ? (
-        <TextInput 
-          style={[style, styles.input]}
-          value={nick}
-          onChangeText={setNick}
-          autoFocus
-          onSubmitEditing={handleUpdate}
-          onBlur={handleUpdate}
-        />
-      ) : (
-        <TouchableOpacity onPress={() => setIsEditing(true)}>
-          <Text style={style}>{nick || "Clique para adicionar apelido"} <MaterialIcons name="edit" size={16} color="#f4a03f" /></Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity onPress={() => {
+        setTempNick(nick);
+        setModalVisible(true);
+      }}>
+        <Text style={style}>
+          {nick || "Clique para adicionar apelido"} <MaterialIcons name="edit" size={16} color="#f4a03f" />
+        </Text>
+      </TouchableOpacity>
+
+      <Modal
+        animationType="slide"
+        transparent
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Editar apelido</Text>
+            <TextInput
+              style={styles.input}
+              value={tempNick}
+              onChangeText={setTempNick}
+              maxLength={20}
+              placeholder="Digite o apelido"
+              fontWeight = "bold"
+              placeholderTextColor={"white"}
+            />
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </Pressable>
+              <Pressable style={styles.saveButton} onPress={handleUpdate}>
+                <Text style={styles.buttonText}>Salvar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5
-  },
-  titleText: {
-    fontWeight: 'bold', 
-    color: 'white', 
-    fontSize: 16,
-    
-  },
   input: {
-    backgroundColor: 'white',
-    color: 'black',
-    padding: 8,
-    borderRadius: 4,
+    backgroundColor: '#fff',
+    color: '#000',
+    padding: 10,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#ccc'
+    borderColor: '#ccc',
+    width: '100%',
+    marginTop: 10
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#113342',
+    padding: 20,
+    borderRadius: 10
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color:"#ffffff"
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 20
+  },
+  cancelButton: {
+    marginRight: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: 'red',
+    borderRadius: 4
+  },
+  saveButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: '#f4a03f',
+    borderRadius: 4
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight : "bold"
   }
 });
